@@ -1,0 +1,12 @@
+# Entorno virtual (No se sube porque cada PC tiene el suyo)
+venv/
+
+# Archivos temporales de Python
+__pycache__/
+*.pyc
+
+# Base de datos local (Opcional, pero mejor no subirla para evitar conflictos)
+db.sqlite3
+
+# Archivos de configuración de VS Code
+.vscode/
