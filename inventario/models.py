@@ -30,6 +30,10 @@ class Proveedor(models.Model):
     activo = models.BooleanField(default=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        verbose_name = "Proveedor"
+        verbose_name_plural = "Proveedores"
+        
     def __str__(self):
         return self.razon_social
 
