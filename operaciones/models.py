@@ -8,7 +8,8 @@ class ListaServicio(models.Model):
     nombre_servicio = models.CharField(max_length=150)
     precio_base_mano_obra = models.DecimalField(max_digits=12, decimal_places=2)
     estado = models.BooleanField(default=True)
-
+    descripcion = models.TextField(blank=True, null=True)
+    
     class Meta:
         verbose_name = "Catálogo de Servicio"
         verbose_name_plural = "Catálogo de Servicios"
