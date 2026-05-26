@@ -10,6 +10,7 @@ class Cliente(models.Model):
     id_cliente = models.AutoField(primary_key=True)
     razon_social = models.CharField(max_length=150)
     tipo_documento = models.CharField(max_length=10, choices=TIPO_DOC_CHOICES, default='CC')
+    nombre = models.CharField(max_length=100, unique=True)
     numero_documento = models.CharField(max_length=20, unique=True)
     telefono = models.CharField(max_length=15)
     correo = models.EmailField(unique=True)
