@@ -127,8 +127,6 @@ class DetalleCompra(models.Model):
     subtotal = models.DecimalField(max_digits=12, decimal_places=2)
     lote = models.CharField(max_length=50, blank=True, null=True)
     fecha_vencimiento = models.DateField(blank=True, null=True)
-    
-    # Relaciones
     id_compra = models.ForeignKey(Compra, on_delete=models.CASCADE, related_name='detalles', db_column='id_compra')
     id_producto = models.ForeignKey(Producto, on_delete=models.CASCADE, db_column='id_producto')
 
