@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from gestion.models import Moto
+from gestion.models import Cliente, Moto 
 from inventario.models import Producto
 
 # Es el menú de trabajos que ofrece el taller.
@@ -59,3 +59,54 @@ class DetalleServicio(models.Model):
     class Meta:
         verbose_name = "Detalle del Servicio"
         verbose_name_plural = "Detalles de los Servicios"
+        
+
+# Cuando vendemos un repuesto a un cliente que no metió la moto al taller.
+class Venta(models.Model):
+    id_venta = models.AutoField(primary_key=True)
+    num_factura = models.IntegerField(unique=True)
+    fecha_venta = models.DateTimeField()
+    tipo_pago = models.CharField(max_length=90)
+    total = models.DecimalField(max_digits=10, decimal_places=0)
+    estado = models.BooleanField(default=True)
+    observacion = models.CharField(max_length=100, blank=True, null=True)
+    id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, db_column='id_cliente')
+    id_usuario = models.ForeignKey(User, on_delete=models.CASCADE, db_column='id_usuario')
+
+    class Meta:
+        verbose_name = "Venta"
+        verbose_name_plural = "Ventas"
+
+    def __str__(self):
+        return f"Factura {self.num_factura}"
+
+# La lista de productos que el cliente se llevó en la factura.
+class DetalleVenta(models.Model):
+    id_detalle_venta = models.AutoField(primary_key=True)
+    cantidad = models.IntegerField()
+    precio_unitario = models.DecimalField(max_digits=10, decimal_places=0)
+    total = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True)
+    tipo = models.CharField(max_length=90)
+    id_venta = models.ForeignKey(Venta, on_delete=models.CASCADE, related_name='detalles_venta', db_column='id_venta')
+    id_producto = models.ForeignKey(Producto, on_delete=models.CASCADE, db_column='id_producto')
+
+    class Meta:
+        verbose_name = "Detalle de Venta"
+        verbose_name_plural = "Detalles de Ventas"
+
+# Para llevar la cuenta de los clientes que fiaron (en taller o en mostrador).
+class CreditoPagado(models.Model):
+    id_credito = models.AutoField(primary_key=True)
+    monto_pago = models.DecimalField(max_digits=10, decimal_places=0)
+    fecha_pago = models.DateTimeField(null=True, blank=True)
+    metodo_pago = models.CharField(max_length=50)
+    saldo_anterior = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    saldo_actual = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    id_usuario = models.ForeignKey(User, on_delete=models.CASCADE, db_column='id_usuario')
+    id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, db_column='id_cliente')
+    id_venta = models.ForeignKey(Venta, on_delete=models.CASCADE, db_column='id_venta', null=True, blank=True)
+    id_servicio = models.ForeignKey(Servicio, on_delete=models.CASCADE, db_column='id_servicio', null=True, blank=True)
+
+    class Meta:
+        verbose_name = "Abono de Crédito"
+        verbose_name_plural = "Abonos de Créditos"        
