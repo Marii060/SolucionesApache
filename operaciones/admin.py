@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import ListaServicio, Servicio, DetalleServicio
+from .models import ListaServicio, Servicio, DetalleServicio, Venta, DetalleVenta, CreditoPagado
 
 #Permite agregar los repuestos y trabajos directamente dentro de la orden de servicio
 class DetalleServicioInline(admin.TabularInline):
@@ -26,3 +26,21 @@ class ServicioAdmin(admin.ModelAdmin):
 class ListaServicioAdmin(admin.ModelAdmin):
     list_display = ('nombre_servicio', 'precio_base_mano_obra', 'estado')
     search_fields = ('nombre_servicio',)
+
+# Esto permite agregar los productos directamente dentro de la factura de venta
+class DetalleVentaInline(admin.TabularInline):
+    model = DetalleVenta
+    extra = 1
+
+@admin.register(Venta)
+class VentaAdmin(admin.ModelAdmin):
+    list_display = ('num_factura', 'id_cliente', 'fecha_venta', 'total', 'tipo_pago')
+    list_filter = ('fecha_venta', 'tipo_pago')
+    search_fields = ('num_factura', 'id_cliente__razon_social', 'id_cliente__nombre')
+    inlines = [DetalleVentaInline]
+
+@admin.register(CreditoPagado)
+class CreditoPagadoAdmin(admin.ModelAdmin):
+    list_display = ('id_credito', 'id_cliente', 'monto_pago', 'fecha_pago', 'metodo_pago')
+    list_filter = ('fecha_pago', 'metodo_pago')
+    search_fields = ('id_cliente__razon_social', 'id_cliente__nombre')
