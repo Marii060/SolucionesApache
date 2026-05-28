@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from gestion.models import Moto
 from inventario.models import Producto
 
+# Es el menú de trabajos que ofrece el taller.
 class ListaServicio(models.Model):
     id_lista_servicio = models.AutoField(primary_key=True)
     nombre_servicio = models.CharField(max_length=150)
@@ -17,6 +18,7 @@ class ListaServicio(models.Model):
     def __str__(self):
         return self.nombre_servicio
 
+# El registro general cuando entra una moto a reparación.
 class Servicio(models.Model):
     ESTADO_CHOICES = [
         ('Pendiente', 'Pendiente'),
@@ -43,6 +45,7 @@ class Servicio(models.Model):
     def __str__(self):
         return f"Servicio {self.codigo_servicio} - {self.id_moto.placa}"
 
+# Aquí anotamos cada repuesto y trabajo gastado en la moto.
 class DetalleServicio(models.Model):
     id_detalle_servicio = models.AutoField(primary_key=True)
     id_servicio = models.ForeignKey(Servicio, on_delete=models.CASCADE, related_name='detalles', db_column='id_servicio')
