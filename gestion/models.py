@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 class Cliente(models.Model):
     TIPO_DOC_CHOICES = [
@@ -31,3 +32,28 @@ class Moto(models.Model):
 
     def __str__(self):
         return f"{self.placa} - {self.modelo}"
+    
+class Rol(models.Model):
+    id_rol = models.AutoField(primary_key=True)
+    nombre = models.CharField(max_length=100, unique=True)
+
+    class Meta:
+        verbose_name = "Rol de Usuario"
+        verbose_name_plural = "Roles de Usuarios"
+
+    def __str__(self):
+        return self.nombre
+
+class Log(models.Model):
+    id_log = models.AutoField(primary_key=True)
+    fecha_hora = models.DateTimeField(auto_now_add=True) # Django pone la fecha y hora automáticamente
+    accion_realizada = models.CharField(max_length=100)
+    descripcion = models.CharField(max_length=100, blank=True, null=True)
+    id_usuario = models.ForeignKey(User, on_delete=models.CASCADE, db_column='id_usuario')
+
+    class Meta:
+        verbose_name = "Registro de Sistema (Log)"
+        verbose_name_plural = "Registros de Sistema (Logs)"
+
+    def __str__(self):
+        return f"{self.fecha_hora} - {self.id_usuario.username}: {self.accion_realizada}"    
