@@ -1,4 +1,5 @@
-{% load static %} <!DOCTYPE html>
+{% load static %}
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -8,102 +9,83 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        body {
-            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url({% static 'img/fondo.jpg' %}) no-repeat center center fixed;
-            background-size: cover;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        body, html {
+            height: 100%;
             margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-image: url("{% static 'img/fondo.png' %}");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            display: flex;
+            align-items: center; 
+            justify-content: center;
+            font-family: 'Segoe UI', sans-serif;
         }
+
+
         .login-card {
-            width: 100%;
-            max-width: 420px;
-            padding: 3rem 2.5rem;
+            background-color: rgba(153, 148, 148, 0.95);
+            padding: 40px;
             border-radius: 20px;
-            background-color: rgba(255, 255, 255, 0.95); /* Blanco ligeramente transparente */
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            text-align: center;
         }
-        .avatar-icon {
-            font-size: 3rem;
-            color: #333;
-            margin-bottom: 10px;
-        }
+
         .text-title {
-            color: #333;
             font-weight: 800;
-            font-size: 1.8rem;
-            letter-spacing: 2px;
+            font-size: 1.6rem;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+        .text-subtitle {
+            color: #363535;
             margin-bottom: 30px;
         }
+
+        .input-group { margin-bottom: 20px; }
         .input-group-text {
-            background-color: transparent;
-            border-right: none;
-            color: #666;
+            background-color: #eee;
+            border: none;
+            border-radius: 30px 0 0 30px;
         }
         .form-control {
-            border-left: none;
-            background-color: transparent;
-        }
-        .form-control:focus {
-            box-shadow: none;
-            border-color: #ced4da;
-        }
-        .input-group {
-            border-bottom: 2px solid #ddd;
-            margin-bottom: 25px;
-        }
-        .input-group input {
+            background-color: #eee;
             border: none;
+            border-radius: 0 30px 30px 0;
+            padding: 12px;
         }
+        
         .btn-login {
-            background: linear-gradient(to right, #ff7b00, #ff9d00); /* El color naranja del botón */
+            background-color: #0d6efd;
             color: white;
             font-weight: bold;
-            letter-spacing: 1px;
-            border-radius: 30px; /* Botón en forma de píldora */
+            border-radius: 30px;
             padding: 12px;
+            width: 100%;
             border: none;
             transition: 0.3s;
         }
-        .btn-login:hover {
-            background: linear-gradient(to right, #e66a00, #ff7b00);
-            color: white;
-            transform: translateY(-2px);
-        }
-        .link-text {
-            color: #666;
+        .btn-login:hover { background-color: #0b5ed7; }
+        
+        .forgot-link {
+            display: block;
+            margin-top: 15px;
+            color: #0d6efd;
             text-decoration: none;
             font-size: 0.9rem;
-        }
-        .link-text:hover {
-            color: #ff7b00;
-        }
-        .social-icons {
-            font-size: 1.5rem;
-            margin: 0 10px;
-            color: #333;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .social-icons:hover {
-            color: #ff7b00;
         }
     </style>
 </head>
 <body>
 
-    <div class="login-card text-center">
-        <i class="fa-solid fa-circle-user avatar-icon"></i>
-        
-        <h2 class="text-title">INICIO DE SESIÓN</h2>
+    <div class="login-card">
+        <h2 class="text-title">BIENVENIDOS SOLUCIONES APACHE</h2>
+        <p class="text-subtitle">Inicia sesión para continuar</p>
 
         {% if form.errors %}
-            <div class="alert alert-danger small py-2" role="alert">
-                Usuario o contraseña incorrectos.
-            </div>
+            <div class="alert alert-danger small">Usuario o contraseña incorrectos.</div>
         {% endif %}
 
         <form method="post" action="{% url 'login' %}">
@@ -119,22 +101,7 @@
                 <input type="password" name="password" class="form-control" placeholder="Contraseña" required>
             </div>
 
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div class="form-check text-start">
-                    <input type="checkbox" class="form-check-input" id="recordarme">
-                    <label class="form-check-label link-text" for="recordarme">Recuérdame</label>
-                </div>
-                <a href="#" class="link-text">¿Olvidaste tu contraseña?</a>
-            </div>
-
-            <button type="submit" class="btn btn-login w-100 mb-4">LOGIN</button>
-            
-            <div class="mt-2">
-                <p class="link-text mb-2">O inicia sesión con</p>
-                <i class="fa-brands fa-google social-icons"></i>
-                <i class="fa-brands fa-facebook-f social-icons"></i>
-                <i class="fa-brands fa-twitter social-icons"></i>
-            </div>
+            <button type="submit" class="btn btn-login shadow">Iniciar sesión</button>
         </form>
     </div>
 
