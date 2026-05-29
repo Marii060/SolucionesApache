@@ -1,5 +1,6 @@
 from pathlib import Path
-import os
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -107,10 +108,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-SSTATICFILES_DIRS = [
+STATIC_URL = 'static/'
+
+# Le decimos a Django que busque imágenes en la carpeta "static"
+STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
-
 # CONFIGURACIÓN DE SEGURIDAD (LOGIN), A dónde ir después de iniciar sesión con éxito (por ahora a clientes, luego haremos el Dashboard)
 LOGIN_REDIRECT_URL = '/gestion/clientes/' 
 # A dónde ir después de cerrar sesión

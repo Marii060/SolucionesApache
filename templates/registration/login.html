@@ -1,53 +1,104 @@
-<!DOCTYPE html>
+{% load static %} <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Soluciones Apache</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* CSS para recrear tu Mockup */
         body {
-            background-color: #d1d5db; /* Fondo gris claro parecido a la imagen */
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url({% static 'img/fondo.jpg' %}) no-repeat center center fixed;
+            background-size: cover;
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         .login-card {
             width: 100%;
-            max-width: 400px;
-            padding: 2.5rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-            background-color: white;
+            max-width: 420px;
+            padding: 3rem 2.5rem;
+            border-radius: 20px;
+            background-color: rgba(255, 255, 255, 0.95); /* Blanco ligeramente transparente */
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        }
+        .avatar-icon {
+            font-size: 3rem;
+            color: #333;
+            margin-bottom: 10px;
         }
         .text-title {
-            color: #4f46e5;
-            font-weight: bold;
-        }
-        .btn-login {
-            background-color: #4f46e5;
-            color: white;
-            font-weight: 500;
-            border-radius: 8px;
-        }
-        .btn-login:hover {
-            background-color: #4338ca;
-            color: white;
+            color: #333;
+            font-weight: 800;
+            font-size: 1.8rem;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
         }
         .input-group-text {
-            background-color: #f3f4f6;
+            background-color: transparent;
+            border-right: none;
+            color: #666;
+        }
+        .form-control {
+            border-left: none;
+            background-color: transparent;
+        }
+        .form-control:focus {
+            box-shadow: none;
+            border-color: #ced4da;
+        }
+        .input-group {
+            border-bottom: 2px solid #ddd;
+            margin-bottom: 25px;
+        }
+        .input-group input {
+            border: none;
+        }
+        .btn-login {
+            background: linear-gradient(to right, #ff7b00, #ff9d00); /* El color naranja del botón */
+            color: white;
+            font-weight: bold;
+            letter-spacing: 1px;
+            border-radius: 30px; /* Botón en forma de píldora */
+            padding: 12px;
+            border: none;
+            transition: 0.3s;
+        }
+        .btn-login:hover {
+            background: linear-gradient(to right, #e66a00, #ff7b00);
+            color: white;
+            transform: translateY(-2px);
+        }
+        .link-text {
+            color: #666;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        .link-text:hover {
+            color: #ff7b00;
+        }
+        .social-icons {
+            font-size: 1.5rem;
+            margin: 0 10px;
+            color: #333;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .social-icons:hover {
+            color: #ff7b00;
         }
     </style>
 </head>
 <body>
 
     <div class="login-card text-center">
-        <h2 class="text-title mb-1">Bienvenidos a<br>Soluciones Apache</h2>
-        <p class="text-muted mb-4 mt-2">Inicia sesión para continuar</p>
+        <i class="fa-solid fa-circle-user avatar-icon"></i>
+        
+        <h2 class="text-title">INICIO DE SESIÓN</h2>
 
         {% if form.errors %}
             <div class="alert alert-danger small py-2" role="alert">
@@ -58,25 +109,31 @@
         <form method="post" action="{% url 'login' %}">
             {% csrf_token %}
             
-            <div class="input-group mb-3">
-                <span class="input-group-text">👤</span>
-                <input type="text" name="username" class="form-control bg-light" placeholder="Usuario" required autofocus>
+            <div class="input-group">
+                <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+                <input type="text" name="username" class="form-control" placeholder="Usuario" required autofocus>
             </div>
             
-            <div class="input-group mb-3">
-                <span class="input-group-text">🔒</span>
-                <input type="password" name="password" class="form-control bg-light" placeholder="Contraseña" required>
+            <div class="input-group">
+                <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                <input type="password" name="password" class="form-control" placeholder="Contraseña" required>
             </div>
 
-            <button type="submit" class="btn btn-login w-100 py-2 mb-3 mt-2">Iniciar Sesión</button>
-            
-            <div class="d-flex justify-content-between align-items-center mt-3">
+            <div class="d-flex justify-content-between align-items-center mb-4">
                 <div class="form-check text-start">
                     <input type="checkbox" class="form-check-input" id="recordarme">
-                    <label class="form-check-label small text-muted text-danger" for="recordarme">
-                        <span class="text-danger">✔</span> Recordarme
-                    </label>
+                    <label class="form-check-label link-text" for="recordarme">Recuérdame</label>
                 </div>
+                <a href="#" class="link-text">¿Olvidaste tu contraseña?</a>
+            </div>
+
+            <button type="submit" class="btn btn-login w-100 mb-4">LOGIN</button>
+            
+            <div class="mt-2">
+                <p class="link-text mb-2">O inicia sesión con</p>
+                <i class="fa-brands fa-google social-icons"></i>
+                <i class="fa-brands fa-facebook-f social-icons"></i>
+                <i class="fa-brands fa-twitter social-icons"></i>
             </div>
         </form>
     </div>
