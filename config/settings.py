@@ -119,3 +119,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+
+# CONFIGURACIÓN DE SEGURIDAD (LOGIN), A dónde ir después de iniciar sesión con éxito (por ahora a clientes, luego haremos el Dashboard)
+LOGIN_REDIRECT_URL = '/gestion/clientes/' 
+# A dónde ir después de cerrar sesión
+LOGOUT_REDIRECT_URL = '/cuentas/login/' 
+# A dónde enviar a los intrusos que intenten entrar sin sesión
+LOGIN_URL = '/cuentas/login/'
