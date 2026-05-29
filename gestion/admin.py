@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Cliente, Moto, Rol, Log
+from .models import Cliente, Moto, Rol, Log, Empleado
 
 # Esto permite que al abrir un cliente, veas y agregues sus motos ahí mismo.
 class MotoInline(admin.TabularInline):
@@ -39,3 +39,8 @@ class LogAdmin(admin.ModelAdmin):
     list_display = ('fecha_hora', 'id_usuario', 'accion_realizada')
     list_filter = ('fecha_hora', 'id_usuario')
     search_fields = ('accion_realizada', 'id_usuario__username', 'descripcion')    
+    
+@admin.register(Empleado)
+class EmpleadoAdmin(admin.ModelAdmin):
+    list_display = ('user', 'rol', 'telefono')
+    search_fields = ('user__username', 'rol__nombre')    
