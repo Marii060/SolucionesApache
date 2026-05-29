@@ -57,3 +57,21 @@ class Log(models.Model):
 
     def __str__(self):
         return f"{self.fecha_hora} - {self.id_usuario.username}: {self.accion_realizada}"    
+    
+    
+class Empleado(models.Model):
+    # Esto conecta este perfil con el usuario de Django
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    
+    # Esto conecta el empleado con el rol que creaste anteriormente
+    rol = models.ForeignKey(Rol, on_delete=models.SET_NULL, null=True)
+    
+    telefono = models.CharField(max_length=20, blank=True)
+    fecha_ingreso = models.DateField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Empleado del Taller"
+        verbose_name_plural = "Empleados del Taller"
+
+    def __str__(self):
+        return f"{self.user.username} - {self.rol}"    
