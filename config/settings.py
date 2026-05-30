@@ -120,3 +120,5 @@ LOGIN_REDIRECT_URL = '/gestion/clientes/'
 LOGOUT_REDIRECT_URL = '/cuentas/login/' 
 # A dónde enviar a los intrusos que intenten entrar sin sesión
 LOGIN_URL = '/cuentas/login/'
+# A dónde ir después de iniciar sesión con éxito
+LOGIN_REDIRECT_URL = '/gestion/'
