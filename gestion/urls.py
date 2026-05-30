@@ -4,6 +4,9 @@ from . import views
 app_name = 'gestion'
 
 urlpatterns = [
-    # Cuando visiten /clientes/, Django ejecutará la vista lista_clientes
+    # Esta será la ruta principal
+    path('', views.dashboard, name='dashboard'), 
+    
     path('clientes/', views.lista_clientes, name='lista_clientes'),
+    path('clientes/nuevo/', views.crear_cliente, name='crear_cliente'),
 ]
