@@ -129,4 +129,26 @@ class CreditoPagado(models.Model):
         verbose_name_plural = "Abonos"
 
     def __str__(self):
-        return f"Abono de ${self.monto_pago} al Crédito {self.credito.id}"        
+        return f"Abono de ${self.monto_pago} al Crédito {self.credito.id if self.credito else 'Sin asignar'}"
+          
+          
+    #Automatización para que cada vez que se guarde un nuevo abono, se actualice el saldo pendiente del crédito correspondiente. Si el saldo llega a 0 o menos, el crédito se marca como PAGADO.
+    def save(self, *args, **kwargs):
+        #Preguntamos si es un abono nuevo (si no tiene ID, apenas se va a guardar)
+        es_nuevo = self.pk is None
+        
+        #Primero guardamos el abono en la base de datos normalmente
+        super().save(*args, **kwargs)
+        
+        #Si es un abono nuevo y está conectado a un crédito, hacemos la matemática
+        if es_nuevo and self.credito:
+            # Le restamos el monto pagado al saldo pendiente
+            self.credito.saldo_pendiente -= self.monto_pago
+            
+            # Si el cliente pagó todo (o dio de más), ponemos el saldo en 0 y el estado en PAGADO
+            if self.credito.saldo_pendiente <= 0:
+                self.credito.saldo_pendiente = 0
+                self.credito.estado = 'PAGADO'
+                
+            # Guardamos el crédito actualizado
+            self.credito.save()
