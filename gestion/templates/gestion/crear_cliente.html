@@ -50,8 +50,8 @@
                     </div>
 
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <button type="submit" class="btn btn-success px-5 py-2 fw-bold shadow-sm" style="border-radius: 30px;">
-                            💾 Guardar Cliente
+                        <button type="submit" class="btn btn-primary">
+    {% if editando %}Actualizar Cliente{% else %}Guardar Cliente{% endif %}
                         </button>
                     </div>
                 </form>

@@ -67,3 +67,18 @@ def detalle_cliente(request, cliente_id):
         'motos': motos,
     }
     return render(request, 'gestion/detalle_cliente.html', contexto)
+
+@login_required
+def editar_cliente(request, cliente_id):
+    cliente = get_object_or_404(Cliente, pk=cliente_id)
+    
+    if request.method == 'POST':
+        form = ClienteForm(request.POST, instance=cliente)
+        if form.is_valid():
+            form.save()
+            messages.success(request, '¡Cliente actualizado correctamente!')
+            return redirect('gestion:lista_clientes')
+    else:
+        # Cargamos el formulario con los datos actuales del cliente
+        form = ClienteForm(instance=cliente)
+    return render(request, 'gestion/crear_cliente.html', {'form': form, 'editando': True})
