@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import ListaServicio, Servicio, DetalleServicio, Venta, DetalleVenta, CreditoPagado
+from .models import ListaServicio, Servicio, DetalleServicio, Venta, DetalleVenta, Credito, CreditoPagado
 
 #Permite agregar los repuestos y trabajos directamente dentro de la orden de servicio
 class DetalleServicioInline(admin.TabularInline):
@@ -39,8 +39,13 @@ class VentaAdmin(admin.ModelAdmin):
     search_fields = ('num_factura', 'id_cliente__razon_social', 'id_cliente__nombre')
     inlines = [DetalleVentaInline]
 
+@admin.register(Credito)
+class CreditoAdmin(admin.ModelAdmin):
+    list_display = ('id', 'cliente', 'valor_total', 'saldo_pendiente', 'estado', 'fecha_creacion')
+    list_filter = ('estado', 'fecha_creacion')
+    search_fields = ('cliente__nombre',) 
+
 @admin.register(CreditoPagado)
 class CreditoPagadoAdmin(admin.ModelAdmin):
-    list_display = ('id_credito', 'id_cliente', 'monto_pago', 'fecha_pago', 'metodo_pago')
-    list_filter = ('fecha_pago', 'metodo_pago')
-    search_fields = ('id_cliente__razon_social', 'id_cliente__nombre')
+    list_display = ('id', 'credito', 'monto_pago', 'metodo_pago', 'fecha_pago', 'usuario')
+    list_filter = ('metodo_pago', 'fecha_pago')

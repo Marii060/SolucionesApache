@@ -19,7 +19,7 @@ class Cliente(models.Model):
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.razon_social
+        return f"{self.numero_documento} - {self.nombre}"
 
 class Moto(models.Model):
     id_moto = models.AutoField(primary_key=True)
