@@ -6,54 +6,109 @@
     <title>{% block title %}Soluciones Apache{% endblock %}</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">  
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-</head>
-<body class="bg-light">
+    
+    <style>
+        body {
+            background-color: #f4f7fa; /* Fondo gris claro de la imagen */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        /* === ESTILOS DE LA BARRA LATERAL === */
+        .sidebar {
+            height: 100vh;
+            width: 260px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: #2b3a55; /* Azul oscuro elegante */
+            color: white;
+            overflow-y: auto;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar-brand {
+            padding: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-align: center;
+            border-bottom: 1px solid #3d4f70;
+            margin-bottom: 10px;
+        }
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">Soluciones Apache</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                {% if user.is_authenticated %}
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item"><a class="nav-link" href="#">Gestión</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Operaciones</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Inventario</a></li>
-                </ul>
-                <span class="navbar-text text-white me-3">
-                    Hola, {{ user.username }}
-                </span>
-                <form action="#" method="post" class="d-inline">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-sm btn-outline-danger">Cerrar Sesión</button>
-                </form>
-                {% else %}
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link btn btn-primary text-white" href="#">Iniciar Sesión</a></li>
-                </ul>
-                {% endif %}
-            </div>
+        .sidebar-heading {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #8c9bb3;
+            padding: 15px 25px 5px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .sidebar a {
+            padding: 12px 25px;
+            text-decoration: none;
+            color: #b0c0d8;
+            display: block;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+
+        .sidebar a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar a:hover, .sidebar a.active {
+            color: white;
+            background-color: #1e2a40;
+            border-left: 4px solid #4f46e5;
+        }
+
+        /* === ESTILOS DEL CONTENIDO PRINCIPAL === */
+        .main-content {
+            margin-left: 260px; /* Empuja el contenido para dejar espacio a la barra */
+            padding: 30px;
+        }
+
+        /* Botón de cerrar sesión al final */
+        .logout-btn {
+            position: absolute;
+            bottom: 20px;
+            width: 90%;
+            margin: 0 5%;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            🏍️ Soluciones Apache
         </div>
-    </nav>
 
-    <main class="container">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
+        <a href="{% url 'gestion:dashboard' %}" class="active"><i class="fa-solid fa-house"></i> Dashboard</a>
+        <a href="{% url 'gestion:lista_clientes' %}"><i class="fa-solid fa-users"></i> Clientes</a>
+        <a href="#"><i class="fa-solid fa-motorcycle"></i> Motos</a>
 
+        <div class="sidebar-heading">Taller</div>
+        <a href="#"><i class="fa-solid fa-wrench"></i> Órdenes</a>
+        <a href="#"><i class="fa-solid fa-clipboard-list"></i> Servicios</a>
+
+        <div class="sidebar-heading">Comercial</div>
+        <a href="#"><i class="fa-solid fa-cart-shopping"></i> Ventas</a>
+        <a href="#"><i class="fa-solid fa-plus"></i> Nueva Venta</a>
+        <a href="#"><i class="fa-solid fa-credit-card"></i> Créditos</a> 
+        <a href="#"><i class="fa-solid fa-box"></i> Productos</a>
+
+        <a href="#" class="btn btn-danger logout-btn text-white" style="border-left: none;"><i class="fa-solid fa-power-off"></i> Cerrar Sesión</a>
+    </div>
+
+    <div class="main-content">
         {% block content %}
         {% endblock %}
-    </main>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>

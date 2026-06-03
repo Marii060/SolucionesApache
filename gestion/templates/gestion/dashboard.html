@@ -1,56 +1,102 @@
 {% extends 'base.html' %}
+{% load humanize %}
 
 {% block title %}Panel de Control - Soluciones Apache{% endblock %}
 
 {% block content %}
-<div class="row mt-4 mb-4">
-    <div class="col-12">
-        <h2 class="fw-bold" style="color: #333;">📊 Panel de Control</h2>
-        <p class="text-muted">¡Hola, <strong>{{ user.username }}</strong>! Aquí tienes el resumen de tu taller al día de hoy.</p>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold text-dark mb-0">Hola, Bienvenido a soluciones Apache👋</h3>
+        <p class="text-muted small">{% now "l, j de F de Y" %}</p>
     </div>
+    <button class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">
+        + Nueva Orden
+    </button>
+</div>
+
+<p class="text-muted small fw-bold mb-3">RESUMEN GENERAL</p>
+
+<div class="row g-3 mb-4">
+    
+    <div class="col-md-4">
+        <div class="card text-white shadow-sm h-100" style="background-color: #3b71ca; border: none; border-radius: 12px;">
+            <div class="card-body position-relative">
+                <h1 class="display-5 fw-bold mb-0">{{ total_motos }}</h1>
+                <p class="small text-uppercase fw-bold mb-0">MOTOS REGISTRADAS</p>
+                <i class="fa-solid fa-motorcycle fa-3x position-absolute opacity-25" style="top: 20px; right: 20px;"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card text-white shadow-sm h-100" style="background-color: #198754; border: none; border-radius: 12px;">
+            <div class="card-body position-relative">
+                <h1 class="display-5 fw-bold mb-0">{{ total_clientes }}</h1>
+                <p class="small text-uppercase fw-bold mb-0">CLIENTES</p>
+                <i class="fa-solid fa-users fa-3x position-absolute opacity-25" style="top: 20px; right: 20px;"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card text-white shadow-sm h-100" style="background-color: #fd7e14; border: none; border-radius: 12px;">
+            <div class="card-body position-relative">
+                <h1 class="display-5 fw-bold mb-0">$ {{ total_cartera|floatformat:0|intcomma }}</h1>
+                <p class="small text-uppercase fw-bold mb-0">SALDO POR COBRAR</p>
+                <i class="fa-solid fa-money-bill-wave fa-3x position-absolute opacity-25" style="top: 20px; right: 20px;"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card text-white shadow-sm h-100" style="background-color: #5c636a; border: none; border-radius: 12px;">
+            <div class="card-body position-relative">
+                <h1 class="display-5 fw-bold mb-0">$ {{ total_recaudado|floatformat:0|intcomma }}</h1>
+                <p class="small text-uppercase fw-bold mb-0">INGRESOS RECAUDADOS</p>
+                <i class="fa-solid fa-sack-dollar fa-3x position-absolute opacity-25" style="top: 20px; right: 20px;"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card text-white shadow-sm h-100" style="background-color: #6f42c1; border: none; border-radius: 12px;">
+            <div class="card-body position-relative">
+                <h1 class="display-5 fw-bold mb-0">0</h1>
+                <p class="small text-uppercase fw-bold mb-0">PRODUCTOS</p>
+                <i class="fa-solid fa-box fa-3x position-absolute opacity-25" style="top: 20px; right: 20px;"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card text-white shadow-sm h-100" style="background-color: #20c997; border: none; border-radius: 12px;">
+            <div class="card-body position-relative">
+                <h1 class="display-5 fw-bold mb-0">0</h1>
+                <p class="small text-uppercase fw-bold mb-0">VENTAS DEL MES</p>
+                <i class="fa-solid fa-cart-shopping fa-3x position-absolute opacity-25" style="top: 20px; right: 20px;"></i>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <div class="row">
-    
-    <div class="col-md-3 mb-4">
-        <div class="card text-white shadow-sm" style="background: linear-gradient(to right, #4f46e5, #6366f1); border: none; border-radius: 15px;">
+    <div class="col-md-4">
+        <div class="card shadow-sm text-center py-4" style="border: none; border-radius: 15px;">
             <div class="card-body">
-                <h5 class="card-title"><i class="fa-solid fa-users"></i> Clientes</h5>
-                <h2 class="display-4 fw-bold">{{ total_clientes }}</h2>
-                <a href="{% url 'gestion:lista_clientes' %}" class="text-white text-decoration-none small">Ver todos los clientes ➔</a>
+                <h5 class="fw-bold mb-4 text-dark"><i class="fa-solid fa-bolt"></i> Acciones Rápidas</h5>
+                
+                <div class="d-grid gap-3 px-3">
+                    <a href="{% url 'gestion:crear_cliente' %}" class="btn btn-outline-primary rounded-pill fw-bold py-2">
+                        <i class="fa-solid fa-plus"></i> Nuevo Cliente
+                    </a>
+                    
+                    <a href="#" class="btn btn-outline-warning rounded-pill fw-bold py-2">
+                        Recibir Moto
+                    </a>
+                </div>
             </div>
         </div>
     </div>
-
-    <div class="col-md-3 mb-4">
-        <div class="card text-white shadow-sm" style="background: linear-gradient(to right, #ff7b00, #ff9d00); border: none; border-radius: 15px;">
-            <div class="card-body">
-                <h5 class="card-title"><i class="fa-solid fa-motorcycle"></i> Motos</h5>
-                <h2 class="display-4 fw-bold">{{ total_motos }}</h2>
-                <a href="#" class="text-white text-decoration-none small">Ver inventario de motos ➔</a>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-3 mb-4">
-        <div class="card text-white shadow-sm" style="background: linear-gradient(to right, #10b981, #34d399); border: none; border-radius: 15px;">
-            <div class="card-body">
-                <h5 class="card-title"><i class="fa-solid fa-wrench"></i> En Taller</h5>
-                <h2 class="display-4 fw-bold">0</h2>
-                <a href="#" class="text-white text-decoration-none small">Ver órdenes de servicio ➔</a>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-3 mb-4">
-        <div class="card shadow-sm" style="border: none; border-radius: 15px; height: 100%;">
-            <div class="card-body text-center d-flex flex-column justify-content-center">
-                <h5 class="card-title mb-3" style="color: #333;"><i class="fa-solid fa-bolt"></i> Acciones Rápidas</h5>
-                <a href="{% url 'gestion:crear_cliente' %}" class="btn btn-outline-primary mb-2 rounded-pill">➕ Nuevo Cliente</a>
-                <a href="#" class="btn btn-outline-warning rounded-pill"> Recibir Moto</a>
-            </div>
-        </div>
-    </div>
-
 </div>
 {% endblock %}
