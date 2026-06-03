@@ -47,5 +47,12 @@ class CreditoAdmin(admin.ModelAdmin):
 
 @admin.register(CreditoPagado)
 class CreditoPagadoAdmin(admin.ModelAdmin):
-    list_display = ('id', 'credito', 'monto_pago', 'metodo_pago', 'fecha_pago', 'usuario')
+    list_display = ('id', 'credito', 'monto_pago', 'saldo_restante', 'metodo_pago', 'fecha_pago', 'usuario')
     list_filter = ('metodo_pago', 'fecha_pago')
+    # Creamos la columna personalizada que va y busca el saldo en la tabla de Crédito
+    def saldo_restante(self, obj):
+        if obj.credito:
+            return f"$ {obj.credito.saldo_pendiente}"
+        return "Sin asignar"
+    # Le ponemos un nombre bonito a la cabecera de la columna
+    saldo_restante.short_description = 'Saldo Pendiente'
