@@ -41,7 +41,7 @@ def lista_clientes(request):
     if estado:
         clientes = clientes.filter(estado=estado)
 
-    return render(request, 'gestion/lista_clientes.html', {'clientes': clientes})
+    return render(request, 'gestion/lista_cliente.html', {'clientes': clientes})
 
 # Crear cliente
 @login_required
