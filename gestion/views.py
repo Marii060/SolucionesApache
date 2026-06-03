@@ -82,3 +82,12 @@ def editar_cliente(request, cliente_id):
         # Cargamos el formulario con los datos actuales del cliente
         form = ClienteForm(instance=cliente)
     return render(request, 'gestion/crear_cliente.html', {'form': form, 'editando': True})
+
+@login_required
+def eliminar_cliente(request, cliente_id):
+    cliente = get_object_or_404(Cliente, pk=cliente_id)
+    if request.method == 'POST':
+        cliente.delete()
+        messages.success(request, '¡Cliente eliminado correctamente!')
+        return redirect('gestion:lista_clientes')
+    return render(request, 'gestion/eliminar.html', {'cliente': cliente})
