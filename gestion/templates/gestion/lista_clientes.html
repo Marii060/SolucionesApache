@@ -4,12 +4,9 @@
 
 {% block content %}
 <style>
-    /* Estilos personalizados para igualar tu diseño moderno */
     .card-custom { border-radius: 12px; border: 1px solid #f0f2f5; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
     .table-custom th { color: #8c9bb3; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #f4f7fa; padding-bottom: 15px; font-weight: 700; }
     .table-custom td { vertical-align: middle; padding: 15px 10px; border-bottom: 1px solid #f4f7fa; font-size: 0.9rem; }
-    
-    /* El circulito con la letra del nombre */
     .avatar { width: 40px; height: 40px; background-color: #4f46e5; color: white; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: bold; font-size: 1rem; }
     
     /* Botones de acción chiquitos */
@@ -47,20 +44,21 @@
                 <form method="GET" class="d-flex justify-content-end gap-2">
                     <div class="position-relative" style="width: 280px;">
                         <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                        <input type="text" name="buscar" class="form-control search-bar" placeholder="Nombre, documento, teléf...">
+                        <input type="text" name="buscar" class="form-control search-bar" placeholder="Nombre, documento, teléf..." value="{{ request.GET.buscar }}">
                     </div>
                     
                     <select name="tipo" class="form-select text-muted" style="width: 160px; border-radius: 8px; font-size: 0.9rem; border-color: #e2e8f0;">
                         <option value="">Todos los tipos</option>
-                        <option value="natural">Natural</option>
-                        <option value="juridica">Jurídica</option>
+                        <option value="natural" {% if request.GET.tipo == 'natural' %}selected{% endif %}>Natural</option>
+                        <option value="juridica" {% if request.GET.tipo == 'juridica' %}selected{% endif %}>Jurídica</option>
                     </select>
                     
                     <select name="estado" class="form-select text-muted" style="width: 170px; border-radius: 8px; font-size: 0.9rem; border-color: #e2e8f0;">
                         <option value="">Todos los estados</option>
-                        <option value="activo">Activos</option>
-                        <option value="inactivo">Inactivos</option>
+                        <option value="activo" {% if request.GET.estado == 'activo' %}selected{% endif %}>Activos</option>
+                        <option value="inactivo" {% if request.GET.estado == 'inactivo' %}selected{% endif %}>Inactivos</option>
                     </select>
+                    <button type="submit" class="d-none">Buscar</button>
                 </form>
             </div>
         </div>
@@ -100,7 +98,7 @@
                         
                         <td>
                             <span class="text-primary fw-bold" style="background-color: #eff6ff; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem;">
-                                1 moto
+                                {{ cliente.cantidad_motos }} moto{{ cliente.cantidad_motos|pluralize }}
                             </span>
                         </td>
                         
