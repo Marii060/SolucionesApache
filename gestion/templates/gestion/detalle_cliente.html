@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Perfil de Cliente - Soluciones Apache{% endblock %}
+
+{% block content %}
+<style>
+    .card-custom { border-radius: 12px; border: 1px solid #f0f2f5; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+    .avatar-large { width: 80px; height: 80px; background-color: #4f46e5; color: white; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: bold; font-size: 2.5rem; margin: 0 auto;}
+    .info-label { font-size: 0.75rem; text-transform: uppercase; color: #8c9bb3; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 2px;}
+    .info-value { font-size: 1rem; color: #1e293b; font-weight: 500; margin-bottom: 15px;}
+</style>
+
+<div class="mb-4">
+    <a href="{% url 'gestion:lista_clientes' %}" class="text-decoration-none text-muted fw-bold">
+        <i class="fa-solid fa-arrow-left me-2"></i> Volver a la lista
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card card-custom bg-white h-100">
+            <div class="card-body p-4 text-center">
+                <div class="avatar-large mb-3">{{ cliente.nombre|make_list|first|upper }}</div>
+                <h4 class="fw-bold text-dark mb-1">{{ cliente.nombre }}</h4>
+                <p class="text-muted small mb-4">Cliente Activo</p>
+                
+                <div class="d-grid gap-2 mb-4">
+                    <button class="btn btn-primary fw-bold" style="background-color: #3b71ca; border: none; border-radius: 8px;">
+                        <i class="fa-solid fa-plus me-2"></i>Nueva Orden
+                    </button>
+                    <button class="btn btn-outline-secondary fw-bold" style="border-radius: 8px;">
+                        <i class="fa-solid fa-pen me-2"></i>Editar Cliente
+                    </button>
+                </div>
+
+                <hr class="text-muted opacity-25">
+
+                <div class="text-start mt-4">
+                    <div class="info-label">Documento</div>
+                    <div class="info-value">{{ cliente.numero_documento }}</div>
+
+                    <div class="info-label">Teléfono</div>
+                    <div class="info-value"><i class="fa-brands fa-whatsapp text-success me-1"></i> {{ cliente.telefono }}</div>
+
+                    <div class="info-label">Correo Electrónico</div>
+                    <div class="info-value">{{ cliente.email|default:"No registrado" }}</div>
+
+                    <div class="info-label">Dirección</div>
+                    <div class="info-value">{{ cliente.direccion|default:"No registrada" }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card card-custom bg-white mb-4">
+            <div class="card-body p-4">
+                <h5 class="fw-bold text-dark mb-4"><i class="fa-solid fa-motorcycle text-primary me-2"></i> Motos Registradas</h5>
+                
+                <div class="row">
+                    {% for moto in motos %}
+                    <div class="col-md-6 mb-3">
+                        <div class="p-3 border rounded" style="background-color: #f8fafc; border-color: #e2e8f0 !important;">
+                            <h6 class="fw-bold mb-1">{{ moto.marca }} {{ moto.modelo }}</h6>
+                            <p class="text-muted small mb-2">Placa: <span class="text-dark fw-bold">{{ moto.placa }}</span></p>
+                            <button class="btn btn-sm btn-outline-primary" style="font-size: 0.75rem; border-radius: 6px;">Ver Historial</button>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-12 text-center py-4 text-muted">
+                        <i class="fa-solid fa-motorcycle fa-2x mb-2 text-light"></i>
+                        <p class="mb-0">Este cliente aún no tiene motos registradas.</p>
+                        <button class="btn btn-sm btn-primary mt-3" style="border-radius: 6px;">+ Registrar Moto</button>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="card card-custom bg-white">
+            <div class="card-body p-4">
+                <h5 class="fw-bold text-dark mb-4"><i class="fa-solid fa-file-invoice-dollar text-success me-2"></i> Historial Financiero</h5>
+                <p class="text-muted">Aquí irán los servicios recientes y créditos asociados a este cliente.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
