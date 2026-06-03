@@ -9,7 +9,7 @@ class Cliente(models.Model):
     ]
     
     id_cliente = models.AutoField(primary_key=True)
-    razon_social = models.CharField(max_length=150)
+    razon_social = models.CharField(max_length=100, blank=True, null=True)
     tipo_documento = models.CharField(max_length=10, choices=TIPO_DOC_CHOICES, default='CC')
     nombre = models.CharField(max_length=100, default='Por definir')
     numero_documento = models.CharField(max_length=20, unique=True)
