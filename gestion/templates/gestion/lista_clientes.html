@@ -3,60 +3,151 @@
 {% block title %}Clientes - Soluciones Apache{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mt-4 mb-3">
-    <h2 class="fw-bold" style="color: #333;">👥 Listado de Clientes</h2>
-    <a href="{% url 'gestion:crear_cliente' %}" class="btn btn-success shadow-sm rounded-pill fw-bold">
-        ➕ Nuevo Cliente
-    </a>
+<style>
+    /* Estilos personalizados para igualar tu diseño moderno */
+    .card-custom { border-radius: 12px; border: 1px solid #f0f2f5; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+    .table-custom th { color: #8c9bb3; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #f4f7fa; padding-bottom: 15px; font-weight: 700; }
+    .table-custom td { vertical-align: middle; padding: 15px 10px; border-bottom: 1px solid #f4f7fa; font-size: 0.9rem; }
+    
+    /* El circulito con la letra del nombre */
+    .avatar { width: 40px; height: 40px; background-color: #4f46e5; color: white; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: bold; font-size: 1rem; }
+    
+    /* Botones de acción chiquitos */
+    .btn-action { padding: 4px 12px; font-size: 0.85rem; border-radius: 6px; font-weight: 500;}
+    
+    /* Etiquetas de Activo/Inactivo */
+    .badge-active { background-color: #eefdf3; color: #22c55e; padding: 6px 12px; border-radius: 20px; font-weight: 600; font-size: 0.75rem; border: 1px solid #dcfce7;}
+    .badge-inactive { background-color: #fef2f2; color: #ef4444; padding: 6px 12px; border-radius: 20px; font-weight: 600; font-size: 0.75rem; border: 1px solid #fee2e2;}
+    
+    /* Buscador */
+    .search-bar { background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding-left: 35px; font-size: 0.9rem;}
+    .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 0.9rem;}
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-1 text-dark">Clientes</h2>
+        <p class="text-muted small mb-0">Inicio > Clientes <span class="ms-2">• {{ clientes|length }} registros</span></p>
+    </div>
+    <div>
+        <a href="{% url 'gestion:crear_cliente' %}" class="btn btn-primary fw-bold px-4 shadow-sm" style="border-radius: 8px; background-color: #3b71ca; border: none;">
+            + Nuevo Cliente
+        </a>
+    </div>
 </div>
 
-<div class="card shadow-sm border-0 rounded-4">
-    <div class="card-body p-0">
-        <table class="table table-hover mb-0">
-            <thead class="table-light">
-                <tr>
-                    <th class="px-4 py-3 text-muted">Documento</th>
-                    <th class="py-3 text-muted">Razón Social</th>
-                    <th class="py-3 text-muted">Nombre</th>
-                    <th class="py-3 text-muted">Teléfono</th>
-                    <th class="px-4 py-3 text-muted text-center">Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for cliente in clientes %}
-                <tr class="align-middle">
-                    <td class="px-4 fw-bold text-secondary">{{ cliente.numero_documento }}</td>
-                    <td>{{ cliente.razon_social|default:"-" }}</td>
-                    <td>{{ cliente.nombre }}</td>
-                    <td>{{ cliente.telefono|default:"No registrado" }}</td>
-                    <td class="px-4 text-center">
-                        <div class="d-flex justify-content-center gap-2">
-                            
-                            <a href="#" class="btn btn-sm btn-info text-white shadow-sm" title="Ver Detalles">
-                                <i class="fa-solid fa-eye"></i>
-                            </a>
-                            
-                            <a href="#" class="btn btn-sm btn-warning text-dark shadow-sm" title="Editar Cliente">
-                                <i class="fa-solid fa-pen"></i>
-                            </a>
-                            
-                            <a href="#" class="btn btn-sm btn-danger shadow-sm" title="Eliminar Cliente">
-                                <i class="fa-solid fa-trash"></i>
-                            </a>
+<div class="card card-custom bg-white">
+    <div class="card-body p-4">
+        
+        <div class="row align-items-center mb-4">
+            <div class="col-md-3">
+                <h6 class="fw-bold mb-0 text-dark">Lista de Clientes</h6>
+            </div>
+            <div class="col-md-9">
+                <form method="GET" class="d-flex justify-content-end gap-2">
+                    <div class="position-relative" style="width: 280px;">
+                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <input type="text" name="buscar" class="form-control search-bar" placeholder="Nombre, documento, teléf...">
+                    </div>
+                    
+                    <select name="tipo" class="form-select text-muted" style="width: 160px; border-radius: 8px; font-size: 0.9rem; border-color: #e2e8f0;">
+                        <option value="">Todos los tipos</option>
+                        <option value="natural">Natural</option>
+                        <option value="juridica">Jurídica</option>
+                    </select>
+                    
+                    <select name="estado" class="form-select text-muted" style="width: 170px; border-radius: 8px; font-size: 0.9rem; border-color: #e2e8f0;">
+                        <option value="">Todos los estados</option>
+                        <option value="activo">Activos</option>
+                        <option value="inactivo">Inactivos</option>
+                    </select>
+                </form>
+            </div>
+        </div>
 
-                        </div>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="5" class="text-center py-5 text-muted">
-                        <i class="fa-solid fa-folder-open fs-1 mb-3 text-light"></i><br>
-                        No hay clientes registrados aún.
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table class="table table-custom mb-0">
+                <thead>
+                    <tr>
+                        <th>CLIENTE</th>
+                        <th>DOCUMENTO</th>
+                        <th>TELÉFONO</th>
+                        <th>MOTOS</th>
+                        <th>ÚLTIMO SERVICIO</th>
+                        <th>SALDO CRÉDITO</th>
+                        <th>ESTADO</th>
+                        <th class="text-center">ACCIONES</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cliente in clientes %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="avatar me-3">{{ cliente.nombre|make_list|first|upper }}</div>
+                                <div>
+                                    <div class="fw-bold text-dark">{{ cliente.nombre }}</div>
+                                    <div class="text-muted" style="font-size: 0.75rem;">{{ cliente.email|default:"Sin email" }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        
+                        <td>
+                            <div class="text-dark">{{ cliente.numero_documento }}</div>
+                        </td>
+                        
+                        <td class="text-muted">{{ cliente.telefono }}</td>
+                        
+                        <td>
+                            <span class="text-primary fw-bold" style="background-color: #eff6ff; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem;">
+                                1 moto
+                            </span>
+                        </td>
+                        
+                        <td>
+                            <div class="text-dark" style="font-size: 0.9rem;">10/03/2026</div>
+                            <div class="text-muted" style="font-size: 0.75rem;">Mantenimiento</div>
+                        </td>
+                        
+                        <td>
+                            <span class="fw-bold text-success">$0</span>
+                        </td>
+                        
+                        <td>
+                            <span class="badge-active"><i class="fa-solid fa-square" style="font-size: 0.4rem; margin-right: 4px; vertical-align: middle;"></i> Activo</span>
+                        </td>
+                        
+                        <td class="text-center">
+                            <a href="#" class="btn btn-outline-secondary btn-action text-secondary me-1">Ver</a>
+                            <a href="#" class="btn btn-outline-warning btn-action me-1"><i class="fa-solid fa-pen"></i></a>
+                            <a href="#" class="btn btn-outline-danger btn-action"><i class="fa-solid fa-trash"></i></a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center py-5 text-muted">
+                            <i class="fa-solid fa-folder-open fa-2x mb-3 text-light"></i><br>
+                            No hay clientes registrados en el sistema.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <nav>
+                <ul class="pagination pagination-sm mb-0">
+                    <li class="page-item disabled"><a class="page-link" href="#" style="border-radius: 4px 0 0 4px;">&lsaquo;</a></li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#" style="border-radius: 0 4px 4px 0;">&rsaquo;</a></li>
+                </ul>
+            </nav>
+            <div class="text-muted small">Mostrando registros de {{ clientes|length }} en total</div>
+        </div>
+
     </div>
 </div>
 {% endblock %}
