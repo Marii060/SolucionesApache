@@ -10,18 +10,18 @@
     
     <style>
         body {
-            background-color: #f4f7fa; /* Fondo gris claro de la imagen */
+            background-color: #dbdee0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
-        /* === ESTILOS DE LA BARRA LATERAL === */
+        /*ESTILOS DE LA BARRA LATERAL*/
         .sidebar {
             height: 100vh;
             width: 260px;
             position: fixed;
             top: 0;
             left: 0;
-            background-color: #2b3a55; /* Azul oscuro elegante */
+            background-color: #4b5f83;
             color: white;
             overflow-y: auto;
             box-shadow: 2px 0 5px rgba(0,0,0,0.1);
@@ -66,9 +66,9 @@
             border-left: 4px solid #4f46e5;
         }
 
-        /* === ESTILOS DEL CONTENIDO PRINCIPAL === */
+        /*ESTILOS DEL CONTENIDO PRINCIPAL*/
         .main-content {
-            margin-left: 260px; /* Empuja el contenido para dejar espacio a la barra */
+            margin-left: 260px;
             padding: 30px;
         }
 
@@ -79,30 +79,54 @@
             width: 90%;
             margin: 0 5%;
         }
+        
+        /* Ajuste extra para asegurar que el botón siempre quede al fondo si hay scroll */
+        .sidebar-footer {
+            margin-top: 40px;
+            padding-bottom: 20px;
+            position: relative;
+        }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
         <div class="sidebar-brand">
-            🏍️ Soluciones Apache
+            Soluciones Apache
         </div>
 
-        <a href="{% url 'gestion:dashboard' %}" class="active"><i class="fa-solid fa-house"></i> Dashboard</a>
+        <a href="{% url 'gestion:dashboard' %}"><i class="fa-solid fa-house"></i> Dashboard</a>
+
+        <div class="sidebar-heading">Clientes</div>
         <a href="{% url 'gestion:lista_clientes' %}"><i class="fa-solid fa-users"></i> Clientes</a>
         <a href="#"><i class="fa-solid fa-motorcycle"></i> Motos</a>
 
         <div class="sidebar-heading">Taller</div>
         <a href="#"><i class="fa-solid fa-wrench"></i> Órdenes</a>
-        <a href="#"><i class="fa-solid fa-clipboard-list"></i> Servicios</a>
+        <a href="#"><i class="fa-solid fa-folder"></i> Servicios</a>
 
         <div class="sidebar-heading">Comercial</div>
         <a href="#"><i class="fa-solid fa-cart-shopping"></i> Ventas</a>
         <a href="#"><i class="fa-solid fa-plus"></i> Nueva Venta</a>
         <a href="#"><i class="fa-solid fa-credit-card"></i> Créditos</a> 
         <a href="#"><i class="fa-solid fa-box"></i> Productos</a>
+        <a href="#"><i class="fa-solid fa-clipboard"></i> Inventario</a>
+        <a href="#"><i class="fa-solid fa-industry"></i> Compras</a>
+        <a href="#"><i class="fa-solid fa-building"></i> Proveedores</a>
 
-        <a href="#" class="btn btn-danger logout-btn text-white" style="border-left: none;"><i class="fa-solid fa-power-off"></i> Cerrar Sesión</a>
+        <div class="sidebar-heading">Administración</div>
+        <a href="#"><i class="fa-solid fa-chart-line"></i> Reportes</a>
+        <a href="#"><i class="fa-solid fa-user"></i> Usuarios</a>
+        <a href="#"><i class="fa-solid fa-clipboard-check"></i> Auditoría</a>
+        <a href="#"><i class="fa-solid fa-gear"></i> Configuración</a>
+
+        <div style="height: 100px;"></div>
+
+        <div class="sidebar-footer">
+            <a href="#" class="btn btn-danger logout-btn text-white" style="border-left: none;">
+                <i class="fa-solid fa-power-off"></i> Cerrar Sesión
+            </a>
+        </div>
     </div>
 
     <div class="main-content">
