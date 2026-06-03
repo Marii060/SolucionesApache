@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.db.models import Sum
+from django.db.models import Sum, Count, Q
 from .models import Cliente, Moto
 from .forms import ClienteForm
 from operaciones.models import Credito, CreditoPagado
@@ -25,10 +25,33 @@ def dashboard(request):
     return render(request, 'gestion/dashboard.html', contexto)
 
 #Lista de clientes
-@login_required 
+@login_required
 def lista_clientes(request):
-    clientes = Cliente.objects.all()   
-    return render(request, 'gestion/lista_clientes.html', {'clientes': clientes})
+    #Traemos todos los clientes y les "anexamos" el conteo de sus motos
+    clientes = Cliente.objects.annotate(cantidad_motos=Count('moto'))
+    #Atrapamos lo que el usuario escribió o seleccionó en la fachada (HTML)
+    buscar = request.GET.get('buscar', '')
+    tipo = request.GET.get('tipo', '')
+    estado = request.GET.get('estado', '')
+    #BUSCADOR: Si escribió algo, filtramos por nombre O por documento (icontains ignora mayúsculas)
+    if buscar:
+        clientes = clientes.filter(
+            Q(nombre__icontains=buscar) | 
+            Q(numero_documento__icontains=buscar)
+        )
+
+    #FILTROS DESPLEGABLES: Si seleccionó un tipo o estado, filtramos por eso
+    if tipo:
+        clientes = clientes.filter(razon_social=tipo)
+        
+    if estado:
+        clientes = clientes.filter(estado=estado)
+
+    # Enviamos los clientes ya filtrados y listos al HTML
+    contexto = {
+        'clientes': clientes,
+    }
+    return render(request, 'gestion/lista_clientes.html', contexto)
 
 #Crear cliente
 @login_required
