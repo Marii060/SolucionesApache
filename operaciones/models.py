@@ -114,7 +114,7 @@ class Credito(models.Model):
         verbose_name_plural = "Créditos"
 
     def __str__(self):
-        return f"Crédito {self.id} - {self.cliente.nombre} - Saldo: ${self.saldo_pendiente}"
+        return f"Crédito {self.id} - {self.cliente.nombre}"
 
 
 class CreditoPagado(models.Model):
