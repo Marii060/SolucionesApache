@@ -94,19 +94,40 @@ class DetalleVenta(models.Model):
         verbose_name = "Detalle de Venta"
         verbose_name_plural = "Detalles de Ventas"
 
-# Para llevar la cuenta de los clientes que fiaron (en taller o en mostrador).
-class CreditoPagado(models.Model):
-    id_credito = models.AutoField(primary_key=True)
-    monto_pago = models.DecimalField(max_digits=10, decimal_places=0)
-    fecha_pago = models.DateTimeField(null=True, blank=True)
-    metodo_pago = models.CharField(max_length=50)
-    saldo_anterior = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    saldo_actual = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    id_usuario = models.ForeignKey(User, on_delete=models.CASCADE, db_column='id_usuario')
-    id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, db_column='id_cliente')
-    id_venta = models.ForeignKey(Venta, on_delete=models.CASCADE, db_column='id_venta', null=True, blank=True)
-    id_servicio = models.ForeignKey(Servicio, on_delete=models.CASCADE, db_column='id_servicio', null=True, blank=True)
+class Credito(models.Model):
+    # La deuda principal
+    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
+    venta = models.ForeignKey(Venta, on_delete=models.CASCADE, null=True, blank=True)
+    servicio = models.ForeignKey(Servicio, on_delete=models.CASCADE, null=True, blank=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    valor_total = models.DecimalField(max_digits=10, decimal_places=0) 
+    saldo_pendiente = models.DecimalField(max_digits=10, decimal_places=0) 
+    
+    ESTADOS = [
+        ('ACTIVO', 'Activo - Con deuda'),
+        ('PAGADO', 'Pagado - Paz y salvo'),
+    ]
+    estado = models.CharField(max_length=20, choices=ESTADOS, default='ACTIVO')
 
     class Meta:
-        verbose_name = "Abono de Crédito"
-        verbose_name_plural = "Abonos de Créditos"        
+        verbose_name = "Crédito"
+        verbose_name_plural = "Créditos"
+
+    def __str__(self):
+        return f"Crédito {self.id} - {self.cliente.nombre} - Saldo: ${self.saldo_pendiente}"
+
+
+class CreditoPagado(models.Model):
+    # El abono conectado a la deuda principal
+    credito = models.ForeignKey(Credito, on_delete=models.CASCADE, related_name='abonos')
+    monto_pago = models.DecimalField(max_digits=10, decimal_places=0)
+    fecha_pago = models.DateTimeField(auto_now_add=True) 
+    metodo_pago = models.CharField(max_length=50)
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name = "Abono"
+        verbose_name_plural = "Abonos"
+
+    def __str__(self):
+        return f"Abono de ${self.monto_pago} al Crédito {self.credito.id}"        
