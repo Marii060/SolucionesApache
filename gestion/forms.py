@@ -1,4 +1,5 @@
 from django import forms
+from django.core.exceptions import ValidationError
 from .models import Cliente, Moto
 
 # Definimos solo las dos opciones necesarias
@@ -36,6 +37,17 @@ class ClienteForm(forms.ModelForm):
         
         # Opcional: Si quieres asegurarte de que 'nombre' no tenga valores iniciales extraños:
         self.fields['nombre'].initial = ''
+    
+def clean_numero_documento(self):
+        documento = self.cleaned_data.get('numero_documento')
+        
+        # Buscamos si existe otro cliente con ese mismo documento
+        # 'exclude(pk=self.instance.pk)' es importante para que 
+        # al editar un cliente no nos marque error a nosotros mismos
+        if Cliente.objects.filter(numero_documento=documento).exclude(pk=self.instance.pk).exists():
+            raise ValidationError("¡Atención! Este número de documento ya se encuentra registrado.")
+        
+        return documento
         
 class MotoForm(forms.ModelForm):
     class Meta:
@@ -49,4 +61,9 @@ class MotoForm(forms.ModelForm):
             'cilindraje': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej. 471 cc'}),
             'kilometraje': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej. 23500 km'}),
         }        
-        
+def clean_placa(self):
+        placa = self.cleaned_data.get('placa')
+        # Buscamos si existe otra moto con esa misma placa
+        if Moto.objects.filter(placa=placa).exists():
+            raise ValidationError("¡Atención! Ya existe una moto registrada con esta placa.")
+        return placa

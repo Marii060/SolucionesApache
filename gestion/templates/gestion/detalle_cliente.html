@@ -34,7 +34,16 @@ Apache{% endblock %} {% block content %}
     margin-bottom: 15px;
   }
 </style>
-
+{% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
 <div class="mb-4">
   <a
     href="{% url 'gestion:lista_clientes' %}"
@@ -78,8 +87,8 @@ Apache{% endblock %} {% block content %}
 
           <div class="info-label">Teléfono</div>
           <div class="info-value">
-            <i class="fa-brands fa-whatsapp text-success me-1"></i> {{
-            cliente.telefono }}
+            <i class="fa-brands fa-whatsapp text-success me-1"></i>
+            {{ cliente.telefono }}
           </div>
 
           <div class="info-label">Correo Electrónico</div>
@@ -130,12 +139,12 @@ Apache{% endblock %} {% block content %}
           <div class="col-12 text-center py-4 text-muted">
             <i class="fa-solid fa-motorcycle fa-2x mb-2 text-light"></i>
             <p class="mb-0">Este cliente aún no tiene motos registradas.</p>
-            <button
-              class="btn btn-sm btn-primary mt-3"
-              style="border-radius: 6px"
+            <a
+              href="{% url 'gestion:registrar_moto' cliente.id_cliente %}"
+              class="btn btn-primary"
             >
               + Registrar Moto
-            </button>
+            </a>
           </div>
           {% endfor %}
         </div>

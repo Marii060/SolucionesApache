@@ -100,10 +100,11 @@ def registrar_moto(request, id_cliente):
         form = MotoForm(request.POST)
         if form.is_valid():
             moto = form.save(commit=False)
-            moto.id_cliente = cliente  # Vinculamos la moto al cliente
+            moto.id_cliente = cliente
             moto.save()
-            messages.success(request, '¡Moto registrada correctamente!')
-            return redirect('gestion:detalle_cliente', id_cliente=id_cliente)
+            messages.success(request, '¡La moto se ha registrado correctamente!')
+            
+            return redirect('gestion:detalle_cliente', cliente_id=id_cliente)
     else:
         form = MotoForm()
         

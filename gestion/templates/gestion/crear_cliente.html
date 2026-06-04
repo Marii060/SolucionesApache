@@ -15,14 +15,24 @@
             <div class="card-body p-4">
                 
                 <form method="post">
-                    {% csrf_token %} <div class="row">
+                    {% csrf_token %} 
+                    <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold text-muted">Tipo de Documento</label>
                             {{ form.tipo_documento }}
                         </div>
+                        
                         <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold text-muted">Número de Documento</label>
+                            <label class="form-label fw-bold small text-muted">NÚMERO DE DOCUMENTO</label>
                             {{ form.numero_documento }}
+                            
+                            {% if form.numero_documento.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.numero_documento.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
                         </div>
                         
                         <div class="col-md-12 mb-3">
@@ -51,7 +61,7 @@
 
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                         <button type="submit" class="btn btn-primary">
-    {% if editando %}Actualizar Cliente{% else %}Guardar Cliente{% endif %}
+                            {% if editando %}Actualizar Cliente{% else %}Guardar Cliente{% endif %}
                         </button>
                     </div>
                 </form>
