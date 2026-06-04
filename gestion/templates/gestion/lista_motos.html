@@ -53,10 +53,10 @@
             </td>
             <td>{{ moto.cilindraje }}</td>
             <td>{{ moto.kilometraje }}</td>
+            <td>{{ moto.id_cliente.nombre }}</td>
             <td class="text-muted small" style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ moto.observaciones }}">
             {{ moto.observaciones|default:"Sin observaciones" }}
             </td>
-            <td>{{ moto.id_cliente.nombre }}</td>
             <td>
               <a href="#" class="btn btn-sm btn-outline-secondary">Ver</a>
               <a href="#" class="btn btn-sm btn-outline-warning"

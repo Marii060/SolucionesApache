@@ -123,7 +123,7 @@ def lista_motos(request):
             Q(id_cliente__nombre__icontains=buscar)
         )
     # Paginación
-    paginator = Paginator(motos_list, 5) # 5 motos por página
+    paginator = Paginator(motos_list, 8) 
     page_number = request.GET.get('page')
     motos = paginator.get_page(page_number)
     
