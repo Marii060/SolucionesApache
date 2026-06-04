@@ -1,5 +1,5 @@
 from django import forms
-from .models import Cliente
+from .models import Cliente, Moto
 
 # Definimos solo las dos opciones necesarias
 TIPO_RAZON_SOCIAL = [
@@ -36,3 +36,17 @@ class ClienteForm(forms.ModelForm):
         
         # Opcional: Si quieres asegurarte de que 'nombre' no tenga valores iniciales extraños:
         self.fields['nombre'].initial = ''
+        
+class MotoForm(forms.ModelForm):
+    class Meta:
+        model = Moto
+        fields = ['placa', 'marca', 'modelo', 'cilindraje', 'kilometraje']
+        
+        widgets = {
+            'placa': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej. ABC-123'}),
+            'marca': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej. Honda'}),
+            'modelo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej. CB500F'}),
+            'cilindraje': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej. 471 cc'}),
+            'kilometraje': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej. 23500 km'}),
+        }        
+        

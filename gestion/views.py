@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Sum, Count, Q
 from .models import Cliente, Moto
-from .forms import ClienteForm
+from .forms import ClienteForm, MotoForm
 from operaciones.models import Credito, CreditoPagado
 
 @login_required
@@ -91,3 +91,20 @@ def eliminar_cliente(request, cliente_id):
         messages.success(request, '¡Cliente eliminado correctamente!')
         return redirect('gestion:lista_clientes')
     return render(request, 'gestion/eliminar.html', {'cliente': cliente})
+
+@login_required
+def registrar_moto(request, id_cliente):
+    cliente = get_object_or_404(Cliente, pk=id_cliente)
+    
+    if request.method == 'POST':
+        form = MotoForm(request.POST)
+        if form.is_valid():
+            moto = form.save(commit=False)
+            moto.id_cliente = cliente  # Vinculamos la moto al cliente
+            moto.save()
+            messages.success(request, '¡Moto registrada correctamente!')
+            return redirect('gestion:detalle_cliente', id_cliente=id_cliente)
+    else:
+        form = MotoForm()
+        
+    return render(request, 'gestion/registrar_moto.html', {'form': form, 'cliente': cliente})
