@@ -52,7 +52,7 @@ def clean_numero_documento(self):
 class MotoForm(forms.ModelForm):
     class Meta:
         model = Moto
-        fields = ['placa', 'marca', 'modelo', 'cilindraje', 'kilometraje']
+        fields = ['placa', 'marca', 'modelo', 'cilindraje', 'kilometraje', 'observaciones']
         
         widgets = {
             'placa': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej. ABC-123'}),
