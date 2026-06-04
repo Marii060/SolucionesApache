@@ -40,6 +40,7 @@
             <th>CILINDRAJE</th>
             <th>KILOMETRAJE</th>
             <th>PROPIETARIO</th>
+            <th>OBSERVACIONES</th>
             <th>ACCIONES</th>
           </tr>
         </thead>
@@ -52,6 +53,9 @@
             </td>
             <td>{{ moto.cilindraje }}</td>
             <td>{{ moto.kilometraje }}</td>
+            <td class="text-muted small" style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ moto.observaciones }}">
+            {{ moto.observaciones|default:"Sin observaciones" }}
+            </td>
             <td>{{ moto.id_cliente.nombre }}</td>
             <td>
               <a href="#" class="btn btn-sm btn-outline-secondary">Ver</a>
