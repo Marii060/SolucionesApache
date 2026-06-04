@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.contrib import messages
 from django.db.models import Sum, Count, Q
 from .models import Cliente, Moto
@@ -109,3 +110,21 @@ def registrar_moto(request, id_cliente):
         form = MotoForm()
         
     return render(request, 'gestion/registrar_moto.html', {'form': form, 'cliente': cliente})
+
+@login_required
+def lista_motos(request):
+    motos_list = Moto.objects.all().order_by('-id_moto') # Las más recientes primero
+    # Lógica de búsqueda
+    buscar = request.GET.get('buscar')
+    if buscar:
+        motos_list = motos_list.filter(
+            Q(placa__icontains=buscar) | 
+            Q(marca__icontains=buscar) |
+            Q(id_cliente__nombre__icontains=buscar)
+        )
+    # Paginación
+    paginator = Paginator(motos_list, 5) # 5 motos por página
+    page_number = request.GET.get('page')
+    motos = paginator.get_page(page_number)
+    
+    return render(request, 'gestion/lista_motos.html', {'motos': motos})

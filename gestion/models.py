@@ -29,7 +29,7 @@ class Moto(models.Model):
     cilindraje = models.CharField(max_length=30)
     kilometraje = models.CharField(max_length=30, null=True, blank=True)
     id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, db_column='id_cliente')
-
+    observaciones = models.TextField(null=True, blank=True)
     def __str__(self):
         return f"{self.placa} - {self.modelo}"
     

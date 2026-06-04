@@ -99,8 +99,13 @@
 
         <div class="sidebar-heading">Clientes</div>
         <a href="{% url 'gestion:lista_clientes' %}"><i class="fa-solid fa-users"></i> Clientes</a>
-        <a href="#"><i class="fa-solid fa-motorcycle"></i> Motos</a>
-
+        
+        <a href="{% url 'gestion:lista_motos' %}" class="{% if request.resolver_match.url_name == 'lista_motos' %}active{% endif %}">
+            <i class="fa-solid fa-motorcycle"></i> Motos
+        </a>
+        
+        <div class="sidebar-heading">Taller</div>
+        
         <div class="sidebar-heading">Taller</div>
         <a href="#"><i class="fa-solid fa-wrench"></i> Órdenes</a>
         <a href="#"><i class="fa-solid fa-folder"></i> Servicios</a>

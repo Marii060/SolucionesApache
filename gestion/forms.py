@@ -60,6 +60,7 @@ class MotoForm(forms.ModelForm):
             'modelo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej. CB500F'}),
             'cilindraje': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej. 471 cc'}),
             'kilometraje': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej. 23500 km'}),
+            'observaciones': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Ej. Estado general, modificaciones, detalles a tener en cuenta...'}),
         }        
 def clean_placa(self):
         placa = self.cleaned_data.get('placa')
