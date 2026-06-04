@@ -24,10 +24,9 @@ def dashboard(request):
     }
     return render(request, 'gestion/dashboard.html', contexto)
 
-# Lista de clientes (Corregido a plural para ser consistente)
 @login_required
 def lista_clientes(request):
-    clientes = Cliente.objects.annotate(cantidad_motos=Count('moto'))
+    clientes = Cliente.objects.annotate(cantidad_motos=Count('moto')).order_by('-id_cliente')
     buscar = request.GET.get('buscar', '')
     tipo = request.GET.get('tipo', '')
     estado = request.GET.get('estado', '')
@@ -37,11 +36,11 @@ def lista_clientes(request):
             Q(nombre__icontains=buscar) | 
             Q(numero_documento__icontains=buscar)
         )
+    
     if tipo:
-        clientes = clientes.filter(razon_social=tipo) # Asegúrate que 'razon_social' sea el nombre correcto en tu models.py
-    if estado:
-        clientes = clientes.filter(estado=estado)
-
+        # Esto filtrará los clientes donde el campo razon_social coincida con el valor enviado
+        clientes = clientes.filter(razon_social=tipo)
+ 
     return render(request, 'gestion/lista_cliente.html', {'clientes': clientes})
 
 # Crear cliente
@@ -52,7 +51,7 @@ def crear_cliente(request):
         if form.is_valid():
             form.save()
             messages.success(request, '¡Cliente guardado exitosamente!')
-            return redirect('gestion:lista_clientes')
+            return redirect('gestion:lista_cliente')
     else:
         form = ClienteForm()
     return render(request, 'gestion/crear_cliente.html', {'form': form})
@@ -78,7 +77,7 @@ def editar_cliente(request, cliente_id):
         if form.is_valid():
             form.save()
             messages.success(request, '¡Cliente actualizado correctamente!')
-            return redirect('gestion:lista_clientes')
+            return redirect('gestion:lista_cliente')
     else:
         # Cargamos el formulario con los datos actuales del cliente
         form = ClienteForm(instance=cliente)
@@ -90,7 +89,7 @@ def eliminar_cliente(request, cliente_id):
     if request.method == 'POST':
         cliente.delete()
         messages.success(request, '¡Cliente eliminado correctamente!')
-        return redirect('gestion:lista_clientes')
+        return redirect('gestion:lista_cliente')
     return render(request, 'gestion/eliminar.html', {'cliente': cliente})
 
 @login_required
