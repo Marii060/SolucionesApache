@@ -55,6 +55,7 @@ class MotoForm(forms.ModelForm):
         fields = ['placa', 'marca', 'modelo', 'cilindraje', 'kilometraje', 'observaciones']
         
         widgets = {
+            'id_cliente': forms.Select(attrs={'class': 'form-select'}),
             'placa': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej. ABC-123'}),
             'marca': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej. Honda'}),
             'modelo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej. CB500F'}),
