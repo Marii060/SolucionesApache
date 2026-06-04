@@ -110,6 +110,7 @@ def registrar_moto(request, id_cliente):
         
     return render(request, 'gestion/registrar_moto.html', {'form': form, 'cliente': cliente})
 
+
 @login_required
 def lista_motos(request):
     motos_list = Moto.objects.all().order_by('-id_moto') # Las más recientes primero
