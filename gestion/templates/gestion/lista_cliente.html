@@ -16,7 +16,7 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h2 class="fw-bold mb-1 text-dark">Clientes</h2>
-        <p class="text-muted small mb-0">Inicio > Clientes <span class="ms-2">• {{ clientes|length }} registros</span></p>
+        <p class="text-muted small mb-0">Inicio > Clientes <span class="ms-2">• {{ page_obj.paginator.count }} registros</span></p>
     </div>
     <div>
         <a href="{% url 'gestion:crear_cliente' %}" class="btn btn-primary fw-bold px-4 shadow-sm" style="border-radius: 8px; background-color: #3b71ca; border: none;">
@@ -62,7 +62,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for cliente in clientes %}
+                    {% for cliente in page_obj %}
                     <tr>
                         <td>
                             <div class="d-flex align-items-center">
@@ -105,6 +105,23 @@
                 </tbody>
             </table>
         </div>
+
+        <nav aria-label="Navegación de páginas" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page=1{% if request.GET.buscar %}&buscar={{ request.GET.buscar }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}">&laquo; Primera</a></li>
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}">Anterior</a></li>
+                {% endif %}
+
+                <li class="page-item disabled"><span class="page-link">Pág {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span></li>
+
+                {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}">Siguiente</a></li>
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}">Última &raquo;</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+
     </div>
 </div>
 {% endblock %}
