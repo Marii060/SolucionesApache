@@ -1,37 +1,53 @@
 {% extends 'base.html' %} 
-
-{% block title %}Registrar Moto - Soluciones Apache{% endblock %}
+{% block title %}Registrar Moto - Soluciones Apache{% endblock %} 
 
 {% block content %}
 <div class="container mt-4" style="max-width: 600px">
-  <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex justify-content-between align-items-center mb-4">
     <div>
       <h2 class="fw-bold text-dark">Registrar Moto</h2>
       <p class="text-muted small">
-        Asignando nueva moto a: <strong>{{ cliente.nombre }}</strong>
+        {% if cliente %}
+          Asignando nueva moto a: <strong>{{ cliente.nombre }}</strong>
+        {% else %}
+          Complete el formulario para registrar una nueva motocicleta.
+        {% endif %}
       </p>
     </div>
-    <a
-      href="{% url 'gestion:detalle_cliente' cliente.id_cliente %}"
-      class="btn btn-outline-secondary"
-      >Volver</a
-    >
-  </div>
+    
+    {% if cliente %}
+      <a href="{% url 'gestion:detalle_cliente' cliente.id_cliente %}" 
+         class="btn fw-bold" 
+         style="background-color: #3b71ca; color: white; border-radius: 8px; border: none; padding: 8px 20px;">
+         Volver al Perfil
+      </a>
+    {% else %}
+      <a href="{% url 'gestion:lista_motos' %}" 
+         class="btn fw-bold" 
+         style="background-color: #3b71ca; color: white; border-radius: 8px; border: none; padding: 8px 20px;">
+         Volver a la Lista
+      </a>
+    {% endif %}
+</div>
 
   <div class="card card-custom bg-white p-4">
     <form method="POST">
       {% csrf_token %}
-
       <div class="row">
+        <div class="col-md-12 mb-3">
+    <label class="form-label fw-bold small text-muted">CLIENTE PROPIETARIO *</label>
+    <div class="input-group">
+        {{ form.id_cliente }}
+    </div>
+    {% if form.id_cliente.errors %}
+        <div class="text-danger small mt-1">{{ form.id_cliente.errors }}</div>
+    {% endif %}
+</div>
+
         <div class="col-md-6 mb-3">
           <label class="form-label fw-bold small text-muted">PLACA</label>
-          {{ form.placa }} {% if form.placa.errors %}
-          <div class="text-danger small mt-1">
-            {% for error in form.placa.errors %} {{ error }} {% endfor %}
-          </div>
-          {% endif %}
+          {{ form.placa }}
         </div>
-
         <div class="col-md-6 mb-3">
           <label class="form-label fw-bold small text-muted">MARCA</label>
           {{ form.marca }}
@@ -44,23 +60,18 @@
           <label class="form-label fw-bold small text-muted">CILINDRAJE</label>
           {{ form.cilindraje }}
         </div>
-        <div class="col-md-12 mb-4">
+        <div class="col-md-12 mb-3">
           <label class="form-label fw-bold small text-muted">KILOMETRAJE</label>
           {{ form.kilometraje }}
         </div>
         <div class="col-md-12 mb-3">
-          <label class="form-label fw-bold small text-muted"
-            >OBSERVACIONES </label>
+          <label class="form-label fw-bold small text-muted">OBSERVACIONES</label>
           {{ form.observaciones }}
         </div>
       </div>
 
-      <div class="d-grid">
-        <button
-          type="submit"
-          class="btn btn-primary fw-bold py-2"
-          style="border-radius: 8px"
-        >
+      <div class="d-grid mt-3">
+        <button type="submit" class="btn btn-primary fw-bold py-2" style="border-radius: 8px">
           Guardar Moto
         </button>
       </div>
