@@ -1,81 +1,61 @@
-{% extends 'base.html' %} 
-{% block title %}Registrar Moto - Soluciones Apache{% endblock %} 
+{% extends 'base.html' %}
 
 {% block content %}
-<div class="container mt-4" style="max-width: 600px">
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-      <h2 class="fw-bold text-dark">Registrar Moto</h2>
-      <p class="text-muted small">
-        {% if cliente %}
-          Asignando nueva moto a: <strong>{{ cliente.nombre }}</strong>
-        {% else %}
-          Complete el formulario para registrar una nueva motocicleta.
-        {% endif %}
-      </p>
+<div class="container mt-4" style="max-width: 700px;">
+    <!-- Encabezado -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-dark">{% if moto %}Editar Moto{% else %}Registrar Moto{% endif %}</h2>
+        <a href="{% url 'gestion:lista_motos' %}" 
+   class="btn fw-bold px-4 shadow-sm" 
+   style="background-color: #3b71ca; color: white; border-radius: 8px; border: none;">
+   Volver
+</a>
     </div>
-    
-    {% if cliente %}
-      <a href="{% url 'gestion:detalle_cliente' cliente.id_cliente %}" 
-         class="btn fw-bold" 
-         style="background-color: #3b71ca; color: white; border-radius: 8px; border: none; padding: 8px 20px;">
-         Volver al Perfil
-      </a>
-    {% else %}
-      <a href="{% url 'gestion:lista_motos' %}" 
-         class="btn fw-bold" 
-         style="background-color: #3b71ca; color: white; border-radius: 8px; border: none; padding: 8px 20px;">
-         Volver a la Lista
-      </a>
-    {% endif %}
-</div>
 
-  <div class="card card-custom bg-white p-4">
-    <form method="POST">
-      {% csrf_token %}
-      <div class="row">
-        <div class="col-md-12 mb-3">
-    <label class="form-label fw-bold small text-muted">CLIENTE PROPIETARIO *</label>
-    <div class="input-group">
-        {{ form.id_cliente }}
+    <!-- Formulario estructurado -->
+    <div class="card shadow-sm border-0 rounded-4 p-4">
+        <form method="POST">
+            {% csrf_token %}
+            <div class="row">
+                <!-- Cliente -->
+                <div class="col-12 mb-3">
+                    <label class="form-label fw-bold text-muted">Cliente</label>
+                    {{ form.id_cliente }}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold text-muted">Placa</label>
+                    {{ form.placa }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold text-muted">Marca</label>
+                    {{ form.marca }}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold text-muted">Modelo</label>
+                    {{ form.modelo }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold text-muted">Cilindraje</label>
+                    {{ form.cilindraje }}
+                </div>
+                
+                <div class="col-12 mb-3">
+                    <label class="form-label fw-bold text-muted">Kilometraje</label>
+                    {{ form.kilometraje }}
+                </div>
+                
+                <div class="col-12 mb-3">
+                    <label class="form-label fw-bold text-muted">Observaciones</label>
+                    {{ form.observaciones }}
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 fw-bold mt-3 py-2">
+                {% if moto %}Guardar Cambios{% else %}Registrar Moto{% endif %}
+            </button>
+        </form>
     </div>
-    {% if form.id_cliente.errors %}
-        <div class="text-danger small mt-1">{{ form.id_cliente.errors }}</div>
-    {% endif %}
-</div>
-
-        <div class="col-md-6 mb-3">
-          <label class="form-label fw-bold small text-muted">PLACA</label>
-          {{ form.placa }}
-        </div>
-        <div class="col-md-6 mb-3">
-          <label class="form-label fw-bold small text-muted">MARCA</label>
-          {{ form.marca }}
-        </div>
-        <div class="col-md-6 mb-3">
-          <label class="form-label fw-bold small text-muted">MODELO</label>
-          {{ form.modelo }}
-        </div>
-        <div class="col-md-6 mb-3">
-          <label class="form-label fw-bold small text-muted">CILINDRAJE</label>
-          {{ form.cilindraje }}
-        </div>
-        <div class="col-md-12 mb-3">
-          <label class="form-label fw-bold small text-muted">KILOMETRAJE</label>
-          {{ form.kilometraje }}
-        </div>
-        <div class="col-md-12 mb-3">
-          <label class="form-label fw-bold small text-muted">OBSERVACIONES</label>
-          {{ form.observaciones }}
-        </div>
-      </div>
-
-      <div class="d-grid mt-3">
-        <button type="submit" class="btn btn-primary fw-bold py-2" style="border-radius: 8px">
-          Guardar Moto
-        </button>
-      </div>
-    </form>
-  </div>
 </div>
 {% endblock %}

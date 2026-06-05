@@ -1,14 +1,21 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} 
 
-{% block title %}Nuevo Cliente - Soluciones Apache{% endblock %}
+{% block title %}{% if editando %}Editar Cliente{% else %}Nuevo Cliente{% endif %} - Soluciones Apache{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center mt-4">
     <div class="col-md-8">
         
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="fw-bold" style="color: #333;">👤 Registrar Nuevo Cliente</h2>
-            <a href="{% url 'gestion:lista_cliente' %}" class="btn btn-outline-secondary">⬅️ Volver a la lista</a>
+            <h2 class="fw-bold" style="color: #333;">
+                {% if editando %}👤 Editar Cliente{% else %}👤 Registrar Nuevo Cliente{% endif %}
+            </h2>
+            
+        <a href="{% url 'gestion:lista_cliente' %}" 
+       class="btn fw-bold px-4 shadow-sm" 
+       style="background-color: #3b71ca; color: white; border-radius: 8px; border: none;">
+       ⬅️ Volver a la lista
+        </a>
         </div>
 
         <div class="card shadow-sm border-0 rounded-4">
@@ -21,20 +28,10 @@
                             <label class="form-label fw-bold text-muted">Tipo de Documento</label>
                             {{ form.tipo_documento }}
                         </div>
-                        
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold small text-muted">NÚMERO DE DOCUMENTO</label>
                             {{ form.numero_documento }}
-                            
-                            {% if form.numero_documento.errors %}
-                                <div class="text-danger small mt-1">
-                                    {% for error in form.numero_documento.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
                         </div>
-                        
                         <div class="col-md-12 mb-3">
                             <label class="form-label fw-bold text-muted">Nombre Completo</label>
                             {{ form.nombre }}
@@ -43,7 +40,6 @@
                             <label class="form-label fw-bold text-muted">Razón Social</label>
                             {{ form.razon_social }}
                         </div>
-
                         <div class="col-md-4 mb-3">
                             <label class="form-label fw-bold text-muted">Teléfono</label>
                             {{ form.telefono }}
@@ -52,7 +48,6 @@
                             <label class="form-label fw-bold text-muted">Correo Electrónico</label>
                             {{ form.correo }}
                         </div>
-
                         <div class="col-md-12 mb-4">
                             <label class="form-label fw-bold text-muted">Dirección</label>
                             {{ form.direccion }}
@@ -60,7 +55,7 @@
                     </div>
 
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-primary fw-bold px-4" style="border-radius: 8px; background-color: #3b71ca; border: none;">
                             {% if editando %}Actualizar Cliente{% else %}Guardar Cliente{% endif %}
                         </button>
                     </div>
