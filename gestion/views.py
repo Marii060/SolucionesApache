@@ -37,12 +37,20 @@ def lista_clientes(request):
             Q(nombre__icontains=buscar) | 
             Q(numero_documento__icontains=buscar)
         )
-    
     if tipo:
         # Esto filtrará los clientes donde el campo razon_social coincida con el valor enviado
         clientes = clientes.filter(razon_social=tipo)
  
-    return render(request, 'gestion/lista_cliente.html', {'clientes': clientes})
+    paginator = Paginator(clientes, 8) 
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'gestion/lista_cliente.html', {
+        'page_obj': page_obj,
+        'buscar': buscar, # Útil para mantener la búsqueda al cambiar de página
+        'tipo': tipo,
+        'estado': estado
+    })
 
 # Crear cliente
 @login_required
@@ -67,6 +75,7 @@ def detalle_cliente(request, cliente_id):
         'cliente': cliente,
         'motos': motos,
     }
+        
     return render(request, 'gestion/detalle_cliente.html', contexto)
 
 @login_required
@@ -137,7 +146,7 @@ def lista_motos(request):
             Q(id_cliente__nombre__icontains=buscar)
         )
     # Paginación
-    paginator = Paginator(motos_list, 8) 
+    paginator = Paginator(motos_list, 7) 
     page_number = request.GET.get('page')
     motos = paginator.get_page(page_number)
     
