@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.paginator import Paginator
 from django import forms
 from django.contrib import messages
@@ -7,6 +8,16 @@ from django.db.models import Sum, Count, Q
 from .models import Cliente, Moto
 from .forms import ClienteForm, MotoForm
 from operaciones.models import Credito, CreditoPagado
+
+def personal_required(user):
+    return user.is_staff
+
+#Aplicación en la vista del dashboard
+@login_required
+@user_passes_test(personal_required, login_url='login') # login_url evita errores si no tiene permiso
+def dashboard(request):
+    # Aquí va toda la lógica de tu dashboard (consultas a la BD, render, etc.)
+    return render(request, 'gestion/dashboard.html', {})
 
 @login_required
 def dashboard(request):
@@ -83,15 +94,21 @@ def editar_cliente(request, cliente_id):
     cliente = get_object_or_404(Cliente, pk=cliente_id)
     
     if request.method == 'POST':
+        # Instanciamos el formulario con los datos enviados y la instancia del cliente a editar
         form = ClienteForm(request.POST, instance=cliente)
         if form.is_valid():
             form.save()
             messages.success(request, '¡Cliente actualizado correctamente!')
             return redirect('gestion:lista_cliente')
     else:
-        # Cargamos el formulario con los datos actuales del cliente
+        # Cargamos el formulario con los datos actuales del cliente para que aparezcan en el HTML
         form = ClienteForm(instance=cliente)
-    return render(request, 'gestion/crear_cliente.html', {'form': form, 'editando': True})
+    
+    # Renderizamos con el nombre de archivo correcto y la variable 'editando' en True
+    return render(request, 'gestion/crear_cliente.html', {
+        'form': form, 
+        'editando': True 
+    })
 
 @login_required
 def eliminar_cliente(request, cliente_id):
@@ -151,3 +168,35 @@ def lista_motos(request):
     motos = paginator.get_page(page_number)
     
     return render(request, 'gestion/lista_motos.html', {'motos': motos})
+
+# Detalle moto
+def detalle_moto(request, pk):
+    moto = get_object_or_404(Moto, pk=pk)
+    return render(request, 'gestion/detalle_moto.html', {'moto': moto})
+
+# Editar moto
+def editar_moto(request, pk):
+    moto = get_object_or_404(Moto, pk=pk)
+    if request.method == 'POST':
+        form = MotoForm(request.POST, instance=moto)
+        if form.is_valid():
+            form.save()
+            return redirect('gestion:lista_motos')
+    else:
+        form = MotoForm(instance=moto)
+        # Aplicamos estilos a los campos del formulario
+        for field in form.fields.values():
+            if isinstance(field.widget, forms.Select):
+                field.widget.attrs.update({'class': 'form-select'})
+            else:
+                field.widget.attrs.update({'class': 'form-control'})
+                
+    return render(request, 'gestion/registrar_moto.html', {'form': form, 'moto': moto})
+
+# Eliminar moto
+def eliminar_moto(request, pk):
+    moto = get_object_or_404(Moto, pk=pk)
+    if request.method == 'POST':
+        moto.delete()
+        return redirect('gestion:lista_motos')
+    return render(request, 'gestion/eliminar_moto.html', {'moto': moto})
