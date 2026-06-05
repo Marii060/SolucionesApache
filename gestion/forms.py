@@ -50,9 +50,14 @@ def clean_numero_documento(self):
         return documento
         
 class MotoForm(forms.ModelForm):
+    id_cliente = forms.ModelChoiceField(
+        queryset=Cliente.objects.all(),
+        empty_label="Seleccione un cliente...",
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
     class Meta:
         model = Moto
-        fields = ['placa', 'marca', 'modelo', 'cilindraje', 'kilometraje', 'observaciones']
+        fields = ['id_cliente','placa', 'marca', 'modelo', 'cilindraje', 'kilometraje', 'observaciones']
         
         widgets = {
             'id_cliente': forms.Select(attrs={'class': 'form-select'}),
