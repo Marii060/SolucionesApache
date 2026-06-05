@@ -1,0 +1,30 @@
+{% extends 'base.html' %} 
+
+{% block title %}Eliminar Moto - Soluciones Apache{% endblock %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 500px;">
+    <div class="card card-custom bg-white p-4 shadow-sm" style="border-radius: 12px; border: 1px solid #e2e8f0;">
+        <div class="text-center mb-4">
+            <i class="fa-solid fa-triangle-exclamation text-danger fa-3x mb-3"></i>
+            <h4 class="fw-bold text-dark">¿Estás segura?</h4>
+            <p class="text-muted small">
+                Estás a punto de eliminar la moto con placa <strong>{{ moto.placa }}</strong>. 
+                Esta acción no se puede deshacer y borrará toda la información asociada.
+            </p>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-danger fw-bold py-2" style="border-radius: 8px;">
+                    Sí, eliminar definitivamente
+                </button>
+                <a href="{% url 'gestion:lista_motos' %}" class="btn btn-outline-secondary fw-bold py-2" style="border-radius: 8px;">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
