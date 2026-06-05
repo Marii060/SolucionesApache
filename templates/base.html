@@ -34,7 +34,8 @@
             left: 0;
             background-color: #4b5f83;
             color: white;
-            overflow-y: auto;
+            display: flex; /* Nuevo: para organizar elementos en columna */
+            flex-direction: column; 
             box-shadow: 2px 0 5px rgba(0,0,0,0.1);
         }
         
@@ -45,6 +46,12 @@
             text-align: center;
             border-bottom: 1px solid #3d4f70;
             margin-bottom: 10px;
+        }
+
+        /* Contenedor que permite scroll en el menú */
+        .sidebar-menu {
+            flex-grow: 1;
+            overflow-y: auto;
         }
 
         .sidebar-heading {
@@ -83,19 +90,13 @@
             padding: 30px;
         }
 
-        /* Botón de cerrar sesión al final */
-        .logout-btn {
-            position: absolute;
-            bottom: 20px;
-            width: 90%;
-            margin: 0 5%;
-        }
-        
-        /* Ajuste extra para asegurar que el botón siempre quede al fondo si hay scroll */
+        /* Botón de cerrar sesión corregido */
         .sidebar-footer {
-            margin-top: 40px;
-            padding-bottom: 20px;
-            position: relative;
+            padding: 20px;
+            border-top: 1px solid #3d4f70;
+        }
+        .logout-btn {
+            width: 100%;
         }
     </style>
 </head>
@@ -106,42 +107,44 @@
             Soluciones Apache
         </div>
 
-        <a href="{% url 'gestion:dashboard' %}"><i class="fa-solid fa-house"></i> Dashboard</a>
+        <div class="sidebar-menu">
+            <a href="{% url 'gestion:dashboard' %}"><i class="fa-solid fa-house"></i> Dashboard</a>
 
-        <div class="sidebar-heading">Clientes</div>
-        <a href="{% url 'gestion:lista_cliente' %}"><i class="fa-solid fa-users"></i> Clientes</a>
-        
-        <a href="{% url 'gestion:lista_motos' %}" class="{% if request.resolver_match.url_name == 'lista_motos' %}active{% endif %}">
-            <i class="fa-solid fa-motorcycle"></i> Motos
-        </a>
-        
-        <div class="sidebar-heading">Taller</div>
-        
-        <div class="sidebar-heading">Taller</div>
-        <a href="#"><i class="fa-solid fa-wrench"></i> Órdenes</a>
-        <a href="#"><i class="fa-solid fa-folder"></i> Servicios</a>
-
-        <div class="sidebar-heading">Comercial</div>
-        <a href="#"><i class="fa-solid fa-cart-shopping"></i> Ventas</a>
-        <a href="#"><i class="fa-solid fa-plus"></i> Nueva Venta</a>
-        <a href="#"><i class="fa-solid fa-credit-card"></i> Créditos</a> 
-        <a href="#"><i class="fa-solid fa-box"></i> Productos</a>
-        <a href="#"><i class="fa-solid fa-clipboard"></i> Inventario</a>
-        <a href="#"><i class="fa-solid fa-industry"></i> Compras</a>
-        <a href="#"><i class="fa-solid fa-building"></i> Proveedores</a>
-
-        <div class="sidebar-heading">Administración</div>
-        <a href="#"><i class="fa-solid fa-chart-line"></i> Reportes</a>
-        <a href="#"><i class="fa-solid fa-user"></i> Usuarios</a>
-        <a href="#"><i class="fa-solid fa-clipboard-check"></i> Auditoría</a>
-        <a href="#"><i class="fa-solid fa-gear"></i> Configuración</a>
-
-        <div style="height: 100px;"></div>
-
-        <div class="sidebar-footer">
-            <a href="#" class="btn btn-danger logout-btn text-white" style="border-left: none;">
-                <i class="fa-solid fa-power-off"></i> Cerrar Sesión
+            <div class="sidebar-heading">Clientes</div>
+            <a href="{% url 'gestion:lista_cliente' %}"><i class="fa-solid fa-users"></i> Clientes</a>
+            
+            <a href="{% url 'gestion:lista_motos' %}" class="{% if request.resolver_match.url_name == 'lista_motos' %}active{% endif %}">
+                <i class="fa-solid fa-motorcycle"></i> Motos
             </a>
+            
+            <div class="sidebar-heading">Taller</div>
+            <a href="#"><i class="fa-solid fa-wrench"></i> Órdenes</a>
+            <a href="#"><i class="fa-solid fa-folder"></i> Servicios</a>
+
+            <div class="sidebar-heading">Comercial</div>
+            <a href="#"><i class="fa-solid fa-cart-shopping"></i> Ventas</a>
+            <a href="#"><i class="fa-solid fa-plus"></i> Nueva Venta</a>
+            <a href="#"><i class="fa-solid fa-credit-card"></i> Créditos</a> 
+            <a href="#"><i class="fa-solid fa-box"></i> Productos</a>
+            <a href="#"><i class="fa-solid fa-clipboard"></i> Inventario</a>
+            <a href="#"><i class="fa-solid fa-industry"></i> Compras</a>
+            <a href="#"><i class="fa-solid fa-building"></i> Proveedores</a>
+
+            <div class="sidebar-heading">Administración</div>
+            <a href="#"><i class="fa-solid fa-chart-line"></i> Reportes</a>
+            <a href="#"><i class="fa-solid fa-user"></i> Usuarios</a>
+            <a href="#"><i class="fa-solid fa-clipboard-check"></i> Auditoría</a>
+            <a href="#"><i class="fa-solid fa-gear"></i> Configuración</a>
+        </div>
+
+        <!-- Botón de Cerrar Sesión corregido -->
+        <div class="sidebar-footer">
+            <form method="POST" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger logout-btn text-white fw-bold">
+                    <i class="fa-solid fa-power-off"></i> Cerrar Sesión
+                </button>
+            </form>
         </div>
     </div>
 
