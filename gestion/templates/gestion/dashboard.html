@@ -7,7 +7,9 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h3 class="fw-bold text-dark mb-0">Hola, Bienvenido a soluciones Apache👋</h3>
-        <p class="text-muted small">{% now "l, j de F de Y" %}</p>
+        <p class="text-muted small">
+    {% now "l" %}, {{ now|date:"j" }} de {% now "F" %} de {% now "Y" %}
+</p>
     </div>
     <button class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">
         + Nueva Orden

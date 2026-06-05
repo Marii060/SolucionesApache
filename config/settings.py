@@ -97,13 +97,15 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es-es'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Bogota'
 
 USE_I18N = True
 
 USE_TZ = True
+
+USE_L10N = False
 
 
 # Static files (CSS, JavaScript, Images)
@@ -115,11 +117,11 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
-# CONFIGURACIÓN DE SEGURIDAD (LOGIN), A dónde ir después de iniciar sesión con éxito (por ahora a clientes, luego haremos el Dashboard)
-LOGIN_REDIRECT_URL = '/gestion/clientes/' 
-# A dónde ir después de cerrar sesión
-LOGOUT_REDIRECT_URL = '/cuentas/login/' 
-# A dónde enviar a los intrusos que intenten entrar sin sesión
-LOGIN_URL = '/cuentas/login/'
 # A dónde ir después de iniciar sesión con éxito
-LOGIN_REDIRECT_URL = '/gestion/'
+LOGIN_REDIRECT_URL = 'gestion:dashboard'
+
+# A dónde ir después de cerrar sesión
+LOGOUT_REDIRECT_URL = 'login' 
+
+# A dónde enviar a los intrusos que intenten entrar sin sesión
+LOGIN_URL = 'login'
