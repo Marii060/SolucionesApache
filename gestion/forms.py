@@ -58,7 +58,9 @@ class MotoForm(forms.ModelForm):
     class Meta:
         model = Moto
         fields = ['id_cliente','placa', 'marca', 'modelo', 'cilindraje', 'kilometraje', 'observaciones']
-        
+        labels = {
+            'id_cliente': 'Cliente', 
+        }
         widgets = {
             'id_cliente': forms.Select(attrs={'class': 'form-select'}),
             'placa': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej. ABC-123'}),
