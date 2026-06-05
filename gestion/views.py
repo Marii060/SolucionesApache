@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django import forms
 from django.contrib import messages
 from django.db.models import Sum, Count, Q
 from .models import Cliente, Moto
@@ -93,23 +94,36 @@ def eliminar_cliente(request, cliente_id):
     return render(request, 'gestion/eliminar.html', {'cliente': cliente})
 
 @login_required
-def registrar_moto(request, id_cliente):
-    cliente = get_object_or_404(Cliente, pk=id_cliente)
-    
+def registrar_moto(request, id_cliente=None):
+    # Si viene un id_cliente, buscamos al cliente para pre-seleccionarlo
+    cliente_inicial = None
+    if id_cliente:
+        cliente_inicial = get_object_or_404(Cliente, pk=id_cliente)
+
     if request.method == 'POST':
         form = MotoForm(request.POST)
         if form.is_valid():
-            moto = form.save(commit=False)
-            moto.id_cliente = cliente
-            moto.save()
-            messages.success(request, '¡La moto se ha registrado correctamente!')
-            
-            return redirect('gestion:detalle_cliente', cliente_id=id_cliente)
+            form.save()
+            # Si venía de un perfil de cliente, volvemos allí; si no, a la lista general
+            if id_cliente:
+                return redirect('gestion:detalle_cliente', id_cliente=id_cliente)
+            return redirect('gestion:lista_motos')
     else:
-        form = MotoForm()
-        
-    return render(request, 'gestion/registrar_moto.html', {'form': form, 'cliente': cliente})
+        # Pre-llenamos el formulario si tenemos el cliente
+        initial_data = {'id_cliente': cliente_inicial} if cliente_inicial else None
+        form = MotoForm(initial=initial_data)
 
+        # Aplicamos estilos a todos los campos
+        for field in form.fields.values():
+            if isinstance(field.widget, forms.Select):
+                field.widget.attrs.update({'class': 'form-select'})
+            else:
+                field.widget.attrs.update({'class': 'form-control'})
+    
+    return render(request, 'gestion/registrar_moto.html', {
+        'form': form, 
+        'cliente': cliente_inicial
+    })
 
 @login_required
 def lista_motos(request):
