@@ -64,3 +64,7 @@ class Empleado(models.Model):
 
     def __str__(self):
         return f"{self.user.get_full_name()} - {self.rol}"   
+    estado = models.BooleanField(default=True) # Toggle para activar/desactivar acceso
+
+    def __str__(self):
+        return f"{self.user.get_full_name()} - {self.rol}"    
