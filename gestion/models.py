@@ -32,17 +32,6 @@ class Moto(models.Model):
     observaciones = models.TextField(null=True, blank=True)
     def __str__(self):
         return f"{self.placa} - {self.modelo}"
-    
-class Rol(models.Model):
-    id_rol = models.AutoField(primary_key=True)
-    nombre = models.CharField(max_length=100, unique=True)
-
-    class Meta:
-        verbose_name = "Rol de Usuario"
-        verbose_name_plural = "Roles de Usuarios"
-
-    def __str__(self):
-        return self.nombre
 
 class Log(models.Model):
     id_log = models.AutoField(primary_key=True)
@@ -56,22 +45,20 @@ class Log(models.Model):
         verbose_name_plural = "Registros de Sistema (Logs)"
 
     def __str__(self):
-        return f"{self.fecha_hora} - {self.id_usuario.username}: {self.accion_realizada}"    
-    
-    
-class Empleado(models.Model):
-    # Esto conecta este perfil con el usuario de Django
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    
-    # Esto conecta el empleado con el rol que creaste anteriormente
-    rol = models.ForeignKey(Rol, on_delete=models.SET_NULL, null=True)
-    
-    telefono = models.CharField(max_length=20, blank=True)
-    fecha_ingreso = models.DateField(auto_now_add=True)
-
-    class Meta:
-        verbose_name = "Empleado del Taller"
-        verbose_name_plural = "Empleados del Taller"
+        return f"{self.fecha_hora} - {self.id_usuario.username}: {self.accion_realizada}"  
+#Rol
+class Rol(models.Model):
+    nombre = models.CharField(max_length=50, unique=True)
 
     def __str__(self):
-        return f"{self.user.username} - {self.rol}"    
+        return self.nombre
+
+#Empleados
+class Empleado(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    rol = models.ForeignKey(Rol, on_delete=models.SET_NULL, null=True)
+    telefono = models.CharField(max_length=20, blank=True)
+    estado = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.user.get_full_name()} - {self.rol}"   
