@@ -35,19 +35,21 @@ class Moto(models.Model):
 
 class Log(models.Model):
     id_log = models.AutoField(primary_key=True)
-    fecha_hora = models.DateTimeField(auto_now_add=True) # Django pone la fecha y hora automáticamente
-    accion_realizada = models.CharField(max_length=100)
-    descripcion = models.CharField(max_length=100, blank=True, null=True)
+    fecha_hora = models.DateTimeField(auto_now_add=True, db_column='fecha_hora') # Mapeo explícito
+    accion_realizada = models.CharField(max_length=100, db_column='accion_realizada')
+    descripcion = models.CharField(max_length=100, blank=True, null=True, db_column='descripcion')
     id_usuario = models.ForeignKey(User, on_delete=models.CASCADE, db_column='id_usuario')
 
     class Meta:
+        db_table = 'log' # ¡Muy importante! Esto vincula a tu tabla de MySQL
         verbose_name = "Registro de Sistema (Log)"
         verbose_name_plural = "Registros de Sistema (Logs)"
 
     def __str__(self):
-        return f"{self.fecha_hora} - {self.id_usuario.username}: {self.accion_realizada}"  
+        return f"{self.fecha_hora} - {self.id_usuario.username}: {self.accion_realizada}"
 #Rol
 class Rol(models.Model):
+    id_rol = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=50, unique=True)
 
     def __str__(self):
