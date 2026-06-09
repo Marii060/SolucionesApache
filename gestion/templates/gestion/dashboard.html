@@ -8,7 +8,8 @@
     <div>
         <h3 class="fw-bold text-dark mb-0">Hola, Bienvenido a soluciones Apache👋</h3>
         <p class="text-muted small">
-    {% now "l" %}, {{ now|date:"j" }} de {% now "F" %} de {% now "Y" %}
+    <p>{{ ""|date:"l d \d\e F \d\e Y" }}</p>
+<p>{% now "l d \d\e F \d\e Y" %}</p>
 </p>
     </div>
     <button class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">
