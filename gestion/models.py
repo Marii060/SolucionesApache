@@ -47,29 +47,4 @@ class Log(models.Model):
 
     def __str__(self):
         return f"{self.fecha_hora} - {self.id_usuario.username}: {self.accion_realizada}"
-#Rol
-class Rol(models.Model):
-    id_rol = models.AutoField(primary_key=True)
-    nombre = models.CharField(max_length=50, unique=True)
     
-    class Meta:
-        db_table = 'Rol' 
-        verbose_name = "Rol"
-        verbose_name_plural = "Roles"
-
-    def __str__(self):
-        return self.nombre
-
-#Empleados
-class Empleado(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    rol = models.ForeignKey(Rol, on_delete=models.SET_NULL, null=True)
-    telefono = models.CharField(max_length=20, blank=True)
-    estado = models.BooleanField(default=True)
-
-    def __str__(self):
-        return f"{self.user.get_full_name()} - {self.rol}"   
-    estado = models.BooleanField(default=True) # Toggle para activar/desactivar acceso
-
-    def __str__(self):
-        return f"{self.user.get_full_name()} - {self.rol}"    

@@ -1,6 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from .models import Cliente, Moto, Empleado, Rol, User
+from .models import Cliente, Moto, User
 
 # Definimos solo las dos opciones necesarias
 TIPO_RAZON_SOCIAL = [
@@ -76,24 +76,4 @@ def clean_placa(self):
             raise ValidationError("¡Atención! Ya existe una moto registrada con esta placa.")
         return placa
     
-class RegistroUsuarioForm(forms.ModelForm):
-    # Campos del modelo User
-    password = forms.CharField(widget=forms.PasswordInput)
-    confirmar_password = forms.CharField(widget=forms.PasswordInput)
-    
-    # Campos del modelo Empleado
-    telefono = forms.CharField(max_length=20)
-    rol = forms.ModelChoiceField(queryset=Rol.objects.all())
-    estado = forms.BooleanField(required=False, initial=True)
-
-    class Meta:
-        model = User
-        fields = ['first_name', 'last_name', 'username', 'email', 'password']
-
-    def clean(self):
-        cleaned_data = super().clean()
-        password = cleaned_data.get("password")
-        confirmar = cleaned_data.get("confirmar_password")
-        if password != confirmar:
-            raise forms.ValidationError("Las contraseñas no coinciden.")
-        return cleaned_data    
+   
