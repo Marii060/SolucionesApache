@@ -31,6 +31,13 @@
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold small text-muted">NÚMERO DE DOCUMENTO</label>
                             {{ form.numero_documento }}
+                            {% if form.numero_documento.errors %}
+                                <div class="text-danger small mt-1" style="font-size: 0.875em;">
+                                    {% for error in form.numero_documento.errors %}
+                                    <i class="fa-solid fa-circle-exclamation"></i> {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
                         </div>
                         <div class="col-md-12 mb-3">
                             <label class="form-label fw-bold text-muted">Nombre Completo</label>
