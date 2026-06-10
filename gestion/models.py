@@ -41,7 +41,7 @@ class Log(models.Model):
     id_usuario = models.ForeignKey(User, on_delete=models.CASCADE, db_column='id_usuario')
 
     class Meta:
-        db_table = 'log' # ¡Muy importante! Esto vincula a tu tabla de MySQL
+        db_table = 'log' 
         verbose_name = "Registro de Sistema (Log)"
         verbose_name_plural = "Registros de Sistema (Logs)"
 
@@ -51,6 +51,11 @@ class Log(models.Model):
 class Rol(models.Model):
     id_rol = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=50, unique=True)
+    
+    class Meta:
+        db_table = 'Rol' 
+        verbose_name = "Rol"
+        verbose_name_plural = "Roles"
 
     def __str__(self):
         return self.nombre
