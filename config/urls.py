@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path, include # <-- Importante agregar include aquí
+from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -7,4 +7,5 @@ urlpatterns = [
     path('cuentas/', include('django.contrib.auth.urls')),
     # Conectamos las rutas de gestión
     path('gestion/', include('gestion.urls')), 
+    path('operaciones/', include('operaciones.urls')), 
 ]
