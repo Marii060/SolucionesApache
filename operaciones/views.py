@@ -12,9 +12,9 @@ def lista_catalogo(request):
 
     # Filtramos por coincidencia si hay texto en la barra
     if query:
-        lista_servicios = ListaServicio.objects.filter(nombre_servicio__icontains=query).order_by('nombre_servicio')
+        lista_servicios = ListaServicio.objects.filter(nombre_servicio__icontains=query).order_by('id_lista_servicio')
     else:
-        lista_servicios = ListaServicio.objects.all().order_by('nombre_servicio')
+        lista_servicios = ListaServicio.objects.all().order_by('id_lista_servicio')
     
     # Paginación de a 10 registros
     paginator = Paginator(lista_servicios, 10)
