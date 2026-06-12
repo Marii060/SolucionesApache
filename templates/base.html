@@ -98,6 +98,16 @@
         .logout-btn {
             width: 100%;
         }
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Ocultar flechas de los campos numéricos (Firefox) */
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
     </style>
 </head>
 <body>
@@ -118,10 +128,12 @@
             </a>
             
             <div class="sidebar-heading">Taller</div>
+            
             <a href="{% url 'operaciones:crear_servicio' %}" class="{% if request.resolver_match.url_name == 'crear_servicio' %}active{% endif %}">
                 <i class="fa-solid fa-wrench"></i> Órdenes de Servicio
             </a>
-            <a href="#">
+            
+            <a href="{% url 'operaciones:lista_catalogo' %}" class="{% if request.resolver_match.url_name == 'lista_catalogo' %}active{% endif %}">
                 <i class="fa-solid fa-list"></i> Catálogo de Servicios
             </a>
 
