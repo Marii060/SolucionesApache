@@ -1,0 +1,53 @@
+{% extends 'base.html' %} 
+
+{% block title %}Nuevo Servicio - Soluciones Apache{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-md-8">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="fw-bold" style="color: #333;">Registrar Servicio</h2>
+            <a href="{% url 'operaciones:lista_catalogo' %}" class="btn fw-bold px-4 shadow-sm" style="background-color: #3b71ca; color: white; border-radius: 8px;">
+                Volver a la lista
+            </a>
+        </div>
+
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold small text-muted">{{ form.nombre_servicio.label|upper }}</label>
+                            {{ form.nombre_servicio }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold small text-muted">{{ form.precio_base_mano_obra.label|upper }}</label>
+                            {{ form.precio_base_mano_obra }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">{{ form.descripcion.label|upper }}</label>
+                        {{ form.descripcion }}
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        {{ form.estado }}
+                        <label class="form-check-label fw-bold small text-muted ms-2 mt-1" for="{{ form.estado.id_for_label }}">
+                            SERVICIO ACTIVO
+                        </label>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <button type="submit" class="btn btn-primary fw-bold px-4" style="border-radius: 8px; background-color: #3b71ca; border: none;">
+                            Guardar Servicio
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

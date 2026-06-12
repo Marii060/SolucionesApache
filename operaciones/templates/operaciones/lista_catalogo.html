@@ -1,0 +1,123 @@
+{% extends 'base.html' %} 
+{% load humanize %} 
+
+{% block title %}Catálogo de Servicios - Soluciones Apache{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4 px-md-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold m-0" style="color: #0f172a; font-size: 1.8rem;">Catálogo de Servicios</h2>
+            <p class="text-muted m-0 mt-1" style="font-size: 0.9rem;">Servicios disponibles del taller</p>
+        </div>
+        <a href="{% url 'operaciones:crear_catalogo' %}" class="btn fw-bold px-4 shadow-sm" style="background-color: #2563eb; color: white; border-radius: 8px;">
+            + Nuevo Servicio
+        </a>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm" role="alert">
+                <i class="fa-solid fa-circle-check me-2"></i> {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body p-0">
+            
+            <div class="d-flex flex-wrap justify-content-between align-items-center p-4 border-bottom">
+                <h5 class="fw-bold m-0" style="color: #0f172a;">Servicios</h5>
+                <form method="GET" action="{% url 'operaciones:lista_catalogo' %}" style="width: 280px;">
+                    <div class="input-group" style="border-radius: 8px; border: 1px solid #e2e8f0; background-color: #f8fafc; overflow: hidden;">
+                        <span class="input-group-text bg-transparent border-0 pe-2" style="color: #3b71ca;">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+                        <input type="text" name="buscar" value="{{ query }}" class="form-control border-0 bg-transparent shadow-none px-0" placeholder="Buscar servicio...">
+                    </div>
+                </form>
+            </div>
+
+            <div class="table-responsive p-4 pt-3">
+                <table class="table align-middle table-hover border-bottom-0" style="margin-bottom: 0;">
+                    <thead>
+                        <tr class="text-uppercase text-muted" style="font-size: 0.75rem; letter-spacing: 0.5px; font-weight: 700; border-bottom: 2px solid #e2e8f0;">
+                            <th class="pb-3" style="width: 10%; border: none;">Código</th>
+                            <th class="pb-3" style="width: 20%; border: none;">Nombre</th>
+                            <th class="pb-3" style="width: 30%; border: none;">Descripción</th>
+                            <th class="pb-3" style="width: 15%; border: none;">Costo Base</th>
+                            <th class="pb-3" style="width: 10%; border: none;">Estado</th>
+                            <th class="pb-3 text-center" style="width: 15%; border: none;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody style="font-size: 0.9rem;">
+                        {% for servicio in servicios %}
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td class="text-muted fw-medium">SV-{{ servicio.id_lista_servicio|stringformat:"03d" }}</td>
+                            
+                            <td class="fw-bold text-dark">{{ servicio.nombre_servicio }}</td>
+                            
+                            <td class="text-muted text-break">{{ servicio.descripcion|default:"---" }}</td>
+                            
+                            <td class="fw-bold text-dark">$ {{ servicio.precio_base_mano_obra|floatformat:0|intcomma }}</td>
+                            
+                            <td>
+                                {% if servicio.estado %}
+                                    <span class="badge" style="background-color: #dcfce7; color: #16a34a; padding: 6px 12px; border-radius: 6px; font-weight: 600;">Activo</span>
+                                {% else %}
+                                    <span class="badge" style="background-color: #fef08a; color: #ca8a04; padding: 6px 12px; border-radius: 6px; font-weight: 600;">Inactivo</span>
+                                {% endif %}
+                            </td>
+                            
+                            <td class="text-center">
+                                <a href="#" class="btn btn-sm me-1" style="background-color: #fff7ed; color: #ea580c; border: 1px solid #fdba74; border-radius: 6px;"><i class="fa-solid fa-pen"></i></a>
+                                <a href="#" class="btn btn-sm" style="background-color: #fef2f2; color: #dc2626; border: 1px solid #fca5a5; border-radius: 6px;"><i class="fa-solid fa-trash"></i></a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-5">
+                                <i class="fa-solid fa-folder-open display-6 mb-3 text-secondary opacity-50"></i>
+                                {% if query %}
+                                    <br>No encontramos ningún servicio que coincida con "<b>{{ query }}</b>".
+                                {% else %}
+                                    <br>No hay servicios registrados en el catálogo aún.
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if servicios.has_other_pages %}
+            <nav aria-label="Navegación de páginas" class="pb-4">
+                <ul class="pagination justify-content-center m-0">
+                    {% if servicios.has_previous %}
+                        <li class="page-item"><a class="page-link fw-bold" href="?page={{ servicios.previous_page_number }}{% if query %}&buscar={{ query }}{% endif %}" style="color: #3b71ca; border-radius: 8px 0 0 8px;">Anterior</a></li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link text-muted" style="border-radius: 8px 0 0 8px;">Anterior</span></li>
+                    {% endif %}
+
+                    {% for num in servicios.paginator.page_range %}
+                        {% if servicios.number == num %}
+                            <li class="page-item active"><span class="page-link fw-bold" style="background-color: #3b71ca; border-color: #3b71ca; color: white;">{{ num }}</span></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ num }}{% if query %}&buscar={{ query }}{% endif %}" style="color: #3b71ca;">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if servicios.has_next %}
+                        <li class="page-item"><a class="page-link fw-bold" href="?page={{ servicios.next_page_number }}{% if query %}&buscar={{ query }}{% endif %}" style="color: #3b71ca; border-radius: 0 8px 8px 0;">Siguiente</a></li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link text-muted" style="border-radius: 0 8px 8px 0;">Siguiente</span></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+{% endblock %}
