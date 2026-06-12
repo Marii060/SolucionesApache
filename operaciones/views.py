@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from .models import Servicio, ListaServicio
 from .forms import ServicioForm, ListaServicioForm
@@ -38,6 +39,35 @@ def crear_catalogo(request):
         form = ListaServicioForm()
         
     return render(request, 'operaciones/registrar_catalogo.html', {'form': form})
+
+@login_required
+def editar_catalogo(request, id):
+    # Buscamos el servicio específico usando su ID
+    servicio = get_object_or_404(ListaServicio, id_lista_servicio=id)
+    
+    if request.method == 'POST':
+        # Le pasamos el 'instance=servicio' para que sobreescriba, no cree uno nuevo
+        form = ListaServicioForm(request.POST, instance=servicio)
+        if form.is_valid():
+            form.save()
+            messages.success(request, '¡Servicio actualizado correctamente!')
+            return redirect('operaciones:lista_catalogo')
+    else:
+        # Cargamos el formulario con los datos que ya tiene el servicio
+        form = ListaServicioForm(instance=servicio)
+        
+    return render(request, 'operaciones/registrar_catalogo.html', {'form': form, 'servicio': servicio})
+
+@login_required
+def eliminar_catalogo(request, id):
+    servicio = get_object_or_404(ListaServicio, id_lista_servicio=id)
+    
+    if request.method == 'POST':
+        servicio.delete()
+        messages.success(request, '¡Servicio eliminado del catálogo exitosamente!')
+        return redirect('operaciones:lista_catalogo')
+        
+    return render(request, 'operaciones/eliminar_catalogo.html', {'servicio': servicio})
 
 @login_required
 def crear_servicio(request):
