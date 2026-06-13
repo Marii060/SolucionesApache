@@ -8,4 +8,6 @@ urlpatterns = [
     # Conectamos las rutas de gestión
     path('gestion/', include('gestion.urls')), 
     path('operaciones/', include('operaciones.urls')), 
+    #ruta para el inventario
+    path('inventario/', include('inventario.urls')),
 ]
