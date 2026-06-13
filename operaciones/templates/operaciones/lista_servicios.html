@@ -1,0 +1,157 @@
+{% extends 'base.html' %} 
+{% load humanize %} 
+
+{% block title %}Órdenes de Servicio - Soluciones Apache{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4 px-md-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold m-0" style="color: #0f172a; font-size: 1.8rem;">Órdenes de Servicio</h2>
+            <p class="text-muted m-0 mt-1" style="font-size: 0.9rem;">Historial y seguimiento de ingresos al taller</p>
+        </div>
+        <a href="{% url 'operaciones:crear_servicio' %}" class="btn fw-bold px-4 shadow-sm" style="background-color: #2563eb; color: white; border-radius: 8px;">
+            + Nueva Orden
+        </a>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm" role="alert">
+                <i class="fa-solid fa-circle-check me-2"></i> {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body p-0">
+            
+            <div class="d-flex flex-wrap justify-content-between align-items-center p-4 border-bottom gap-3">
+                
+                <div class="d-flex align-items-center flex-wrap gap-1 bg-light p-1 rounded-3" style="border: 1px solid #e2e8f0;">
+                    <a href="?estado=Todos{% if query %}&buscar={{ query }}{% endif %}" class="btn btn-sm fw-semibold px-3 py-1.5 border-0" style="border-radius: 6px; {% if estado_actual == 'Todos' %}background-color: white; color: #2563eb; shadow-sm;{% else %}color: #64748b;{% endif %}">
+                        Todos
+                    </a>
+                    <a href="?estado=Pendiente{% if query %}&buscar={{ query }}{% endif %}" class="btn btn-sm fw-semibold px-3 py-1.5 border-0" style="border-radius: 6px; {% if estado_actual == 'Pendiente' %}background-color: white; color: #2563eb; shadow-sm;{% else %}color: #64748b;{% endif %}">
+                        Pendiente
+                    </a>
+                    <a href="?estado=En Proceso{% if query %}&buscar={{ query }}{% endif %}" class="btn btn-sm fw-semibold px-3 py-1.5 border-0" style="border-radius: 6px; {% if estado_actual == 'En Proceso' %}background-color: white; color: #2563eb; shadow-sm;{% else %}color: #64748b;{% endif %}">
+                        En Proceso
+                    </a>
+                    <a href="?estado=Terminado{% if query %}&buscar={{ query }}{% endif %}" class="btn btn-sm fw-semibold px-3 py-1.5 border-0" style="border-radius: 6px; {% if estado_actual == 'Terminado' %}background-color: white; color: #16a34a; shadow-sm;{% else %}color: #64748b;{% endif %}">
+                        Terminado
+                    </a>
+                    <a href="?estado=Entregado{% if query %}&buscar={{ query }}{% endif %}" class="btn btn-sm fw-semibold px-3 py-1.5 border-0" style="border-radius: 6px; {% if estado_actual == 'Entregado' %}background-color: white; color: #0369a1; shadow-sm;{% else %}color: #64748b;{% endif %}">
+                        Entregado
+                    </a>
+                </div>
+                
+                <form method="GET" action="{% url 'operaciones:lista_servicios' %}" style="width: 260px;">
+                    <input type="hidden" name="estado" value="{{ estado_actual }}">
+                    <div class="input-group" style="border-radius: 8px; border: 1px solid #e2e8f0; background-color: #f8fafc; overflow: hidden;">
+                        <span class="input-group-text bg-transparent border-0 pe-2" style="color: #3b71ca;">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+                        <input type="text" name="buscar" value="{{ query }}" class="form-control border-0 bg-transparent shadow-none px-0" placeholder="Buscar por código o placa...">
+                    </div>
+                </form>
+            </div>
+
+            <div class="table-responsive p-4 pt-3">
+                <table class="table align-middle table-hover border-bottom-0" style="margin-bottom: 0;">
+                    <thead>
+                        <tr class="text-uppercase text-muted" style="font-size: 0.75rem; letter-spacing: 0.5px; font-weight: 700; border-bottom: 2px solid #e2e8f0;">
+                            <th class="pb-3" style="width: 10%; border: none;">Código</th>
+                            <th class="pb-3" style="width: 15%; border: none;">Cliente</th>
+                            <th class="pb-3" style="width: 12%; border: none;">Moto/Placa</th>
+                            <th class="pb-3" style="width: 13%; border: none;">Mecánico</th>
+                            <th class="pb-3" style="width: 25%; border: none;">Descripción</th>
+                            <th class="pb-3" style="width: 12%; border: none;">Total</th>
+                            <th class="pb-3" style="width: 13%; border: none;">Estado</th>
+                            <th class="pb-3 text-center" style="width: 10%; border: none;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody style="font-size: 0.9rem;">
+                        {% for orden in ordenes %}
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td class="fw-bold text-dark">{{ orden.codigo_servicio }}</td>
+                            
+                            <td class="text-dark fw-medium">
+                                {{ orden.id_moto.id_cliente.nombre|default:"Cliente General" }}
+                            </td>
+                            
+                            <td>
+                                <span class="fw-semibold text-dark"><i class="fa-solid fa-motorcycle text-muted me-1"></i> {{ orden.id_moto.placa }}</span>
+                            </td>
+                            
+                            <td class="text-muted">
+                                {{ orden.id_usuario.get_full_name|default:orden.id_usuario.username }}
+                            </td>
+                            
+                            <td class="text-muted text-break">
+                                {{ orden.descripcion|default:"---"|truncatechars:45 }}
+                            </td>
+                            
+                            <td class="fw-bold text-dark">$ {{ orden.valor_total|floatformat:0|intcomma }}</td>
+                            
+                            <td>
+                                {% if orden.estado == 'Pendiente' %}
+                                    <span class="badge" style="background-color: #f1f5f9; color: #475569; padding: 6px 12px; border-radius: 6px; font-weight: 600;">Pendiente</span>
+                                {% elif orden.estado == 'En Proceso' %}
+                                    <span class="badge" style="background-color: #dbeafe; color: #2563eb; padding: 6px 12px; border-radius: 6px; font-weight: 600;">En Proceso</span>
+                                {% elif orden.estado == 'Terminado' %}
+                                    <span class="badge" style="background-color: #dcfce7; color: #16a34a; padding: 6px 12px; border-radius: 6px; font-weight: 600;">Terminado</span>
+                                {% elif orden.estado == 'Entregado' %}
+                                    <span class="badge" style="background-color: #e0f2fe; color: #0369a1; padding: 6px 12px; border-radius: 6px; font-weight: 600;">Entregado</span>
+                                {% endif %}
+                            </td>
+                            
+                            <td class="text-center">
+                                <a href="#" class="btn btn-sm" style="background-color: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; border-radius: 6px;" title="Ver Detalles">
+                                    <i class="fa-solid fa-folder-open"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center text-muted py-5">
+                                <i class="fa-solid fa-wrench display-6 mb-3 text-secondary opacity-50"></i>
+                                <br>No se encontraron órdenes de servicio bajo estos criterios.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if ordenes.has_other_pages %}
+            <nav aria-label="Navegación de páginas" class="pb-4">
+                <ul class="pagination justify-content-center m-0">
+                    {% if ordenes.has_previous %}
+                        <li class="page-item"><a class="page-link fw-bold" href="?page={{ ordenes.previous_page_number }}&estado={{ estado_actual }}{% if query %}&buscar={{ query }}{% endif %}" style="color: #3b71ca; border-radius: 8px 0 0 8px;">Anterior</a></li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link text-muted" style="border-radius: 8px 0 0 8px;">Anterior</span></li>
+                    {% endif %}
+
+                    {% for num in ordenes.paginator.page_range %}
+                        {% if ordenes.number == num %}
+                            <li class="page-item active"><span class="page-link fw-bold" style="background-color: #3b71ca; border-color: #3b71ca; color: white;">{{ num }}</span></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ num }}&estado={{ estado_actual }}{% if query %}&buscar={{ query }}{% endif %}" style="color: #3b71ca;">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if ordenes.has_next %}
+                        <li class="page-item"><a class="page-link fw-bold" href="?page={{ ordenes.next_page_number }}&estado={{ estado_actual }}{% if query %}&buscar={{ query }}{% endif %}" style="color: #3b71ca; border-radius: 0 8px 8px 0;">Siguiente</a></li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link text-muted" style="border-radius: 0 8px 8px 0;">Siguiente</span></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+{% endblock %}

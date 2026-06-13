@@ -129,7 +129,7 @@
             
             <div class="sidebar-heading">Taller</div>
             
-            <a href="{% url 'operaciones:crear_servicio' %}" class="{% if request.resolver_match.url_name == 'crear_servicio' %}active{% endif %}">
+            <a href="{% url 'operaciones:lista_servicios' %}" class="{% if request.resolver_match.url_name == 'lista_servicios' or request.resolver_match.url_name == 'crear_servicio' %}active{% endif %}">
                 <i class="fa-solid fa-wrench"></i> Órdenes de Servicio
             </a>
             
