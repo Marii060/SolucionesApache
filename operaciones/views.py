@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
+from django.db.models import Q
 from django.core.paginator import Paginator
 from .models import Servicio, ListaServicio
 from .forms import ServicioForm, ListaServicioForm
@@ -70,22 +71,50 @@ def eliminar_catalogo(request, id):
     return render(request, 'operaciones/eliminar_catalogo.html', {'servicio': servicio})
 
 @login_required
+def lista_servicios(request):
+    #Capturamos el texto del buscador y el estado seleccionado (por defecto 'Todos')
+    query = request.GET.get('buscar', '')
+    estado_filtro = request.GET.get('estado', 'Todos')
+    lista_ordenes = Servicio.objects.all()
+
+    #Aplicamos filtro de búsqueda si el usuario escribió algo (Código o Placa)
+    if query:
+        lista_ordenes = lista_ordenes.filter(
+            Q(codigo_servicio__icontains=query) | 
+            Q(id_moto__placa__icontains=query)
+        )
+
+    #Aplicamos filtro por Estado si seleccionó uno diferente a 'Todos'
+    if estado_filtro != 'Todos':
+        lista_ordenes = lista_ordenes.filter(estado=estado_filtro)
+
+    #Ordenamos para que las más recientes aparezcan arriba
+    lista_ordenes = lista_ordenes.order_by('-id_servicio')
+    
+    #Paginacion de a 10 registros
+    paginator = Paginator(lista_ordenes, 10)
+    page_number = request.GET.get('page')
+    ordenes = paginator.get_page(page_number)
+    
+    #Enviamos los datos y los estados actuales para mantener la selección visual activa
+    return render(request, 'operaciones/lista_servicios.html', {
+        'ordenes': ordenes,
+        'query': query,
+        'estado_actual': estado_filtro
+    })
+
+@login_required
 def crear_servicio(request):
     if request.method == 'POST':
         form = ServicioForm(request.POST)
         if form.is_valid():
             servicio = form.save(commit=False) 
-            
-            # Asignamos automáticamente el usuario de la sesión activa
             servicio.id_usuario = request.user 
-            
-            # Guardamos definitivamente en MySQL
             servicio.save() 
             
             messages.success(request, '¡Orden de servicio creada con éxito!')
-            
-            # NOTA: Cambiado temporalmente a lista_catalogo para evitar errores si no has creado la lista de órdenes
-            return redirect('operaciones:lista_catalogo') 
+
+            return redirect('operaciones:lista_servicios') 
     else:
         form = ServicioForm()
         
