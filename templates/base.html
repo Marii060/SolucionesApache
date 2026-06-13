@@ -154,7 +154,7 @@
                     Productos
                 </a>
                 
-                <a href="#" class="ms-4 {% if 'marcas' in request.path %}active{% endif %}">
+                <a href="{% url 'inventario:lista_marcas' %}" class="ms-4 {% if 'marcas' in request.path %}active{% endif %}">
                     Marcas
                 </a>
 

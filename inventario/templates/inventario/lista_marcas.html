@@ -1,0 +1,83 @@
+{% extends 'base.html' %} 
+
+{% block title %}Marcas - Soluciones Apache{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4 px-md-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold m-0" style="color: #0f172a; font-size: 1.8rem;">Marcas</h2>
+            <p class="text-muted m-0 mt-1" style="font-size: 0.9rem;">Gestión de fabricantes y marcas de repuestos</p>
+        </div>
+        <a href="{% url 'inventario:crear_marca' %}" class="btn fw-bold px-4 shadow-sm" style="background-color: #2563eb; color: white; border-radius: 8px;">
+            + Nueva Marca
+        </a>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %} alert-dismissible fade show rounded-3 shadow-sm" role="alert">
+                <i class="fa-solid {% if message.tags == 'error' %}fa-triangle-exclamation{% else %}fa-circle-check{% endif %} me-2"></i> {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body p-0">
+            <div class="d-flex flex-wrap justify-content-between align-items-center p-4 border-bottom">
+                <h5 class="fw-bold m-0" style="color: #0f172a;">Listado de Marcas</h5>
+                <form method="GET" action="{% url 'inventario:lista_marcas' %}" style="width: 280px;">
+                    <div class="input-group" style="border-radius: 8px; border: 1px solid #e2e8f0; background-color: #f8fafc; overflow: hidden;">
+                        <span class="input-group-text bg-transparent border-0 pe-2" style="color: #3b71ca;">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+                        <input type="text" name="buscar" value="{{ query }}" class="form-control border-0 bg-transparent shadow-none px-0" placeholder="Buscar marca...">
+                    </div>
+                </form>
+            </div>
+
+            <div class="table-responsive p-4 pt-3">
+                <table class="table align-middle table-hover border-bottom-0" style="margin-bottom: 0;">
+                    <thead>
+                        <tr class="text-uppercase text-muted" style="font-size: 0.75rem; font-weight: 700; border-bottom: 2px solid #e2e8f0;">
+                            <th class="pb-3" style="width: 10%; border: none;">ID</th>
+                            <th class="pb-3" style="width: 25%; border: none;">Nombre</th>
+                            <th class="pb-3" style="width: 35%; border: none;">Descripción</th>
+                            <th class="pb-3 text-center" style="width: 15%; border: none;">Productos</th>
+                            <th class="pb-3 text-center" style="width: 15%; border: none;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody style="font-size: 0.9rem;">
+                        {% for marca in marcas %}
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td class="fw-bold text-muted">{{ marca.id_marca }}</td>
+                            <td class="fw-bold text-dark">{{ marca.nombre }}</td>
+                            <td class="text-muted text-break">{{ marca.descripcion|default:"---" }}</td>
+                            
+                            <td class="text-center fw-bold text-dark">
+                                <span class="px-2.5 py-1 rounded-3" style="background-color: #f8fafc; border: 1px solid #e2e8f0;">
+                                    {{ marca.producto_set.count }}
+                                </span>
+                            </td>
+                            
+                            <td class="text-center">
+                                <a href="{% url 'inventario:editar_marca' marca.id_marca %}" class="btn btn-sm me-1" style="background-color: #fff7ed; color: #ea580c; border: 1px solid #fdba74; border-radius: 6px;" title="Editar"><i class="fa-solid fa-pen"></i></a>
+                                <a href="{% url 'inventario:eliminar_marca' marca.id_marca %}" class="btn btn-sm" style="background-color: #fef2f2; color: #dc2626; border: 1px solid #fca5a5; border-radius: 6px;" title="Eliminar"><i class="fa-solid fa-trash"></i></a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-5">
+                                <i class="fa-solid fa-copyright display-6 mb-3 text-secondary opacity-50"></i>
+                                <br>No hay marcas registradas aún.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
