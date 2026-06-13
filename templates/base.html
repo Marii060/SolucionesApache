@@ -141,10 +141,39 @@
             <a href="#"><i class="fa-solid fa-cart-shopping"></i> Ventas</a>
             <a href="#"><i class="fa-solid fa-plus"></i> Nueva Venta</a>
             <a href="#"><i class="fa-solid fa-credit-card"></i> Créditos</a> 
-            <a href="#"><i class="fa-solid fa-box"></i> Productos</a>
-            <a href="#"><i class="fa-solid fa-clipboard"></i> Inventario</a>
-            <a href="#"><i class="fa-solid fa-industry"></i> Compras</a>
-            <a href="#"><i class="fa-solid fa-building"></i> Proveedores</a>
+            <div class="sidebar-heading mt-3">Almacén</div>
+            
+            <a href="#collapseInventario" data-bs-toggle="collapse" role="button" aria-expanded="{% if request.resolver_match.app_name == 'inventario' %}true{% else %}false{% endif %}" class="d-flex justify-content-between align-items-center {% if request.resolver_match.app_name == 'inventario' %}active{% endif %}">
+                <span><i class="fa-solid fa-boxes-stacked fa-fw"></i> Inventario</span>
+                <i class="fa-solid fa-chevron-down" style="font-size: 0.8rem;"></i>
+            </a>
+
+            <div class="collapse {% if request.resolver_match.app_name == 'inventario' %}show{% endif %}" id="collapseInventario">
+
+                <a href="#" class="ms-4 {% if 'productos' in request.path %}active{% endif %}">
+                    Productos
+                </a>
+                
+                <a href="#" class="ms-4 {% if 'marcas' in request.path %}active{% endif %}">
+                    Marcas
+                </a>
+
+                <a href="{% url 'inventario:lista_categorias' %}" class="ms-4 {% if 'categorias' in request.path %}active{% endif %}">
+                    Categorías
+                </a>
+                
+                <a href="#" class="ms-4 {% if 'control' in request.path %}active{% endif %}">
+                    Control de Inventario
+                </a>
+            </div>
+
+            <a href="#" class="{% if 'compras' in request.path %}active{% endif %}">
+                <i class="fa-solid fa-cart-shopping fa-fw"></i> Compras
+            </a>
+
+            <a href="#" class="{% if 'proveedores' in request.path %}active{% endif %}">
+                <i class="fa-solid fa-truck fa-fw"></i> Proveedores
+            </a>
 
             <div class="sidebar-heading">Administración</div>
             <a href="#"><i class="fa-solid fa-chart-line"></i> Reportes</a>
