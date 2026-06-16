@@ -150,7 +150,7 @@
 
             <div class="collapse {% if request.resolver_match.app_name == 'inventario' %}show{% endif %}" id="collapseInventario">
 
-                <a href="#" class="ms-4 {% if 'productos' in request.path %}active{% endif %}">
+                <a href="{% url 'inventario:lista_productos' %}" class="ms-4 {% if 'productos' in request.path %}active{% endif %}">
                     Productos
                 </a>
                 
