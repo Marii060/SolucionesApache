@@ -1,0 +1,128 @@
+{% extends 'base.html' %} 
+{% load humanize %}
+
+{% block title %}Productos - Soluciones Apache{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4 px-md-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold m-0" style="color: #0f172a; font-size: 1.8rem;">Catálogo de Productos</h2>
+            <p class="text-muted m-0 mt-1" style="font-size: 0.9rem;">Inventario general de repuestos y accesorios</p>
+        </div>
+        <a href="{% url 'inventario:crear_producto' %}" class="btn fw-bold px-4 shadow-sm" style="background-color: #2563eb; color: white; border-radius: 8px;">
+            + Nuevo Producto
+        </a>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm" role="alert">
+                <i class="fa-solid fa-circle-check me-2"></i> {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body p-0">
+            <div class="d-flex flex-wrap justify-content-between align-items-center p-4 border-bottom">
+                <h5 class="fw-bold m-0" style="color: #0f172a;">Listado de Productos</h5>
+                <form method="GET" action="{% url 'inventario:lista_productos' %}" style="width: 320px;">
+                    <div class="input-group" style="border-radius: 8px; border: 1px solid #e2e8f0; background-color: #f8fafc; overflow: hidden;">
+                        <span class="input-group-text bg-transparent border-0 pe-2" style="color: #3b71ca;">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+                        <input type="text" name="buscar" value="{{ query }}" class="form-control border-0 bg-transparent shadow-none px-0" placeholder="Buscar por código o nombre...">
+                    </div>
+                </form>
+            </div>
+
+            <div class="table-responsive p-4 pt-3">
+                <table class="table align-middle table-hover border-bottom-0" style="margin-bottom: 0;">
+                    <thead>
+                        <tr class="text-uppercase text-muted" style="font-size: 0.75rem; font-weight: 700; border-bottom: 2px solid #e2e8f0;">
+                            <th class="pb-3" style="width: 10%; border: none;">Código</th>
+                            <th class="pb-3" style="width: 25%; border: none;">Producto</th>
+                            <th class="pb-3" style="width: 15%; border: none;">Categoría/Marca</th>
+                            <th class="pb-3" style="width: 12%; border: none;">Precio Venta</th>
+                            <th class="pb-3 text-center" style="width: 10%; border: none;">Stock</th>
+                            <th class="pb-3" style="width: 13%; border: none;">Estado</th>
+                            <th class="pb-3 text-center" style="width: 15%; border: none;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody style="font-size: 0.9rem;">
+                        {% for producto in productos %}
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td class="fw-bold text-dark">{{ producto.codigo_interno }}</td>
+                            
+                            <td>
+                                <div class="fw-bold text-dark">{{ producto.nombre }}</div>
+                                {% if producto.codigo_barras %}
+                                    <small class="text-muted"><i class="fa-solid fa-barcode"></i> {{ producto.codigo_barras }}</small>
+                                {% endif %}
+                            </td>
+                            
+                            <td>
+                                <span class="badge bg-light text-dark border mb-1">{{ producto.id_categoria.nombre }}</span><br>
+                                <small class="text-muted fw-semibold">{{ producto.id_marca.nombre }}</small>
+                            </td>
+                            
+                            <td class="fw-bold text-success">$ {{ producto.precio_venta|floatformat:0|intcomma }}</td>
+                            
+                            <td class="text-center">
+                                {% if producto.cantidad <= producto.stock_minimo %}
+                                    <span class="badge text-danger" style="background-color: #fef2f2; border: 1px solid #fca5a5; font-size: 0.85rem;">{{ producto.cantidad }}</span>
+                                {% else %}
+                                    <span class="fw-bold text-dark">{{ producto.cantidad }}</span>
+                                {% endif %}
+                            </td>
+                            
+                            <td>
+                                {% if producto.disponible %}
+                                    <span class="badge" style="background-color: #dcfce7; color: #16a34a; padding: 6px 12px; border-radius: 6px;">Disponible</span>
+                                {% else %}
+                                    <span class="badge" style="background-color: #fef2f2; color: #dc2626; padding: 6px 12px; border-radius: 6px;">Inactivo</span>
+                                {% endif %}
+                            </td>
+                            
+                            <td class="text-center">
+                                <a href="{% url 'inventario:editar_producto' producto.id_producto %}" class="btn btn-sm me-1" style="background-color: #fff7ed; color: #ea580c; border: 1px solid #fdba74; border-radius: 6px;" title="Editar"><i class="fa-solid fa-pen"></i></a>
+                                <a href="{% url 'inventario:inactivar_producto' producto.id_producto %}" class="btn btn-sm" style="background-color: #fef2f2; color: #dc2626; border: 1px solid #fca5a5; border-radius: 6px;" title="Inactivar"><i class="fa-solid fa-ban"></i></a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-5">
+                                <i class="fa-solid fa-box-open display-6 mb-3 text-secondary opacity-50"></i>
+                                <br>No hay productos registrados en el inventario.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            {% if productos.has_other_pages %}
+            <nav aria-label="Navegación de páginas" class="pb-4 pt-2">
+                <ul class="pagination justify-content-center m-0">
+                    {% if productos.has_previous %}
+                        <li class="page-item"><a class="page-link fw-bold" href="?page={{ productos.previous_page_number }}{% if query %}&buscar={{ query }}{% endif %}" style="color: #3b71ca; border-radius: 8px 0 0 8px;">Anterior</a></li>
+                    {% endif %}
+                    {% for num in productos.paginator.page_range %}
+                        {% if productos.number == num %}
+                            <li class="page-item active"><span class="page-link fw-bold" style="background-color: #3b71ca; border-color: #3b71ca; color: white;">{{ num }}</span></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ num }}{% if query %}&buscar={{ query }}{% endif %}" style="color: #3b71ca;">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if productos.has_next %}
+                        <li class="page-item"><a class="page-link fw-bold" href="?page={{ productos.next_page_number }}{% if query %}&buscar={{ query }}{% endif %}" style="color: #3b71ca; border-radius: 0 8px 8px 0;">Siguiente</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

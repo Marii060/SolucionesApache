@@ -1,0 +1,113 @@
+{% extends 'base.html' %} 
+
+{% block title %}
+    {% if producto %}Editar{% else %}Nuevo{% endif %} Producto - Soluciones Apache
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-lg-10">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="fw-bold" style="color: #333;">
+                {% if producto %}Editar Producto: {{ producto.codigo_interno }}{% else %}Registrar Producto{% endif %}
+            </h2>
+            <a href="{% url 'inventario:lista_productos' %}" class="btn fw-bold px-4 shadow-sm" style="background-color: #3b71ca; color: white; border-radius: 8px;">
+                Volver
+            </a>
+        </div>
+
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-body p-4 p-md-5">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <label class="form-label fw-bold small text-muted">CÓDIGO INTERNO</label>
+                            {{ form.codigo_interno }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted">CÓDIGO DE BARRAS (Opcional)</label>
+                            {{ form.codigo_barras }}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <label class="form-label fw-bold small text-muted">NOMBRE DEL PRODUCTO</label>
+                            {{ form.nombre }}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <label class="form-label fw-bold small text-muted">CATEGORÍA</label>
+                            {{ form.id_categoria }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted">MARCA</label>
+                            {{ form.id_marca }}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <label class="form-label fw-bold small text-muted">DESCRIPCIÓN</label>
+                            {{ form.descripcion }}
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-3 mb-3 mb-md-0">
+                            <label class="form-label fw-bold small text-muted">PRECIO COMPRA</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">$</span>
+                                {{ form.precio_compra }}
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3 mb-md-0">
+                            <label class="form-label fw-bold small text-muted">PRECIO VENTA</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">$</span>
+                                {{ form.precio_venta }}
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3 mb-md-0">
+                            <label class="form-label fw-bold small text-muted">STOCK MÍNIMO</label>
+                            {{ form.stock_minimo }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold small text-muted">CANTIDAD INICIAL</label>
+                            {{ form.cantidad }}
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <label class="form-label fw-bold small text-muted">PROVEEDORES ASOCIADOS (Opcional)</label>
+                            {{ form.proveedores }}
+                            <div class="form-text">Mantén presionado Ctrl (o Cmd) para seleccionar varios.</div>
+                        </div>
+                        <div class="col-md-6 d-flex align-items-center mt-3 mt-md-0">
+                            <div class="form-check form-switch ms-md-4">
+                                {{ form.disponible }}
+                                <label class="form-check-label fw-bold small text-muted ms-2 mt-1" for="{{ form.disponible.id_for_label }}">
+                                    PRODUCTO DISPONIBLE PARA VENTA
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="text-muted opacity-25 my-4">
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button type="submit" class="btn fw-bold px-5 py-2 text-white shadow-sm" style="border-radius: 8px; {% if producto %}background-color: #ea580c;{% else %}background-color: #2563eb;{% endif %} border: none;">
+                            {% if producto %}Actualizar Producto{% else %}Guardar Producto{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
