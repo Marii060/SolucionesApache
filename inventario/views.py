@@ -2,9 +2,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-
-from .models import Categoria, MarcaProducto
-from .forms import CategoriaForm, MarcaForm
+from django.db.models import Q
+from .models import Categoria, MarcaProducto, Producto
+from .forms import CategoriaForm, MarcaForm, ProductoForm
 
 @login_required
 def lista_categorias(request):
@@ -115,3 +115,57 @@ def eliminar_marca(request, id):
         messages.success(request, f'¡La marca "{marca.nombre}" ha sido eliminada!')
         
     return redirect('inventario:lista_marcas')
+
+@login_required
+def lista_productos(request):
+    query = request.GET.get('buscar', '')
+    
+    if query:
+        # Busca por nombre o por código interno
+        lista = Producto.objects.filter(
+            Q(nombre__icontains=query) | Q(codigo_interno__icontains=query)
+        ).order_by('codigo_interno')
+    else:
+        lista = Producto.objects.all().order_by('codigo_interno')
+        
+    paginator = Paginator(lista, 10)
+    page_number = request.GET.get('page')
+    productos = paginator.get_page(page_number)
+    
+    return render(request, 'inventario/lista_productos.html', {
+        'productos': productos,
+        'query': query
+    })
+
+@login_required
+def crear_producto(request):
+    if request.method == 'POST':
+        form = ProductoForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, '¡Producto registrado en el inventario con éxito!')
+            return redirect('inventario:lista_productos')
+    else:
+        form = ProductoForm()
+    return render(request, 'inventario/registrar_producto.html', {'form': form})
+
+@login_required
+def editar_producto(request, id):
+    producto = get_object_or_404(Producto, id_producto=id)
+    if request.method == 'POST':
+        form = ProductoForm(request.POST, instance=producto)
+        if form.is_valid():
+            form.save()
+            messages.success(request, '¡Producto actualizado correctamente!')
+            return redirect('inventario:lista_productos')
+    else:
+        form = ProductoForm(instance=producto)
+    return render(request, 'inventario/registrar_producto.html', {'form': form, 'producto': producto})
+
+@login_required
+def inactivar_producto(request, id):
+    producto = get_object_or_404(Producto, id_producto=id)
+    producto.disponible = False
+    producto.save()
+    messages.success(request, f'¡El producto "{producto.nombre}" ha sido inactivado!')
+    return redirect('inventario:lista_productos')
