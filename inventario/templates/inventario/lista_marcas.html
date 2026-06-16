@@ -41,9 +41,8 @@
                 <table class="table align-middle table-hover border-bottom-0" style="margin-bottom: 0;">
                     <thead>
                         <tr class="text-uppercase text-muted" style="font-size: 0.75rem; font-weight: 700; border-bottom: 2px solid #e2e8f0;">
-                            <th class="pb-3" style="width: 10%; border: none;">ID</th>
-                            <th class="pb-3" style="width: 25%; border: none;">Nombre</th>
-                            <th class="pb-3" style="width: 35%; border: none;">Descripción</th>
+                            <th class="pb-3" style="width: 30%; border: none;">Nombre</th>
+                            <th class="pb-3" style="width: 40%; border: none;">Descripción</th>
                             <th class="pb-3 text-center" style="width: 15%; border: none;">Productos</th>
                             <th class="pb-3 text-center" style="width: 15%; border: none;">Acciones</th>
                         </tr>
@@ -51,7 +50,6 @@
                     <tbody style="font-size: 0.9rem;">
                         {% for marca in marcas %}
                         <tr style="border-bottom: 1px solid #f1f5f9;">
-                            <td class="fw-bold text-muted">{{ marca.id_marca }}</td>
                             <td class="fw-bold text-dark">{{ marca.nombre }}</td>
                             <td class="text-muted text-break">{{ marca.descripcion|default:"---" }}</td>
                             
@@ -68,7 +66,7 @@
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="5" class="text-center text-muted py-5">
+                            <td colspan="4" class="text-center text-muted py-5">
                                 <i class="fa-solid fa-copyright display-6 mb-3 text-secondary opacity-50"></i>
                                 <br>No hay marcas registradas aún.
                             </td>
