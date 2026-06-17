@@ -26,18 +26,38 @@
 
     <div class="card shadow-sm border-0 rounded-4">
         <div class="card-body p-0">
+            
+            <!-- Barra superior con Buscador y Filtros -->
             <div class="d-flex flex-wrap justify-content-between align-items-center p-4 border-bottom">
-                <h5 class="fw-bold m-0" style="color: #0f172a;">Listado de Productos</h5>
-                <form method="GET" action="{% url 'inventario:lista_productos' %}" style="width: 320px;">
-                    <div class="input-group" style="border-radius: 8px; border: 1px solid #e2e8f0; background-color: #f8fafc; overflow: hidden;">
+                <h5 class="fw-bold m-0 mb-3 mb-md-0" style="color: #0f172a;">Listado de Productos</h5>
+                
+                <form method="GET" action="{% url 'inventario:lista_productos' %}" class="d-flex flex-wrap gap-2">
+                    
+                    <select name="categoria" class="form-select border-0 shadow-none text-muted" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; width: auto;" onchange="this.form.submit()">
+                        <option value="">Todas las Categorías</option>
+                        {% for cat in categorias %}
+                            <option value="{{ cat.id_categoria }}" {% if categoria_sel == cat.id_categoria|stringformat:"s" %}selected{% endif %}>{{ cat.nombre }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <select name="marca" class="form-select border-0 shadow-none text-muted" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; width: auto;" onchange="this.form.submit()">
+                        <option value="">Todas las Marcas</option>
+                        {% for marca in marcas %}
+                            <option value="{{ marca.id_marca }}" {% if marca_sel == marca.id_marca|stringformat:"s" %}selected{% endif %}>{{ marca.nombre }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <div class="input-group" style="border-radius: 8px; border: 1px solid #e2e8f0; background-color: #f8fafc; overflow: hidden; width: 250px;">
                         <span class="input-group-text bg-transparent border-0 pe-2" style="color: #3b71ca;">
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </span>
-                        <input type="text" name="buscar" value="{{ query }}" class="form-control border-0 bg-transparent shadow-none px-0" placeholder="Buscar por código o nombre...">
+                        <input type="text" name="buscar" value="{{ query }}" class="form-control border-0 bg-transparent shadow-none px-0" placeholder="Buscar código o nombre...">
                     </div>
+                    <button type="submit" class="d-none">Buscar</button> 
                 </form>
             </div>
 
+            <!-- Tabla de datos -->
             <div class="table-responsive p-4 pt-3">
                 <table class="table align-middle table-hover border-bottom-0" style="margin-bottom: 0;">
                     <thead>
@@ -46,9 +66,9 @@
                             <th class="pb-3" style="width: 25%; border: none;">Producto</th>
                             <th class="pb-3" style="width: 15%; border: none;">Categoría/Marca</th>
                             <th class="pb-3" style="width: 12%; border: none;">Precio Venta</th>
-                            <th class="pb-3 text-center" style="width: 10%; border: none;">Stock</th>
-                            <th class="pb-3" style="width: 13%; border: none;">Estado</th>
-                            <th class="pb-3 text-center" style="width: 15%; border: none;">Acciones</th>
+                            <th class="pb-3 text-center" style="width: 8%; border: none;">Stock</th>
+                            <th class="pb-3" style="width: 10%; border: none;">Estado</th>
+                            <th class="pb-3 text-center" style="width: 20%; border: none;">Acciones</th>
                         </tr>
                     </thead>
                     <tbody style="font-size: 0.9rem;">
@@ -72,7 +92,7 @@
                             
                             <td class="text-center">
                                 {% if producto.cantidad <= producto.stock_minimo %}
-                                    <span class="badge text-danger" style="background-color: #fef2f2; border: 1px solid #fca5a5; font-size: 0.85rem;">{{ producto.cantidad }}</span>
+                                    <span class="badge text-danger" style="background-color: #fef2f2; border: 1px solid #fca5a5; font-size: 0.85rem;" title="Stock Crítico">{{ producto.cantidad }}</span>
                                 {% else %}
                                     <span class="fw-bold text-dark">{{ producto.cantidad }}</span>
                                 {% endif %}
@@ -86,9 +106,19 @@
                                 {% endif %}
                             </td>
                             
+                            <!-- Botones con +Stock, Editar y Eliminar Físico -->
                             <td class="text-center">
-                                <a href="{% url 'inventario:editar_producto' producto.id_producto %}" class="btn btn-sm me-1" style="background-color: #fff7ed; color: #ea580c; border: 1px solid #fdba74; border-radius: 6px;" title="Editar"><i class="fa-solid fa-pen"></i></a>
-                                <a href="{% url 'inventario:inactivar_producto' producto.id_producto %}" class="btn btn-sm" style="background-color: #fef2f2; color: #dc2626; border: 1px solid #fca5a5; border-radius: 6px;" title="Inactivar"><i class="fa-solid fa-ban"></i></a>
+                                <a href="#" class="btn btn-sm fw-bold me-1" style="background-color: #dcfce7; color: #16a34a; border: 1px solid #bbf7d0; border-radius: 6px;" title="Aumentar Stock">
+                                    <i class="fa-solid fa-plus"></i> Stock
+                                </a>
+                                
+                                <a href="{% url 'inventario:editar_producto' producto.id_producto %}" class="btn btn-sm me-1" style="background-color: #fff7ed; color: #ea580c; border: 1px solid #fdba74; border-radius: 6px;" title="Editar">
+                                    <i class="fa-solid fa-pen"></i>
+                                </a>
+                                
+                                <a href="{% url 'inventario:eliminar_producto' producto.id_producto %}" class="btn btn-sm" style="background-color: #fef2f2; color: #dc2626; border: 1px solid #fca5a5; border-radius: 6px;" title="Eliminar">
+                                    <i class="fa-solid fa-trash"></i>
+                                </a>
                             </td>
                         </tr>
                         {% empty %}
@@ -103,21 +133,22 @@
                 </table>
             </div>
             
+            <!-- Paginación conectada a los filtros -->
             {% if productos.has_other_pages %}
             <nav aria-label="Navegación de páginas" class="pb-4 pt-2">
                 <ul class="pagination justify-content-center m-0">
                     {% if productos.has_previous %}
-                        <li class="page-item"><a class="page-link fw-bold" href="?page={{ productos.previous_page_number }}{% if query %}&buscar={{ query }}{% endif %}" style="color: #3b71ca; border-radius: 8px 0 0 8px;">Anterior</a></li>
+                        <li class="page-item"><a class="page-link fw-bold" href="?page={{ productos.previous_page_number }}{% if query %}&buscar={{ query }}{% endif %}{% if categoria_sel %}&categoria={{ categoria_sel }}{% endif %}{% if marca_sel %}&marca={{ marca_sel }}{% endif %}" style="color: #3b71ca; border-radius: 8px 0 0 8px;">Anterior</a></li>
                     {% endif %}
                     {% for num in productos.paginator.page_range %}
                         {% if productos.number == num %}
                             <li class="page-item active"><span class="page-link fw-bold" style="background-color: #3b71ca; border-color: #3b71ca; color: white;">{{ num }}</span></li>
                         {% else %}
-                            <li class="page-item"><a class="page-link" href="?page={{ num }}{% if query %}&buscar={{ query }}{% endif %}" style="color: #3b71ca;">{{ num }}</a></li>
+                            <li class="page-item"><a class="page-link" href="?page={{ num }}{% if query %}&buscar={{ query }}{% endif %}{% if categoria_sel %}&categoria={{ categoria_sel }}{% endif %}{% if marca_sel %}&marca={{ marca_sel }}{% endif %}" style="color: #3b71ca;">{{ num }}</a></li>
                         {% endif %}
                     {% endfor %}
                     {% if productos.has_next %}
-                        <li class="page-item"><a class="page-link fw-bold" href="?page={{ productos.next_page_number }}{% if query %}&buscar={{ query }}{% endif %}" style="color: #3b71ca; border-radius: 0 8px 8px 0;">Siguiente</a></li>
+                        <li class="page-item"><a class="page-link fw-bold" href="?page={{ productos.next_page_number }}{% if query %}&buscar={{ query }}{% endif %}{% if categoria_sel %}&categoria={{ categoria_sel }}{% endif %}{% if marca_sel %}&marca={{ marca_sel }}{% endif %}" style="color: #3b71ca; border-radius: 0 8px 8px 0;">Siguiente</a></li>
                     {% endif %}
                 </ul>
             </nav>
