@@ -162,7 +162,7 @@
                     Categorías
                 </a>
                 
-                <a href="#" class="ms-4 {% if 'control' in request.path %}active{% endif %}">
+                <a href="{% url 'inventario:control_inventario' %}" class="ms-4 {% if 'control' in request.path %}active{% endif %}">
                     Control de Inventario
                 </a>
             </div>

@@ -108,8 +108,8 @@
                             
                             <!-- Botones con +Stock, Editar y Eliminar Físico -->
                             <td class="text-center">
-                                <a href="#" class="btn btn-sm fw-bold me-1" style="background-color: #dcfce7; color: #16a34a; border: 1px solid #bbf7d0; border-radius: 6px;" title="Aumentar Stock">
-                                    <i class="fa-solid fa-plus"></i> Stock
+                                <a href="{% url 'inventario:abastecer_stock' producto.id_producto %}" class="btn btn-sm fw-bold me-1" style="background-color: #dcfce7; color: #16a34a; border: 1px solid #bbf7d0; border-radius: 6px;" title="Aumentar Stock">
+                                     <i class="fa-solid fa-plus"></i> Stock
                                 </a>
                                 
                                 <a href="{% url 'inventario:editar_producto' producto.id_producto %}" class="btn btn-sm me-1" style="background-color: #fff7ed; color: #ea580c; border: 1px solid #fdba74; border-radius: 6px;" title="Editar">
