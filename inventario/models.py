@@ -72,6 +72,28 @@ class Producto(models.Model):
 
     def __str__(self):
         return self.nombre
+    
+class MovimientoInventario(models.Model):
+    TIPOS = (
+        ('Entrada', 'Entrada'),
+        ('Salida', 'Salida'),
+        ('Ajuste', 'Ajuste'),
+    )
+    id_movimiento = models.AutoField(primary_key=True)
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    tipo = models.CharField(max_length=20, choices=TIPOS)
+    cantidad = models.IntegerField() # Puede ser positiva o negativa
+    stock_anterior = models.IntegerField()
+    stock_nuevo = models.IntegerField()
+    motivo = models.CharField(max_length=150)
+    referencia = models.CharField(max_length=50, blank=True, null=True)
+    observaciones = models.TextField(blank=True, null=True)
+    usuario = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    fecha_movimiento = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'inv_movimientos'
+        ordering = ['-fecha_movimiento']
 
 
 class Compra(models.Model):
