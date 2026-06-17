@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Q
-from .models import Categoria, MarcaProducto, Producto
+from .models import Categoria, MarcaProducto, Producto, MovimientoInventario
 from .forms import CategoriaForm, MarcaForm, ProductoForm
 
 @login_required
@@ -196,6 +196,112 @@ def eliminar_producto(request, id):
         producto.delete()
         messages.success(request, f'¡El producto "{nombre_producto}" ha sido eliminado del inventario!')
         return redirect('inventario:lista_productos')
-        
-    # Si solo está accediendo al enlace, le mostramos la pantalla de advertencia
     return render(request, 'inventario/eliminar_producto.html', {'producto': producto})
+
+@login_required
+def control_inventario(request):
+    # Capturamos filtros
+    query = request.GET.get('buscar', '')
+    tipo = request.GET.get('tipo', '')
+    fecha = request.GET.get('fecha', '')
+    
+    # Base de datos de movimientos
+    lista = MovimientoInventario.objects.all().select_related('producto', 'usuario')
+    
+    # Aplicamos filtros
+    if query:
+        lista = lista.filter(
+            Q(producto__nombre__icontains=query) | 
+            Q(referencia__icontains=query)
+        )
+    if tipo:
+        lista = lista.filter(tipo=tipo)
+    if fecha:
+        lista = lista.filter(fecha_movimiento__date=fecha)
+        
+    paginator = Paginator(lista, 10)
+    page_number = request.GET.get('page')
+    movimientos = paginator.get_page(page_number)
+    
+    return render(request, 'inventario/control_inventario.html', {
+        'movimientos': movimientos,
+        'query': query,
+        'tipo_sel': tipo,
+        'fecha_sel': fecha
+    })
+
+@login_required
+def ajuste_manual(request):
+    # Traemos solo productos activos
+    productos = Producto.objects.filter(disponible=True).order_by('nombre')
+    
+    if request.method == 'POST':
+        producto_id = request.POST.get('producto_id')
+        tipo_ajuste = request.POST.get('tipo_ajuste')
+        cantidad = int(request.POST.get('cantidad', 0))
+        motivo = request.POST.get('motivo')
+        observaciones = request.POST.get('observaciones', '')
+        
+        producto = get_object_or_404(Producto, id_producto=producto_id)
+        stock_anterior = producto.cantidad
+        
+        # Calcular nuevos valores
+        if tipo_ajuste == 'Salida':
+            stock_nuevo = stock_anterior - cantidad
+            cant_registro = -cantidad # Negativo para la tabla
+        else:
+            stock_nuevo = stock_anterior + cantidad
+            cant_registro = cantidad
+            
+        # 1. Actualizamos el producto físico
+        producto.cantidad = stock_nuevo
+        producto.save()
+        
+        # 2. Grabamos el movimiento en la auditoría
+        MovimientoInventario.objects.create(
+            producto=producto,
+            tipo=tipo_ajuste,
+            cantidad=cant_registro,
+            stock_anterior=stock_anterior,
+            stock_nuevo=stock_nuevo,
+            motivo=motivo,
+            referencia=f"ADJ-{producto.codigo_interno}",
+            observaciones=observaciones,
+            usuario=request.user
+        )
+        
+        messages.success(request, '¡Ajuste de inventario registrado con éxito!')
+        return redirect('inventario:control_inventario')
+        
+    return render(request, 'inventario/ajuste_manual.html', {'productos': productos})
+
+@login_required
+def abastecer_stock(request, id):
+    producto = get_object_or_404(Producto, id_producto=id)
+    
+    if request.method == 'POST':
+        cantidad = int(request.POST.get('cantidad', 0))
+        motivo = "Abastecimiento Rápido desde Catálogo"
+        
+        # Lógica de actualización (similar al ajuste manual)
+        stock_anterior = producto.cantidad
+        stock_nuevo = stock_anterior + cantidad
+        
+        producto.cantidad = stock_nuevo
+        producto.save()
+        
+        MovimientoInventario.objects.create(
+            producto=producto,
+            tipo='Entrada',
+            cantidad=cantidad,
+            stock_anterior=stock_anterior,
+            stock_nuevo=stock_nuevo,
+            motivo=motivo,
+            referencia=f"ABS-{producto.codigo_interno}",
+            usuario=request.user
+        )
+        
+        messages.success(request, f'¡{cantidad} unidades agregadas a "{producto.nombre}"!')
+        return redirect('inventario:lista_productos')
+        
+    return render(request, 'inventario/abastecer_producto.html', {'producto': producto})
