@@ -35,8 +35,9 @@ class Servicio(models.Model):
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='Pendiente')
     descripcion = models.TextField(blank=True, null=True)
     valor_total = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    mecanico = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='trabajos')
     id_moto = models.ForeignKey(Moto, on_delete=models.CASCADE, db_column='id_moto')
-    id_usuario = models.ForeignKey(User, on_delete=models.CASCADE, db_column='id_usuario')
+    id_usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='registros')
 
     class Meta:
         verbose_name = "Orden de Servicio"
