@@ -37,7 +37,7 @@ class Servicio(models.Model):
     valor_total = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     mecanico = models.CharField(max_length=100, blank=True, null=True)
     id_moto = models.ForeignKey(Moto, on_delete=models.CASCADE, db_column='id_moto')
-    id_usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='registros')
+    id_usuario = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = "Orden de Servicio"
