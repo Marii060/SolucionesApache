@@ -1,56 +1,453 @@
-{% extends 'base.html' %} 
+{% extends 'base.html' %}
+{% load humanize %}
 
-{% block title %}Nuevo Servicio - Soluciones Apache{% endblock %}
+{% block title %}Nueva Orden - Soluciones Apache{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Estilos para Formularios */
+    .bg-soft { background-color: #f8fafc; }
+    .card-custom { border: none; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); }
+    .input-custom { background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.6rem 1rem; font-size: 0.95rem; color: #334155; transition: all 0.2s; }
+    .input-custom:focus { background-color: #ffffff; border-color: #3b71ca; box-shadow: 0 0 0 3px rgba(59, 113, 202, 0.1); outline: none; }
+    .section-title { font-size: 1rem; font-weight: 700; color: #0f172a; margin-bottom: 1.5rem; display: flex; align-items: center; }
+    
+    /* Stepper*/
+    .stepper-wrapper { display: flex; justify-content: space-between; position: relative; margin-bottom: 2.5rem; }
+    .stepper-wrapper::before { content: ""; position: absolute; top: 15px; left: 0; right: 0; height: 3px; background-color: #e2e8f0; z-index: 1; border-radius: 3px; }
+    .stepper-progress { position: absolute; top: 15px; left: 0; height: 3px; background-color: #2563eb; z-index: 2; border-radius: 3px; width: 33%; transition: width 0.4s ease; }
+    .step-item { position: relative; z-index: 3; display: flex; flex-direction: column; align-items: center; background-color: #f1f5f9; padding: 0 10px; transition: all 0.3s; }
+    .step-circle { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; margin-bottom: 8px; border: 2px solid #e2e8f0; background-color: white; color: #94a3b8; transition: all 0.3s; }
+    .step-item.active .step-circle { background-color: #2563eb; border-color: #2563eb; color: white; }
+    .step-item.completed .step-circle { background-color: #2563eb; border-color: #2563eb; color: white; }
+    .step-label { font-size: 0.85rem; font-weight: 600; color: #64748b; transition: all 0.3s; }
+    .step-item.active .step-label { color: #2563eb; }
+
+    .table-modern th { background-color: #f8fafc; color: #475569; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0; padding: 12px 16px; }
+    .table-modern td { padding: 12px 16px; vertical-align: middle; border-bottom: 1px solid #f1f5f9; }
+
+    /* Fix visual para el Buscador Select2 dentro de diseño*/
+    .select2-container .select2-selection--single {
+        height: 44px !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 8px !important;
+        background-color: #f8fafc !important;
+        padding: 6px !important;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 42px !important;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center mt-4">
-    <div class="col-md-8">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="fw-bold" style="color: #333;">🛠️ Nueva Orden de Servicio</h2>
-            <a href="{% url 'operaciones:lista_servicios' %}" class="btn fw-bold px-4 shadow-sm" style="background-color: #3b71ca; color: white; border-radius: 8px;">
-                Volver a la lista
-            </a>
+<div class="container-fluid mt-4 px-md-4" style="background-color: #f1f5f9; min-height: 100vh; padding-bottom: 40px;">
+    
+    <div class="mb-4 d-flex justify-content-between align-items-end">
+        <div>
+            <h2 class="fw-bold m-0" style="color: #0f172a;">Nueva Orden de Servicio</h2>
+            <p class="text-muted m-0 mt-1" style="font-size: 0.95rem;">Complete los detalles para registrar el ingreso al taller</p>
         </div>
+        <a href="{% url 'operaciones:lista_servicios' %}" class="btn bg-white border fw-bold text-secondary shadow-sm px-4" style="border-radius: 8px;">
+            Cancelar
+        </a>
+    </div>
 
-        <div class="card shadow-sm border-0 rounded-4">
-            <div class="card-body p-4">
-                <form method="post">
-                    {% csrf_token %}
-                    
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold small text-muted">{{ form.codigo_servicio.label|upper }}</label>
-                            {{ form.codigo_servicio }}
-                            {% if form.codigo_servicio.errors %}
-                                <div class="text-danger small mt-1"><i class="fa-solid fa-circle-exclamation"></i> {{ form.codigo_servicio.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold small text-muted">{{ form.id_moto.label|upper }}</label>
-                            {{ form.id_moto }}
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-bold small text-muted">{{ form.descripcion.label|upper }}</label>
-                        {{ form.descripcion }}
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold small text-muted">{{ form.estado.label|upper }}</label>
-                            {{ form.estado }}
-                        </div>
-                    </div>
-
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                        <button type="submit" class="btn btn-primary fw-bold px-4" style="border-radius: 8px; background-color: #3b71ca; border: none;">
-                            Guardar Servicio
-                        </button>
-                    </div>
-                </form>
-            </div>
+    <div class="stepper-wrapper">
+        <div class="stepper-progress"></div>
+        <div class="step-item completed">
+            <div class="step-circle"><i class="fa-solid fa-check"></i></div>
+            <span class="step-label">Datos Generales</span>
+        </div>
+        <div class="step-item active">
+            <div class="step-circle">2</div>
+            <span class="step-label">Servicios</span>
+        </div>
+        <div class="step-item">
+            <div class="step-circle">3</div>
+            <span class="step-label">Repuestos</span>
+        </div>
+        <div class="step-item">
+            <div class="step-circle">4</div>
+            <span class="step-label">Confirmar</span>
         </div>
     </div>
+
+    <form method="POST" id="ordenForm">
+        {% csrf_token %}
+        
+        {% if form.errors %}
+            <div class="alert alert-danger alert-dismissible fade show shadow-sm mb-4" role="alert" style="border-radius: 8px;">
+                <h5 class="fw-bold mb-2"><i class="fa-solid fa-triangle-exclamation me-2"></i> No se pudo procesar el registro</h5>
+                <ul class="mb-0 small fw-semibold">
+                    {% for field, errors in form.errors.items %}
+                        <li>El campo <span class="text-uppercase text-primary">"{{ field }}"</span>: {{ errors|striptags }}</li>
+                    {% endfor %}
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endif %}
+
+        <div class="row g-4">
+            
+            <div class="col-lg-8">
+                
+                <div class="card card-custom mb-4">
+                    <div class="card-body p-4 p-md-5">
+                        <div class="section-title">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px;"><i class="fa-solid fa-user-gear fs-6"></i></div>
+                            Información del Cliente y Vehículo
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label class="form-label fw-bold small text-muted text-uppercase">Cliente Asociado</label>
+                                <select name="cliente" id="clienteSelect" class="form-select input-custom" required>
+                                    <option value=""></option>
+                                    {% for c in clientes %}
+                                        <option value="{{ c.id_cliente }}">{{ c.numero_documento }} - {{ c.nombre }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted text-uppercase">Motocicleta</label>
+                                <select name="moto" id="motoSelect" class="form-select input-custom" required>
+                                    <option value=""></option>
+                                    {% for m in motos %}
+                                        <option value="{{ m.id_moto }}">{{ m.marca }} {{ m.modelo }} — Placa: {{ m.placa }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label class="form-label fw-bold small text-muted text-uppercase">Mecánico Asignado</label>
+                                <input type="text" name="mecanico" class="form-control input-custom" placeholder="Ej: Pedro Mejia">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted text-uppercase">Fecha Estimada de Entrega</label>
+                                <input type="date" name="fecha_entrega" class="form-control input-custom">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <label class="form-label fw-bold small text-muted text-uppercase">Descripción de la falla o solicitud</label>
+                                <textarea name="descripcion" class="form-control input-custom" rows="3" placeholder="Ej: El cliente reporta un ruido..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card card-custom mb-4">
+                    <div class="card-body p-4 p-md-5">
+                        <div class="section-title">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px;"><i class="fa-solid fa-wrench fs-6"></i></div>
+                            Mano de Obra y Servicios
+                        </div>
+                        
+                        <div class="d-flex gap-2 mb-4">
+                            <div class="flex-grow-1">
+                                <select id="selectServicio" class="form-select input-custom">
+                                    <option value="" data-precio="0"></option>
+                                    {% for s in servicios_taller %}
+                                        <option value="{{ s.id_lista_servicio }}" data-nombre="{{ s.nombre_servicio }}" data-precio="{{ s.precio_base_mano_obra }}">
+                                            {{ s.nombre_servicio }} - ${{ s.precio_base_mano_obra|floatformat:0|intcomma }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <button type="button" class="btn fw-bold px-4 text-primary bg-soft border" style="border-radius: 8px;" onclick="agregarServicio()">
+                                <i class="fa-solid fa-plus me-1"></i> Agregar
+                            </button>
+                        </div>
+
+                        <div class="table-responsive border rounded-3 overflow-hidden">
+                            <table class="table table-modern m-0" id="tablaServicios">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 60%;">Servicio</th>
+                                        <th style="width: 25%;">Valor</th>
+                                        <th style="width: 15%; text-align: center;">Quitar</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card card-custom mb-4">
+                    <div class="card-body p-4 p-md-5">
+                        <div class="section-title">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px;"><i class="fa-solid fa-box fs-6"></i></div>
+                            Repuestos e Insumos
+                        </div>
+                        
+                        <div class="d-flex gap-2 mb-4">
+                            <div class="flex-grow-1">
+                                <select id="selectProducto" class="form-select input-custom">
+                                    <option value="" data-precio="0"></option>
+                                    {% for p in productos %}
+                                        <option value="{{ p.id_producto }}" data-nombre="{{ p.nombre }}" data-precio="{{ p.precio_venta }}">
+                                            {{ p.nombre }} - ${{ p.precio_venta|floatformat:0|intcomma }} (Disponibles: {{ p.cantidad }})
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <button type="button" class="btn fw-bold px-4 text-primary bg-soft border" style="border-radius: 8px;" onclick="agregarProducto()">
+                                <i class="fa-solid fa-plus me-1"></i> Agregar
+                            </button>
+                        </div>
+
+                        <div class="table-responsive border rounded-3 overflow-hidden">
+                            <table class="table table-modern m-0" id="tablaProductos">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 40%;">Producto</th>
+                                        <th style="width: 20%; text-align: center;">Cantidad</th>
+                                        <th style="width: 15%;">P. Unitario</th>
+                                        <th style="width: 15%;">Subtotal</th>
+                                        <th style="width: 10%; text-align: center;">Quitar</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card card-custom sticky-top" style="top: 20px;">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-4 text-dark border-bottom pb-3">Resumen de Cotización</h5>
+                        
+                        <div class="d-flex justify-content-between mb-3 text-muted">
+                            <span class="fw-semibold">Mano de Obra</span>
+                            <span id="resumenServicios" class="fw-bold text-dark">$0</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-4 text-muted">
+                            <span class="fw-semibold">Repuestos</span>
+                            <span id="resumenProductos" class="fw-bold text-dark">$0</span>
+                        </div>
+                        
+                        <div class="bg-soft p-3 rounded-3 mb-4 border">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold text-muted text-uppercase small">Total Estimado</span>
+                                <span id="resumenTotal" class="fw-bold fs-3 text-primary">$0</span>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-3">
+                            <input type="hidden" name="valor_mano_obra" id="valor_mano_obra" value="0">
+                            <input type="hidden" name="total_productos_oculto" id="total_productos_oculto" value="0">
+                            
+                            <button type="submit" class="btn btn-primary py-3 fw-bold shadow-sm" style="border-radius: 8px;">
+                                Generar Orden de Servicio
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </form>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    //ACTIVACIÓN DE LOS BUSCADORES
+    $(document).ready(function() {
+        $('#clienteSelect').select2({
+            placeholder: "Buscar por nombre o documento...",
+            allowClear: true,
+            width: '100%'
+        });
+
+        $('#motoSelect').select2({
+            placeholder: "Buscar por placa o marca...",
+            allowClear: true,
+            width: '100%'
+        });
+
+        $('#selectServicio').select2({
+            placeholder: "Buscar servicio de mano de obra...",
+            allowClear: true,
+            width: '100%'
+        });
+
+        $('#selectProducto').select2({
+            placeholder: "Buscar producto en el inventario...",
+            allowClear: true,
+            width: '100%'
+        });
+
+        // MAGIA DE LAS MOTOS AUTOMÁTICAS (AJAX)
+        $('#clienteSelect').on('change', function() {
+            const clienteId = $(this).val(); 
+            const motoSelect = $('#motoSelect');
+
+            // 1. Limpiamos las opciones actuales de las motos
+            motoSelect.empty().append('<option value=""></option>');
+
+            if (clienteId) {
+                // 2. Construimos la URL correcta usando el patrón de Django
+                const url = "{% url 'operaciones:obtener_motos_cliente' 0 %}".replace('0', clienteId);
+
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        // 3. Llenamos el desplegable con las motos devueltas por Python
+                        data.forEach(moto => {
+                            const newOption = new Option(moto.texto, moto.id, false, false);
+                            motoSelect.append(newOption);
+                        });
+                        
+                        // Si solo hay 1 moto, la pre-seleccionamos
+                        if (data.length === 1) {
+                            motoSelect.val(data[0].id);
+                        }
+                        
+                        // Refrescamos visualmente el buscador de Select2
+                        motoSelect.trigger('change'); 
+                    })
+                    .catch(error => console.error('Error buscando motos:', error));
+            } else {
+                motoSelect.trigger('change');
+            }
+        });
+    });
+
+    //CALCULADORA DE PRECIOS Y STEPPER
+    let totalServicios = 0;
+    let totalProductos = 0;
+
+    const formatearDinero = (valor) => {
+        return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(valor);
+    };
+
+    function actualizarTotales() {
+        totalServicios = 0;
+        document.querySelectorAll('.precio-servicio').forEach(el => {
+            totalServicios += parseFloat(el.dataset.valor);
+        });
+
+        totalProductos = 0;
+        document.querySelectorAll('.subtotal-producto').forEach(el => {
+            totalProductos += parseFloat(el.dataset.valor);
+        });
+
+        document.getElementById('resumenServicios').innerText = formatearDinero(totalServicios);
+        document.getElementById('resumenProductos').innerText = formatearDinero(totalProductos);
+        document.getElementById('resumenTotal').innerText = formatearDinero(totalServicios + totalProductos);
+        
+        // AQUÍ ACTUALIZAMOS EL VALOR DEL CAMPO OCULTO
+        document.getElementById('valor_mano_obra').value = totalServicios;
+        document.getElementById('total_productos_oculto').value = totalProductos;
+        
+           
+        //LLAMADA A LA FUNCIÓN QUE ANIMA EL STEPPER
+        actualizarBarraProgreso();
+    }
+
+    //LA NUEVA FUNCIÓN PARA EL STEPPER DINÁMICO
+    function actualizarBarraProgreso() {
+        const numServicios = document.querySelectorAll('#tablaServicios tbody tr').length;
+        const numProductos = document.querySelectorAll('#tablaProductos tbody tr').length;
+        const barra = document.querySelector('.stepper-progress');
+        const items = document.querySelectorAll('.step-item');
+
+        //Reiniciamos los estados visuales
+        items[1].classList.remove('completed', 'active');
+        items[2].classList.remove('completed', 'active');
+        items[3].classList.remove('completed', 'active');
+
+        //Evaluamos en qué paso estamos
+        if (numServicios === 0 && numProductos === 0) {
+            //Estamos eligiendo Servicios (o recién empezamos)
+            barra.style.width = '33%';
+            items[1].classList.add('active'); 
+        } else if (numServicios > 0 && numProductos === 0) {
+            // Ya hay servicios, pasamos a Repuestos
+            barra.style.width = '66%';
+            items[1].classList.add('completed');
+            items[2].classList.add('active'); 
+        } else if (numProductos > 0) {
+            //Ya hay repuestos, estamos listos para Confirmar
+            barra.style.width = '100%';
+            items[1].classList.add('completed');
+            items[2].classList.add('completed');
+            items[3].classList.add('active'); 
+        }
+    }
+
+    function agregarServicio() {
+        const select = document.getElementById('selectServicio');
+        const opcion = select.options[select.selectedIndex];
+        if (!opcion.value) return;
+
+        const tbody = document.querySelector('#tablaServicios tbody');
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="fw-bold text-dark">
+                ${opcion.dataset.nombre}
+                <input type="hidden" name="servicios_id[]" value="${opcion.value}">
+            </td>
+            <td class="text-dark fw-semibold precio-servicio" data-valor="${opcion.dataset.precio}">${formatearDinero(parseFloat(opcion.dataset.precio))}</td>
+            <td class="text-center">
+                <button type="button" class="btn btn-sm btn-light text-danger border" onclick="eliminarFila(this)"><i class="fa-solid fa-trash"></i></button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+        select.value = ""; 
+        actualizarTotales();
+    }
+
+    function agregarProducto() {
+        const select = document.getElementById('selectProducto');
+        const opcion = select.options[select.selectedIndex];
+        if (!opcion.value) return;
+
+        const precio = parseFloat(opcion.dataset.precio);
+        const tbody = document.querySelector('#tablaProductos tbody');
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="fw-bold text-dark">
+                ${opcion.dataset.nombre}
+                <input type="hidden" name="productos_id[]" value="${opcion.value}">
+            </td>
+            <td class="text-center">
+                <input type="number" name="productos_cant[]" class="form-control input-custom text-center mx-auto" value="1" min="1" style="width: 80px; padding: 4px;" onchange="actualizarSubtotalProducto(this, ${precio})">
+            </td>
+            <td class="text-muted">${formatearDinero(precio)}</td>
+            <td class="text-dark fw-bold subtotal-producto" data-valor="${precio}">${formatearDinero(precio)}</td>
+            <td class="text-center">
+                <button type="button" class="btn btn-sm btn-light text-danger border" onclick="eliminarFila(this)"><i class="fa-solid fa-trash"></i></button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+        select.value = ""; 
+        actualizarTotales();
+    }
+
+    function actualizarSubtotalProducto(inputElement, precioUnitario) {
+        const cantidad = parseInt(inputElement.value) || 1;
+        const subtotal = cantidad * precioUnitario;
+        const tdSubtotal = inputElement.closest('tr').querySelector('.subtotal-producto');
+        tdSubtotal.dataset.valor = subtotal;
+        tdSubtotal.innerText = formatearDinero(subtotal);
+        actualizarTotales();
+    }
+
+    function eliminarFila(btn) {
+        btn.closest('tr').remove();
+        actualizarTotales();
+    }
+</script>
 {% endblock %}
