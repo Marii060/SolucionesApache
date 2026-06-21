@@ -7,9 +7,13 @@
 <style>
     .card-premium { border: none; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); background: #ffffff; }
     .badge-status { padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; }
-    .status-pendiente { background-color: #fef3c7; color: #d97706; }
+    
+    /* Colores dinámicos para los estados */
+    .status-pendiente { background-color: #f1f5f9; color: #475569; }
     .status-proceso { background-color: #dbeafe; color: #2563eb; }
-    .status-completado { background-color: #dcfce7; color: #16a34a; }
+    .status-terminado { background-color: #dcfce7; color: #16a34a; }
+    .status-entregado { background-color: #e0f2fe; color: #0369a1; }
+    
     .info-label { font-size: 0.8rem; font-weight: 700; color: #64748b; text-transform: uppercase; }
     .info-value { font-size: 1rem; font-weight: 600; color: #1e293b; }
 </style>
@@ -21,9 +25,20 @@
         <div>
             <div class="d-flex align-items-center gap-3">
                 <h3 class="fw-bold m-0" style="color: #0f172a;">Orden de Servicio #{{ orden.codigo_servicio }}</h3>
-                <span class="badge-status status-pendiente">En Espera</span>
+                
+                {% if orden.estado == 'Pendiente' %}
+                    <span class="badge-status status-pendiente">Pendiente</span>
+                {% elif orden.estado == 'En Proceso' %}
+                    <span class="badge-status status-proceso">En Proceso</span>
+                {% elif orden.estado == 'Terminado' %}
+                    <span class="badge-status status-terminado">Terminado</span>
+                {% elif orden.estado == 'Entregado' %}
+                    <span class="badge-status status-entregado">Entregado</span>
+                {% else %}
+                    <span class="badge-status status-pendiente">{{ orden.estado }}</span>
+                {% endif %}
             </div>
-            <p class="text-muted m-0 mt-1">Registrado el {{ orden.fecha_ingreso|date:"d/m/Y g:i a" }} por {{ orden.id_usuario.get_full_name|default:orden.id_usuario.username }}</p>
+            <p class="text-muted m-0 mt-1">Registrado el {{ orden.fecha_inicio|date:"d/m/Y g:i a" }} por {{ orden.id_usuario.get_full_name|default:orden.id_usuario.username }}</p>
         </div>
         <div class="d-flex gap-2">
             <a href="{% url 'operaciones:lista_servicios' %}" class="btn btn-light border fw-bold px-3">Volver al listado</a>
@@ -38,7 +53,7 @@
                 <div class="row g-4">
                     <div class="col-md-6">
                         <div class="info-label">Cliente</div>
-                        <div class="info-value">{{ orden.id_moto.id_cliente.nombre }} — CC: {{ orden.id_moto.id_cliente.cedula }}</div>
+                        <div class="info-value">{{ orden.id_moto.id_cliente.nombre }} — CC: {{ orden.id_moto.id_cliente.numero_documento }}</div>
                     </div>
                     <div class="col-md-6">
                         <div class="info-label">Motocicleta</div>
@@ -46,15 +61,15 @@
                     </div>
                     <div class="col-md-6">
                         <div class="info-label">Mecánico Asignado</div>
-                        <div class="info-value">{{ orden.mecanico|default:"Sin asignar mecánico" }}</div>
+                        <div class="info-value">{{ orden.mecanico|default:"<span class='text-warning fw-normal'>Sin asignar mecánico</span>"|safe }}</div>
                     </div>
                     <div class="col-md-6">
                         <div class="info-label">Fecha Estimada de Entrega</div>
-                        <div class="info-value">{{ orden.fecha_entrega|default:"No estipulada" }}</div>
+                        <div class="info-value">{{ orden.fecha_fin|default:"No estipulada" }}</div>
                     </div>
                     <div class="col-12">
                         <div class="info-label">Diagnóstico de Entrada o Falla</div>
-                        <div class="info-value bg-light p-3 rounded-3 mt-1 fw-normal text-secondary">{{ orden.descripcion_falla|default:"No se registró ninguna descripción de falla." }}</div>
+                        <div class="info-value bg-light p-3 rounded-3 mt-1 fw-normal text-secondary">{{ orden.descripcion|default:"No se registró ninguna descripción." }}</div>
                     </div>
                 </div>
             </div>
@@ -66,17 +81,17 @@
                     <thead class="table-light small text-uppercase">
                         <tr>
                             <th>Descripción del Concepto</th>
-                            <th class="text-center">Cant.</th>
-                            <th class="text-end">Precio Unitario</th>
                             <th class="text-end">Subtotal</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td><span class="badge bg-blue text-primary mb-1" style="background-color: #eff6ff; font-size: 0.75rem;">Mano de Obra</span><br><strong>Diagnóstico General del Motor</strong></td>
-                            <td class="text-center">1</td>
-                            <td class="text-end">$30.000</td>
-                            <td class="text-end fw-bold">$30.000</td>
+                            <td><span class="badge text-primary mb-1" style="background-color: #eff6ff; font-size: 0.75rem;">Mano de Obra</span><br><strong>Servicios técnicos y diagnósticos aplicados</strong></td>
+                            <td class="text-end fw-bold text-dark">$ {{ orden.valor_mano_obra|default:0|floatformat:0|intcomma }}</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge text-success mb-1" style="background-color: #dcfce7; font-size: 0.75rem;">Repuestos</span><br><strong>Insumos y piezas utilizadas en la orden</strong></td>
+                            <td class="text-end fw-bold text-dark">$ {{ total_repuestos|default:0|floatformat:0|intcomma }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -88,16 +103,16 @@
                 <h5 class="fw-bold mb-4 text-dark border-bottom pb-3">Resumen Económico</h5>
                 <div class="d-flex justify-content-between mb-3 text-muted">
                     <span class="fw-semibold">Total Mano de Obra</span>
-                    <span class="fw-bold text-dark">$30.000</span>
+                    <span class="fw-bold text-dark">$ {{ orden.valor_mano_obra|default:0|floatformat:0|intcomma }}</span>
                 </div>
                 <div class="d-flex justify-content-between mb-4 text-muted">
                     <span class="fw-semibold">Total Repuestos</span>
-                    <span class="fw-bold text-dark">$0</span>
+                    <span class="fw-bold text-dark">$ {{ total_repuestos|default:0|floatformat:0|intcomma }}</span>
                 </div>
                 <div class="p-3 rounded-3 mb-4 border" style="background-color: #f0fdf4;">
                     <div class="d-flex justify-content-between align-items-center">
                         <span class="fw-bold text-success text-uppercase small">Total Neto</span>
-                        <span class="fw-bold fs-3 text-success">$30.000</span>
+                        <span class="fw-bold fs-3 text-success">$ {{ orden.valor_total|default:0|floatformat:0|intcomma }}</span>
                     </div>
                 </div>
             </div>

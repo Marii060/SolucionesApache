@@ -210,3 +210,41 @@ def obtener_motos_cliente(request, cliente_id):
         })
         
     return JsonResponse(motos_data, safe=False)
+
+@login_required
+def detalle_servicio(request, id):
+    # Buscamos la orden
+    orden = get_object_or_404(Servicio, id_servicio=id)
+    
+    # Calculamos cuánto se gastó solo en repuestos
+    total_repuestos = orden.valor_total - orden.valor_mano_obra
+    
+    return render(request, 'operaciones/detalle_servicio.html', {
+        'orden': orden,
+        'total_repuestos': total_repuestos 
+    })
+
+@login_required
+def actualizar_estado(request, id):
+    if request.method == 'POST':
+        orden = get_object_or_404(Servicio, id_servicio=id)
+        nuevo_estado = request.POST.get('estado')
+        
+        if nuevo_estado in ['Pendiente', 'En Proceso', 'Terminado', 'Entregado']:
+            orden.estado = nuevo_estado
+            orden.save()
+            messages.success(request, f'¡Estado de la orden {orden.codigo_servicio} actualizado a {nuevo_estado}!')
+            
+    return redirect('operaciones:lista_servicios')
+
+@login_required
+def asignar_mecanico(request, id):
+    if request.method == 'POST':
+        orden = get_object_or_404(Servicio, id_servicio=id)
+        nombre_mecanico = request.POST.get('mecanico_nombre')
+        
+        orden.mecanico = nombre_mecanico
+        orden.save()
+        messages.success(request, f'¡Mecánico "{nombre_mecanico}" asignado con éxito a la orden {orden.codigo_servicio}!')
+        
+    return redirect('operaciones:lista_servicios')
