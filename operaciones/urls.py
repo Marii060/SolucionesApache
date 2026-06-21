@@ -1,8 +1,7 @@
 from django.urls import path, include
 from . import views
 
-app_name = 'operaciones' # Esto es clave para que Django sepa de qué app es la URL
-
+app_name = 'operaciones' 
 urlpatterns = [
      #rutas para el catálogo de servicios
     path('catalogo/', views.lista_catalogo, name='lista_catalogo'),
@@ -12,4 +11,8 @@ urlpatterns = [
     #rutas para servicios que presta el taller
     path('servicios/', views.lista_servicios, name='lista_servicios'),
     path('servicios/nuevo/', views.crear_servicio, name='crear_servicio'),
+    path('motos-cliente/<int:cliente_id>/', views.obtener_motos_cliente, name='obtener_motos_cliente'),
+    path('servicios/<int:id>/', views.detalle_servicio, name='detalle_servicio'),
+    path('servicios/<int:id>/estado/', views.actualizar_estado, name='actualizar_estado'),
+    path('servicios/<int:id>/mecanico/', views.asignar_mecanico, name='asignar_mecanico'),
 ]
