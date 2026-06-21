@@ -70,7 +70,7 @@ def crear_cliente(request):
         form = ClienteForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, '¡Cliente guardado exitosamente!')
+            messages.success(request, '¡Cliente registrado correctamente!')
             return redirect('gestion:lista_cliente')
     else:
         form = ClienteForm()
@@ -129,28 +129,37 @@ def registrar_moto(request, id_cliente=None):
     if request.method == 'POST':
         form = MotoForm(request.POST)
         if form.is_valid():
-            form.save()
+            #Detenemos el guardado directo en la BD
+            moto = form.save(commit=False)
+            
+            # Si venimos desde el perfil de un cliente, le inyectamos el dueño manualmente
+            if cliente_inicial:
+                moto.id_cliente = cliente_inicial
+                
+            # Ahora sí guardamos de forma segura en la base de datos
+            moto.save()
+            
+            messages.success(request, '¡Motocicleta registrada con éxito!')
+            
             # Si venía de un perfil de cliente, volvemos allí; si no, a la lista general
             if id_cliente:
-                return redirect('gestion:detalle_cliente', id_cliente=id_cliente)
+                return redirect('gestion:detalle_cliente', cliente_id=id_cliente)
             return redirect('gestion:lista_motos')
     else:
         # Pre-llenamos el formulario si tenemos el cliente
         initial_data = {'id_cliente': cliente_inicial} if cliente_inicial else None
         form = MotoForm(initial=initial_data)
 
-        # Aplicamos estilos a todos los campos
-        for field in form.fields.values():
-            if isinstance(field.widget, forms.Select):
-                field.widget.attrs.update({'class': 'form-select'})
-            else:
-                field.widget.attrs.update({'class': 'form-control'})
+    for field in form.fields.values():
+        if isinstance(field.widget, forms.Select):
+            field.widget.attrs.update({'class': 'form-select'})
+        else:
+            field.widget.attrs.update({'class': 'form-control'})
     
     return render(request, 'gestion/registrar_moto.html', {
         'form': form, 
         'cliente': cliente_inicial
     })
-
 @login_required
 def lista_motos(request):
     motos_list = Moto.objects.all().order_by('-id_moto') # Las más recientes primero
