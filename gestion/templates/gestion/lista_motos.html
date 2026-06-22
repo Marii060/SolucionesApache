@@ -47,7 +47,23 @@
             <td>{{ moto.cilindraje }}</td>
             <td>{{ moto.kilometraje }}</td>
             <td>{{ moto.id_cliente.nombre }}</td>
-            <td><span class="text-muted small">--/--/----</span></td>
+            <td>
+    {% if moto.ultimo_servicio %}
+        <div class="d-flex flex-column">
+            <span class="small fw-bold">
+                {{ moto.ultimo_servicio.fecha_inicio|date:"d/m/Y" }}
+            </span>
+            <span class="badge 
+                {% if moto.ultimo_servicio.estado == 'Terminado' %}bg-success
+                {% elif moto.ultimo_servicio.estado == 'En Proceso' %}bg-warning text-dark
+                {% else %}bg-secondary{% endif %}">
+                {{ moto.ultimo_servicio.estado }}
+            </span>
+        </div>
+    {% else %}
+        <span class="text-muted small">Sin servicios</span>
+    {% endif %}
+</td>
             <td>
               <span class="badge bg-light text-dark border">Pendiente</span>
             </td>
