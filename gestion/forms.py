@@ -82,16 +82,14 @@ class ConfiguracionSistemaForm(forms.ModelForm):
         fields = [
             'tipo_documento', 'nit', 'razon_social', 'telefono', 'email', 'direccion',
             'iva_porcentaje', 'moneda_simbolo', 'moneda_nombre', 'stock_minimo_alerta', 'dias_credito_default',
-            'backup_automatico_activo'
         ]
         
         widgets = {
             'tipo_documento': forms.Select(attrs={'class': 'form-select'}),
-            'backup_automatico_activo': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
     
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)        
+        super().__init__(*args, **kwargs)
         for field_name, field in self.fields.items():
-            if field_name not in ['tipo_documento', 'backup_automatico_activo']:
+            if field_name != 'tipo_documento':
                 field.widget.attrs.update({'class': 'form-control'})

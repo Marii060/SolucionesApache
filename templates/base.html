@@ -180,7 +180,9 @@
             <div class="sidebar-heading">Administración</div>
             <a href="#"><i class="fa-solid fa-chart-line"></i> Reportes</a>
             <a href="#"><i class="fa-solid fa-clipboard-check"></i> Auditoría</a>
-            <a href="#"><i class="fa-solid fa-gear"></i> Configuración</a>
+            <a href="{% url 'gestion:panel' %}" class="{% if request.resolver_match.url_name == 'panel' %}active{% endif %}">
+                <i class="fa-solid fa-gear"></i> Configuración
+            </a>
         </div>
 
         <div class="sidebar-footer">

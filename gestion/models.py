@@ -83,7 +83,7 @@ class ConfiguracionSistema(models.Model):
     
     #COPIAS DE SEGURIDAD
     backup_automatico_activo = models.BooleanField(default=False, verbose_name="Backup Automático Activo")
-    ultima_copia_seguridad = models.DateTimeField(null=True, blank=True, verbose_name="Última Copia Realizada")
+    
 
     class Meta:
         verbose_name = "Configuración del Sistema"

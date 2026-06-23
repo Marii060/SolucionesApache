@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Configuración de Soluciones Apache{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card-config { border: none; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); background: #ffffff; margin-bottom: 1.5rem; }
+    .config-title { font-size: 1.1rem; font-weight: 700; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.75rem; margin-bottom: 1.5rem; }
+    .form-label { font-weight: 600; color: #475569; font-size: 0.9rem; margin-bottom: 0.4rem; text-transform: uppercase; }
+    .form-control:focus, .form-select:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4 px-md-4">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold m-0" style="color: #0f172a;">Configuración Central del Sistema</h2>
+            <p class="text-muted m-0 mt-1">Ajuste los parámetros del taller y gestione las copias de seguridad de forma segura.</p>
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm mb-4" role="alert">
+                <i class="fa-solid fa-circle-check me-2"></i> {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="row g-4">
+        
+        <div class="col-lg-8">
+            <form method="POST">
+                {% csrf_token %}
+                
+                <div class="card card-config p-4 p-md-5 border">
+                    <div class="config-title">
+                        <i class="fa-solid fa-building text-primary me-2"></i> Datos del Taller y Razón Social
+                    </div>
+                    <div class="row g-4">
+                        <div class="col-md-3">
+                            <label class="form-label">Tipo Docto.</label>
+                            {{ form.tipo_documento }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">NIT / Documento</label>
+                            {{ form.nit }}
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">Razón Social</label>
+                            {{ form.razon_social }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Teléfono de Contacto</label>
+                            {{ form.telefono }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Email Principal</label>
+                            {{ form.email }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Dirección Física</label>
+                            {{ form.direccion }}
+                        </div>
+                    </div>
+                    <div class="mt-4 text-end">
+                        <button type="submit" class="btn btn-primary fw-bold px-4 rounded-3" style="background-color: #2563eb;">
+                            <i class="fa-solid fa-save me-1"></i> Guardar datos del Taller
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card card-config p-4 p-md-5 border">
+                    <div class="config-title">
+                        <i class="fa-solid fa-cogs text-success me-2"></i> Parámetros de Operación del Sistema
+                    </div>
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <label class="form-label">IVA (%) para Recibos</label>
+                            {{ form.iva_porcentaje }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Símbolo Moneda</label>
+                            {{ form.moneda_simbolo }}
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">Nombre Moneda (Ej: COP)</label>
+                            {{ form.moneda_nombre }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Alerta Stock Mínimo (uds)</label>
+                            {{ form.stock_minimo_alerta }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Días Crédito (Defecto)</label>
+                            {{ form.dias_credito_default }}
+                        </div>
+                    </div>
+                    <div class="mt-4 text-end">
+                        <button type="submit" class="btn btn-success fw-bold px-4 rounded-3">
+                            <i class="fa-solid fa-save me-1"></i> Guardar Parámetros
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card card-config p-4 border sticky-top" style="top: 20px;">
+                <div class="config-title">
+                    <i class="fa-solid fa-database text-warning me-2"></i> Copias de Seguridad
+                </div>
+                
+                <p class="text-muted small mb-4">
+                    Descargue una copia de respaldo completa en formato JSON que incluye todos los módulos del sistema.
+                
+                <div class="d-grid mb-4">
+                    <a href="{% url 'gestion:backup_crear_manual' %}" class="btn btn-outline-warning fw-bold rounded-3">
+                        <i class="fa-solid fa-cloud-download me-1"></i> Descargar Backup
+                    </a>
+                </div>
+
+                <div class="small border p-3 rounded-3 bg-light">
+                    <h6 class="fw-bold m-0 mb-2" style="color: #1e293b;">Último respaldo</h6>
+                    <ul class="list-unstyled m-0 small text-muted">
+                        {% if config.ultima_copia_seguridad %}
+                            <li>
+                                <i class="fa-solid fa-check-circle text-success me-1"></i> Generado con éxito el: <br>
+                                <span class="fw-semibold text-dark mt-1 d-block">{{ config.ultima_copia_seguridad|date:"d/m/Y - g:i a" }}</span>
+                            </li>
+                        {% else %}
+                            <li class="text-center py-2 fs-7">No se han realizado copias en este equipo aún.</li>
+                        {% endif %}
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+        
+    </div>
+</div>
+{% endblock %}
