@@ -1,10 +1,10 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from .models import Cliente, Moto, User
+from .models import Cliente, Moto, User, ConfiguracionSistema
 
 # Definimos solo las dos opciones necesarias
 TIPO_RAZON_SOCIAL = [
-    ('', 'Seleccione tipo (Opcional)'), # Opción vacía para que sea opcional
+    ('', 'Seleccione tipo (Opcional)'), 
     ('natural', 'Persona Natural'),
     ('juridica', 'Persona Jurídica'),
 ]
@@ -36,7 +36,7 @@ class ClienteForm(forms.ModelForm):
         self.fields['razon_social'].required = False
         
         # Opcional: Si quieres asegurarte de que 'nombre' no tenga valores iniciales extraños:
-        self.fields['nombre'].initial = ''
+        self.fields ['nombre'].initial = ''
     
 def clean_numero_documento(self):
         documento = self.cleaned_data.get('numero_documento')
@@ -76,4 +76,22 @@ def clean_placa(self):
             raise ValidationError("¡Atención! Ya existe una moto registrada con esta placa.")
         return placa
     
-   
+class ConfiguracionSistemaForm(forms.ModelForm):
+    class Meta:
+        model = ConfiguracionSistema
+        fields = [
+            'tipo_documento', 'nit', 'razon_social', 'telefono', 'email', 'direccion',
+            'iva_porcentaje', 'moneda_simbolo', 'moneda_nombre', 'stock_minimo_alerta', 'dias_credito_default',
+            'backup_automatico_activo'
+        ]
+        
+        widgets = {
+            'tipo_documento': forms.Select(attrs={'class': 'form-select'}),
+            'backup_automatico_activo': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)        
+        for field_name, field in self.fields.items():
+            if field_name not in ['tipo_documento', 'backup_automatico_activo']:
+                field.widget.attrs.update({'class': 'form-control'})
