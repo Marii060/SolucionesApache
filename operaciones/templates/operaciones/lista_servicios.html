@@ -1,4 +1,3 @@
-```html
 {% extends 'base.html' %} 
 {% load humanize %} 
 
@@ -125,13 +124,23 @@
                                         Ver detalle
                                     </a>
 
-                                    {% if orden.estado == 'Pendiente' %}
+                                    {% if orden.estado == 'Terminado' or orden.estado == 'Entregado' %}
+                                        <a href="{% url 'operaciones:generar_recibo' orden.id_servicio %}" class="btn btn-sm text-white" style="background-color: #16a34a; border-radius: 6px; padding: 4px 10px;">
+                                            <i class="fa-solid fa-file-invoice me-1"></i> 
+                                            {% if orden.estado == 'Terminado' %}Generar{% else %}Ver{% endif %} {% if config.tipo_documento == 'factura' %}Factura{% else %}Recibo{% endif %}
+                                        </a>
+                                    {% else %}
+                                        <button class="btn btn-sm text-muted border bg-light" style="border-radius: 6px; padding: 4px 10px;" disabled>
+                                            <i class="fa-solid fa-file-invoice me-1"></i> 
+                                            Ver {% if config.tipo_documento == 'factura' %}Factura{% else %}Recibo{% endif %}
+                                        </button>
+                                    {% endif %}
+
+                                    {% if orden.estado == 'Pendiente' or orden.estado == 'Terminado' %}
                                         <button type="button" class="btn btn-sm text-white" style="background-color: #2563eb; border-radius: 6px; padding: 4px 10px;" data-bs-toggle="modal" data-bs-target="#modalEstado{{ orden.id_servicio }}">
                                             Actualizar estado
                                         </button>
-                                        
                                     {% elif orden.estado == 'En Proceso' %}
-                                        
                                         {% if not orden.mecanico %}
                                             <button type="button" class="btn btn-sm text-white" style="background-color: #d97706; border-radius: 6px; padding: 4px 10px;" data-bs-toggle="modal" data-bs-target="#modalMecanico{{ orden.id_servicio }}">
                                                 Asignar mecánico
@@ -141,20 +150,6 @@
                                                 Actualizar estado
                                             </button>
                                         {% endif %}
-                                        
-                                    {% elif orden.estado == 'Terminado' %}
-                                        <form method="POST" action="{% url 'operaciones:actualizar_estado' orden.id_servicio %}" class="d-inline m-0">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="estado" value="Entregado">
-                                            <button type="submit" class="btn btn-sm text-white" style="background-color: #16a34a; border-radius: 6px; padding: 4px 10px;">
-                                                <i class="fa-solid fa-file-invoice me-1"></i> Generar Recibo
-                                            </button>
-                                        </form>
-                                        
-                                    {% elif orden.estado == 'Entregado' %}
-                                        <button type="button" class="btn btn-sm border bg-light text-muted" style="border-radius: 6px; padding: 4px 10px;" disabled>
-                                            <i class="fa-solid fa-check-double me-1"></i> Ver Recibo
-                                        </button>
                                     {% endif %}
                                 </div>
                             </td>
@@ -254,4 +249,3 @@
     </div>
 </div>
 {% endblock %}
-

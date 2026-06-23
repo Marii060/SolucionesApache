@@ -27,11 +27,14 @@ def dashboard(request):
     suma_pagos = CreditoPagado.objects.aggregate(total=Sum('monto_pago'))['total'] or 0
     total_cartera = suma_creditos - suma_pagos
     
+    total_productos = Producto.objects.count()
+    
     contexto = {
         'total_clientes': total_clientes,
         'total_motos': total_motos,
         'total_cartera': total_cartera,
         'total_recaudado': suma_pagos,
+        'total_productos': total_productos, 
     }
     return render(request, 'gestion/dashboard.html', contexto)
 

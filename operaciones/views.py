@@ -4,7 +4,9 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.db.models import Q
 from django.core.paginator import Paginator
-from .models import Servicio, ListaServicio, Cliente, Moto, Producto
+from operaciones.models import Servicio, DetalleServicio, ListaServicio 
+from gestion.models import Cliente, Moto, ConfiguracionSistema
+from inventario.models import Producto
 from .forms import ServicioForm, ListaServicioForm
 
 @login_required
@@ -90,19 +92,21 @@ def lista_servicios(request):
 
     # Ordenamos para que las más recientes aparezcan arriba
     lista_ordenes = lista_ordenes.order_by('-id_servicio')
-    
-    # Paginacion de a 10 registros
     paginator = Paginator(lista_ordenes, 10)
     page_number = request.GET.get('page')
     ordenes = paginator.get_page(page_number)
     
-    # Enviamos los datos y los estados actuales para mantener la selección visual activa
+    #configuración global de Soluciones Apache
+    config = ConfiguracionSistema.obtener_config()
+    
+    # Enviamos los datos, los estados actuales y la CONFIGURACIÓN al HTML
     return render(request, 'operaciones/lista_servicios.html', {
         'ordenes': ordenes,
         'query': query,
-        'estado_actual': estado_filtro
+        'estado_actual': estado_filtro,
+        'config': config  
     })
-
+    
 @login_required
 def crear_servicio(request):
     clientes = Cliente.objects.all()
@@ -195,7 +199,7 @@ def crear_servicio(request):
         'productos': productos_inventario
     })
     
-#Buscador silencioso de motos por cliente
+#Buscador de motos por cliente
 @login_required
 def obtener_motos_cliente(request, cliente_id):
     # Buscamos todas las motos que pertenezcan a ese cliente específico
@@ -248,3 +252,55 @@ def asignar_mecanico(request, id):
         messages.success(request, f'¡Mecánico "{nombre_mecanico}" asignado con éxito a la orden {orden.codigo_servicio}!')
         
     return redirect('operaciones:lista_servicios')
+
+@login_required
+def generar_recibo(request, servicio_id):
+    servicio = get_object_or_404(Servicio, pk=servicio_id)
+    detalles = DetalleServicio.objects.filter(id_servicio=servicio)
+    config = ConfiguracionSistema.obtener_config()
+    
+    mano_obra = 0
+    repuestos = 0
+    
+    # 1. Intentamos sumar los detalles (si los ingresaste uno por uno)
+    for item in detalles:
+        valor = float(item.total or (item.precio_unitario * item.cantidad) or 0)
+        
+        if item.id_producto or (item.tipo and 'repuesto' in str(item.tipo).lower()):
+            repuestos += valor
+        else:
+            mano_obra += valor
+
+    # 2. 💡 EL SALVAVIDAS MATEMÁTICO (Aquí estaba el error de los ceros)
+    # Si la orden no tiene detalles registrados uno a uno, tomamos los valores
+    # directamente de la orden principal de tu modelo Servicio.
+    if mano_obra == 0 and repuestos == 0:
+        mano_obra = float(servicio.valor_mano_obra or 0)
+        total_orden = float(servicio.valor_total or 0)
+        
+        # Lógica matemática: Si sabemos el total y la mano de obra, el resto son repuestos.
+        # Ejemplo de Fredy: 185.000 (Total) - 30.000 (Mano de obra) = 155.000 (Repuestos)
+        if total_orden > mano_obra:
+            repuestos = total_orden - mano_obra
+
+    # 3. Cálculos de Impuestos
+    porcentaje_iva = float(config.iva_porcentaje or 0)
+    
+    # El IVA se aplica ÚNICAMENTE a la bolsa de repuestos
+    monto_iva = repuestos * (porcentaje_iva / 100)
+    
+    # 4. Totales finales
+    subtotal_general = mano_obra + repuestos
+    total_general = subtotal_general + monto_iva
+
+    contexto = {
+        'servicio': servicio,
+        'config': config,
+        'mano_obra': mano_obra,
+        'repuestos': repuestos,
+        'subtotal_general': subtotal_general, 
+        'monto_iva': monto_iva,
+        'total_general': total_general,
+    }
+    
+    return render(request, 'operaciones/generar_recibo.html', contexto)
