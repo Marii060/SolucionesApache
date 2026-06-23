@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.cache import cache
 from django.contrib.auth.models import User
 
 class Cliente(models.Model):
@@ -51,4 +52,65 @@ class Log(models.Model):
 
     def __str__(self):
         return f"{self.fecha_hora} - {self.id_usuario.username}: {self.accion_realizada}"
+
+class ConfiguracionSistema(models.Model):
+    TIPO_DOC_CHOICES = [
+        ('recibo', 'Recibo de venta (sin DIAN)'),
+        ('factura', 'Factura electrónica (con DIAN)'),
+    ]
+
+    id = models.AutoField(primary_key=True)
     
+    #DATOS DEL TALLER
+    tipo_documento = models.CharField(
+        max_length=20, 
+        choices=TIPO_DOC_CHOICES, 
+        default='recibo', 
+        verbose_name="Tipo Documento"
+    )
+    nit = models.CharField(max_length=20, unique=True, verbose_name="NIT / Documento")
+    razon_social = models.CharField(max_length=100, verbose_name="Razón Social")
+    telefono = models.CharField(max_length=20, verbose_name="Teléfono")
+    email = models.EmailField(verbose_name="Email de Contacto")
+    direccion = models.CharField(max_length=200, verbose_name="Dirección")
+    
+    #PARÁMETROS DEL SISTEMA
+    iva_porcentaje = models.DecimalField(max_digits=5, decimal_places=2, default=19.00, verbose_name="IVA (%)")
+    moneda_simbolo = models.CharField(max_length=5, default='$', verbose_name="Símbolo Moneda")
+    moneda_nombre = models.CharField(max_length=20, default='COP', verbose_name="Nombre Moneda")
+    stock_minimo_alerta = models.PositiveIntegerField(default=5, verbose_name="Stock Mínimo Alerta")
+    dias_credito_default = models.PositiveIntegerField(default=30, verbose_name="Días Crédito (Defecto)")
+    
+    #COPIAS DE SEGURIDAD
+    backup_automatico_activo = models.BooleanField(default=False, verbose_name="Backup Automático Activo")
+    ultima_copia_seguridad = models.DateTimeField(null=True, blank=True, verbose_name="Última Copia Realizada")
+
+    class Meta:
+        verbose_name = "Configuración del Sistema"
+        verbose_name_plural = "Configuraciones del Sistema"
+
+    def __str__(self):
+        return f"Configuración del Sistema - {self.razon_social}"
+
+    # Singleton para asegurar que solo exista un registro
+    def save(self, *args, **kwargs):
+        # Asegura que siempre se guarde con ID=1
+        self.id = 1
+        super().save(*args, **kwargs)
+        # Limpia el cache al guardar
+        cache.delete('configuracion_sistema')
+
+    @classmethod
+    def obtener_config(cls):
+        # Implementación con Cache para máximo rendimiento
+        config = cache.get('configuracion_sistema')
+        if not config:
+            # Si no está en cache, lo busca en la BD, creándolo si no existe
+            config, created = cls.objects.get_or_create(id=1, defaults={
+                'razon_social': 'Soluciones Apache', 
+                'nit': '000000000-0',
+                'tipo_documento': 'recibo', 
+            })
+            # Cache por 24 horas
+            cache.set('configuracion_sistema', config, 86400) 
+        return config
