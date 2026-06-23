@@ -229,7 +229,7 @@ def panel_configuracion(request):
     else:
         form = ConfiguracionSistemaForm(instance=config)
     
-    return render(request, 'configuracion/panel_configuracion.html', {
+    return render(request, 'gestion/panel_configuracion.html', {
         'config': config,
         'form': form,
     })
