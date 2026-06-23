@@ -225,7 +225,7 @@ def panel_configuracion(request):
         if form.is_valid():
             form.save()
             messages.success(request, '¡Configuración de Soluciones Apache actualizada correctamente!')
-            return redirect('panel_configuracion') # Ajusta esto al nombre de tu URL
+            return redirect('gestion:panel') # Ajusta esto al nombre de tu URL
     else:
         form = ConfiguracionSistemaForm(instance=config)
     
