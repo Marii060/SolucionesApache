@@ -1,12 +1,18 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import login_required, user_passes_test
+import json
+import datetime
 from django.core.paginator import Paginator
 from django import forms
 from django.contrib import messages
 from django.db.models import Sum, Count, Q
-from .models import Cliente, Moto
-from .forms import ClienteForm, MotoForm
+from django.http import HttpResponse
+from django.core import serializers
+from gestion.models import Cliente, Moto, Log, ConfiguracionSistema
+from inventario.models import MarcaProducto, Categoria, Proveedor, Producto, MovimientoInventario, Compra, DetalleCompra
+from operaciones.models import ListaServicio, Servicio, DetalleServicio, Venta, DetalleVenta, Credito, CreditoPagado
+from .forms import ClienteForm, MotoForm, ConfiguracionSistemaForm
 from operaciones.models import Credito, CreditoPagado
 
 def personal_required(user):
@@ -209,3 +215,70 @@ def eliminar_moto(request, pk):
         moto.delete()
         return redirect('gestion:lista_motos')
     return render(request, 'gestion/eliminar_moto.html', {'moto': moto})
+
+@login_required
+def panel_configuracion(request):
+    config = ConfiguracionSistema.obtener_config()
+    
+    if request.method == 'POST':
+        form = ConfiguracionSistemaForm(request.POST, instance=config)
+        if form.is_valid():
+            form.save()
+            messages.success(request, '¡Configuración de Soluciones Apache actualizada correctamente!')
+            return redirect('panel_configuracion') # Ajusta esto al nombre de tu URL
+    else:
+        form = ConfiguracionSistemaForm(instance=config)
+    
+    return render(request, 'configuracion/panel_configuracion.html', {
+        'config': config,
+        'form': form,
+    })
+
+@login_required
+def crear_backup_manual(request):
+    if not request.user.is_superuser:
+        messages.error(request, 'No tienes permisos para realizar copias de seguridad.')
+        return redirect('panel_configuracion')
+
+    modelos_a_respaldar = [
+        ConfiguracionSistema,
+        Cliente,
+        MarcaProducto,
+        Categoria,
+        Proveedor,
+        ListaServicio,
+        Moto,          
+        Producto,      
+        Compra,       
+        Venta,        
+        Servicio,      
+        MovimientoInventario,
+        DetalleCompra,    
+        DetalleVenta,    
+        DetalleServicio,  
+        Credito,          
+        CreditoPagado,    
+        Log,              
+        ]
+    
+    data_consolidada = []
+    for modelo in modelos_a_respaldar:
+        queryset = modelo.objects.all()
+        serialized_data = serializers.serialize('json', queryset, indent=2)
+        model_data_list = json.loads(serialized_data)
+        data_consolidada.extend(model_data_list)
+
+    final_json_data = json.dumps(data_consolidada, indent=2)
+
+    fecha_hoy = datetime.date.today().strftime("%Y-%m-%d")
+    nombre_archivo = f"backup_soluciones_apache_{fecha_hoy}.json"
+    
+    response = HttpResponse(final_json_data, content_type='application/json')
+    response['Content-Disposition'] = f'attachment; filename="{nombre_archivo}"'
+    
+    config = ConfiguracionSistema.obtener_config()
+    config.ultima_copia_seguridad = datetime.datetime.now()
+    config.save()
+    
+    messages.success(request, '¡Backup generado exitosamente!')
+    return response
