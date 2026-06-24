@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ titulo }} - Soluciones Apache{% endblock %}
+
+{% block content %}
+<div class="container mt-4" style="max-width: 600px;">
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-header bg-white border-bottom py-3">
+            <h4 class="fw-bold m-0" style="color: #0f172a;">{{ titulo }}</h4>
+        </div>
+        <div class="card-body p-4">
+            <form method="POST">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label class="form-label fw-semibold text-muted">Nombre del Fabricante <span class="text-danger">*</span></label>
+                    {{ form.nombre }}
+                    {{ form.nombre.errors }}
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label fw-semibold text-muted">Descripción (Opcional)</label>
+                    {{ form.descripcion }}
+                    {{ form.descripcion.errors }}
+                </div>
+                
+                <div class="mb-4 form-check">
+                    {{ form.estado }}
+                    <label class="form-check-label fw-semibold text-muted" for="{{ form.estado.id_for_label }}">
+                        Fabricante Activo
+                    </label>
+                </div>
+                
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary fw-semibold px-4" style="background-color: #2563eb;">Guardar</button>
+                    <a href="{% url 'inventario:lista_fabricantes' %}" class="btn btn-outline-secondary fw-semibold">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
