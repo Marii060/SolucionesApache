@@ -198,6 +198,20 @@ def eliminar_moto(request, pk):
         return redirect('gestion:lista_motos')
     return render(request, 'gestion/eliminar_moto.html', {'moto': moto})
 
+#Historial de servicios de una moto
+@login_required
+def historial_moto(request, id):
+    moto = get_object_or_404(Moto, pk=id)
+    historial = Servicio.objects.filter(id_moto=moto).order_by('-id_servicio')
+    
+    contexto = {
+        'moto': moto,
+        'cliente': moto.id_cliente,
+        'historial': historial
+    }
+    
+    return render(request, 'gestion/historial_moto.html', contexto)
+
 #CONFIGURACIÓN Y BACKUPS
 @login_required
 def panel_configuracion(request):

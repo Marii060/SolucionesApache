@@ -16,6 +16,7 @@ urlpatterns = [
     path('moto/detalle/<int:pk>/', views.detalle_moto, name='detalle_moto'),
     path('moto/editar/<int:pk>/', views.editar_moto, name='editar_moto'),
     path('moto/eliminar/<int:pk>/', views.eliminar_moto, name='eliminar_moto'),
+    path('moto/<int:id>/historial/', views.historial_moto, name='historial_moto'),
     path('panel/', views.panel_configuracion, name='panel'),
     path('backup/crear-manual/', views.crear_backup_manual, name='backup_crear_manual'),
 ]
