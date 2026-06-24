@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Historial: {{ moto.placa }} - Soluciones Apache{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4 px-md-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold m-0" style="color: #0f172a;">Historial de Mantenimiento</h2>
+            <p class="text-muted m-0 mt-1">
+                Motocicleta: <span class="fw-bold text-dark">{{ moto.marca }} {{ moto.modelo }} ({{ moto.año }})</span> - Placa: <span class="badge bg-primary">{{ moto.placa }}</span>
+            </p>
+        </div>
+        <a href="{% url 'gestion:detalle_cliente' cliente.id_cliente %}" class="btn btn-sm btn-primary fw-bold">
+            Volver al Cliente
+        </a>
+    </div>
+
+    <!-- Tarjeta con la tabla del historial -->
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-header bg-white border-bottom py-3">
+            <h5 class="mb-0 fw-bold" style="color: #1e3a8a;"><i class="fa-solid fa-wrench me-2"></i> Servicios Realizados</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="text-uppercase text-muted small fw-bold py-3 px-4 border-0">N° Orden</th>
+                            <th class="text-uppercase text-muted small fw-bold py-3 border-0">Fecha de Ingreso</th>
+                            <th class="text-uppercase text-muted small fw-bold py-3 border-0">Mecánico</th>
+                            <th class="text-uppercase text-muted small fw-bold py-3 border-0">Estado</th>
+                            <th class="text-uppercase text-muted small fw-bold py-3 text-end border-0">Total</th>
+                            <th class="text-uppercase text-muted small fw-bold py-3 text-center border-0">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for servicio in historial %}
+                        <tr class="border-bottom">
+                            <td class="px-4 fw-bold text-dark">{{ servicio.num_orden|default:servicio.id_servicio }}</td>
+                            <td>{{ servicio.fecha_inicio|date:"d/m/Y g:i A"|default:"Sin fecha" }}</td>
+                            <td>{{ servicio.mecanico_asignado.get_full_name|default:"No asignado" }}</td>
+                            <td>
+                                {% if servicio.estado == 'Terminado' %}
+                                    <span class="badge bg-success-subtle text-success">Terminado</span>
+                                {% elif servicio.estado == 'En Proceso' %}
+                                    <span class="badge bg-warning-subtle text-warning">En Proceso</span>
+                                {% else %}
+                                    <span class="badge bg-secondary-subtle text-secondary">{{ servicio.estado }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end fw-semibold text-success">$ {{ servicio.valor_total|floatformat:0|intcomma }}</td>
+                            <td class="text-center">
+                                <a href="{% url 'operaciones:generar_recibo' servicio.id_servicio %}" class="btn btn-sm btn-outline-primary border-0" title="Ver Detalle">
+    <i class="fa-regular fa-eye"></i>
+</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                <i class="fa-solid fa-motorcycle display-6 mb-3 opacity-25"></i>
+                                <br>Esta motocicleta aún no tiene servicios registrados en el taller.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

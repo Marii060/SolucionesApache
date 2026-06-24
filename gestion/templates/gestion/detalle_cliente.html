@@ -44,8 +44,8 @@
     </div>
 {% endif %}
 <div class="mb-4">
-  <a href="{% url 'gestion:lista_cliente' %}" class="text-decoration-none text-muted fw-bold">
-    <i class="fa-solid fa-arrow-left me-2"></i> Volver a la lista
+  <a href="{% url 'gestion:lista_cliente' %}" class="btn btn-sm btn-primary fw-bold">
+     Volver a la lista
   </a>
 </div>
 
@@ -108,9 +108,9 @@
             <div class="p-3 border rounded" style="background-color: #f8fafc; border-color: #e2e8f0 !important;">
               <h6 class="fw-bold mb-1">{{ moto.marca }} {{ moto.modelo }}</h6>
               <p class="text-muted small mb-2">Placa: <span class="text-dark fw-bold">{{ moto.placa }}</span></p>
-              <button class="btn btn-sm btn-outline-primary" style="font-size: 0.75rem; border-radius: 6px">
-                Ver Historial
-              </button>
+            <a href="{% url 'gestion:historial_moto' moto.id_moto %}" class="btn btn-sm btn-outline-primary fw-bold" style="border-radius: 6px;">
+              Ver Historial
+            </a>
             </div>
           </div>
           {% empty %}
