@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Q
-from .models import Categoria, MarcaProducto, Producto, MovimientoInventario
+from inventario.models import Categoria, MarcaProducto, Producto, MovimientoInventario
 from .forms import CategoriaForm, MarcaForm, ProductoForm
 
 @login_required
