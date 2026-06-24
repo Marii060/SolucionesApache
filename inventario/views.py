@@ -3,8 +3,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Q
-from inventario.models import Categoria, MarcaProducto, Producto, MovimientoInventario
-from .forms import CategoriaForm, MarcaForm, ProductoForm
+from inventario.models import Categoria, MarcaProducto, Fabricante, Producto, MovimientoInventario
+from .forms import CategoriaForm, MarcaForm, FabricanteForm ,ProductoForm
 
 @login_required
 def lista_categorias(request):
@@ -117,30 +117,78 @@ def eliminar_marca(request, id):
     return redirect('inventario:lista_marcas')
 
 @login_required
+def lista_fabricantes(request):
+    fabricantes = Fabricante.objects.all()
+    return render(request, 'inventario/lista_fabricantes.html', {'fabricantes': fabricantes})
+
+@login_required
+def crear_fabricante(request):
+    if request.method == 'POST':
+        form = FabricanteForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, '¡Fabricante registrado con éxito!')
+            return redirect('inventario:lista_fabricantes')
+    else:
+        form = FabricanteForm()
+    return render(request, 'inventario/registrar_fabricante.html', {'form': form, 'titulo': 'Registrar Fabricante'})
+
+@login_required
+def editar_fabricante(request, id):
+    fabricante = get_object_or_404(Fabricante, id_fabricante=id)
+    if request.method == 'POST':
+        form = FabricanteForm(request.POST, instance=fabricante)
+        if form.is_valid():
+            form.save()
+            messages.success(request, '¡Fabricante actualizado correctamente!')
+            return redirect('inventario:lista_fabricantes')
+    else:
+        form = FabricanteForm(instance=fabricante)
+    return render(request, 'inventario/registrar_fabricante.html', {'form': form, 'fabricante': fabricante, 'titulo': 'Editar Fabricante'})
+
+@login_required
+def cambiar_estado_fabricante(request, id):
+    fabricante = get_object_or_404(Fabricante, id_fabricante=id)
+    #Invertimos el estado actual 
+    fabricante.estado = not fabricante.estado
+    fabricante.save()
+    #Creamos un mensaje dinámico 
+    accion = "habilitado" if fabricante.estado else "deshabilitado"
+    messages.success(request, f'¡El fabricante "{fabricante.nombre}" ha sido {accion} correctamente!')
+    
+    return redirect('inventario:lista_fabricantes')
+
+@login_required
 def lista_productos(request):
-    # 1. Capturamos todos los parámetros de búsqueda y filtros
+    #Capturamos todos los parámetros de búsqueda y filtros
     query = request.GET.get('buscar', '')
     categoria_id = request.GET.get('categoria', '')
     marca_id = request.GET.get('marca', '')
-    
-    # 2. Base de la consulta
+    fabricante_id = request.GET.get('fabricante', '') 
+    #Base de la consulta
     lista = Producto.objects.all()
     
-    # 3. Filtramos por nombre o código si el usuario escribió algo
+    #Filtramos por nombre, código o FABRICANTE si el usuario escribió algo en el cuadro de texto
     if query:
         lista = lista.filter(
-            Q(nombre__icontains=query) | Q(codigo_interno__icontains=query)
+            Q(nombre__icontains=query) | 
+            Q(codigo_interno__icontains=query) |
+            Q(id_fabricante__nombre__icontains=query) 
         )
         
-    # 4. Filtramos por Categoría si seleccionó alguna
+    #Filtramos por Categoría si seleccionó alguna
     if categoria_id:
         lista = lista.filter(id_categoria_id=categoria_id)
         
-    # 5. Filtramos por Marca si seleccionó alguna
+    #Filtramos por Marca si seleccionó alguna
     if marca_id:
         lista = lista.filter(id_marca_id=marca_id)
         
-    # 6. Ordenamos alfabéticamente por código
+    #Filtramos por Fabricante si seleccionó alguno en el menú desplegable
+    if fabricante_id:
+        lista = lista.filter(id_fabricante_id=fabricante_id)
+        
+    #Ordenamos alfabéticamente por código
     lista = lista.order_by('codigo_interno')
         
     # Paginación
@@ -148,17 +196,20 @@ def lista_productos(request):
     page_number = request.GET.get('page')
     productos = paginator.get_page(page_number)
     
-    # Consultamos las categorías y marcas para llenar los <select> del HTML
+    # Consultamos las tablas para llenar los <select> del HTML
     categorias = Categoria.objects.filter(estado=True)
     marcas = MarcaProducto.objects.all()
+    fabricantes = Fabricante.objects.filter(estado=True) #Traemos solo los activos
     
     return render(request, 'inventario/lista_productos.html', {
         'productos': productos,
         'query': query,
-        'categoria_sel': categoria_id, # Para mantener el filtro visible en pantalla
-        'marca_sel': marca_id,         # Para mantener el filtro visible en pantalla
+        'categoria_sel': categoria_id,
+        'marca_sel': marca_id,
+        'fabricante_sel': fabricante_id, #mantener el filtro visible
         'categorias': categorias,
-        'marcas': marcas
+        'marcas': marcas,
+        'fabricantes': fabricantes   #Para armar el <select> en el HTML
     })
 
 @login_required
