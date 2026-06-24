@@ -48,7 +48,20 @@ class Proveedor(models.Model):
     def __str__(self):
         return self.nombre
 
+class Fabricante(models.Model):
+    id_fabricante = models.AutoField(primary_key=True)
+    nombre = models.CharField(max_length=150, unique=True, verbose_name="Nombre del Fabricante")
+    descripcion = models.TextField(blank=True, null=True)
+    estado = models.BooleanField(default=True, verbose_name="Activo")
 
+    class Meta:
+        verbose_name = "Fabricante"
+        verbose_name_plural = "Fabricantes"
+        ordering = ['nombre']
+
+    def __str__(self):
+        return self.nombre
+    
 class Producto(models.Model):
     id_producto = models.AutoField(primary_key=True)
     codigo_interno = models.CharField(max_length=20, unique=True)
@@ -63,6 +76,7 @@ class Producto(models.Model):
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     id_categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, db_column='id_categoria')
     id_marca = models.ForeignKey(MarcaProducto, on_delete=models.CASCADE, db_column='id_marca')
+    id_fabricante = models.ForeignKey(Fabricante, on_delete=models.SET_NULL, null=True, blank=True, db_column='id_fabricante',verbose_name="Fabricante")
     # Relación Muchos a Muchos con Proveedores
     proveedores = models.ManyToManyField(Proveedor, related_name='productos')
 

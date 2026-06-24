@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import MarcaProducto, Categoria, Proveedor, Producto
+from .models import MarcaProducto, Categoria, Proveedor, Fabricante, Producto
 
 @admin.register(MarcaProducto)
 class MarcaProductoAdmin(admin.ModelAdmin):
@@ -18,6 +18,13 @@ class ProveedorAdmin(admin.ModelAdmin):
     list_filter = ('activo',)
     search_fields = ('razon_social', 'identificacion')
 
+
+@admin.register(Fabricante)
+class FabricanteAdmin(admin.ModelAdmin):
+    list_display = ('id_fabricante', 'nombre', 'estado')
+    list_filter = ('estado',)
+    search_fields = ('nombre', 'descripcion')
+    
 @admin.register(Producto)
 class ProductoAdmin(admin.ModelAdmin):
     # Mostramos los campos principales incluyendo stock y precios
