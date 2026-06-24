@@ -164,6 +164,11 @@
                     Categorías
                 </a>
                 
+                 <a href="{% url 'inventario:lista_fabricantes' %}" class="ms-4 {% if 'fabricantes' in request.path %}active{% endif %}">
+                    Fabricantes
+                </a>
+    
+
                 <a href="{% url 'inventario:control_inventario' %}" class="ms-4 {% if 'control' in request.path %}active{% endif %}">
                     Control de Inventario
                 </a>
