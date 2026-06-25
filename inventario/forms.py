@@ -1,5 +1,6 @@
 from django import forms
-from .models import Categoria, MarcaProducto, Fabricante, Producto
+from django.forms import inlineformset_factory
+from .models import Categoria, MarcaProducto, Fabricante, Producto, Proveedor,Compra, DetalleCompra
 
 class CategoriaForm(forms.ModelForm):
     class Meta:
@@ -31,6 +32,20 @@ class FabricanteForm(forms.ModelForm):
             'estado': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
+class ProveedorForm(forms.ModelForm):
+    class Meta:
+        model = Proveedor
+        fields = ['razon_social', 'nombre', 'identificacion', 'activo', 'telefono', 'correo', 'direccion']
+        widgets = {
+            'razon_social': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: Motopartes S.A.'}),
+            'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: Motopartes (Nombre Comercial)'}),
+            'identificacion': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: 900.123.456-7'}),
+            'activo': forms.Select(choices=[(True, 'Activo'), (False, 'Inactivo')], attrs={'class': 'form-select'}),
+            'telefono': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: 601 555 0001'}),
+            'correo': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Ej: ventas@proveedor.com'}),
+            'direccion': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: Calle 80 #23-45, Bogotá'}),
+        }        
+
 class ProductoForm(forms.ModelForm):
     class Meta:
         model = Producto
@@ -59,3 +74,42 @@ class ProductoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['proveedores'].required = False
+        
+class CompraForm(forms.ModelForm):
+    class Meta:
+        model = Compra
+        fields = [
+            'codigo_interno', 'numero_factura', 'fecha_compra', 
+            'id_proveedor', 'metodo_pago', 'estado', 
+            'observaciones', 'total_compra'
+        ]
+        widgets = {
+            'codigo_interno': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: OC-001'}),
+            'numero_factura': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: F-98765'}),
+            'fecha_compra': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'id_proveedor': forms.Select(attrs={'class': 'form-select'}),
+            'metodo_pago': forms.Select(attrs={'class': 'form-select'}),
+            'estado': forms.Select(attrs={'class': 'form-select'}),
+            'total_compra': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'observaciones': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'Notas adicionales...'}),
+        }
+        
+class DetalleCompraForm(forms.ModelForm):
+    class Meta:
+        model = DetalleCompra
+        fields = ['id_producto', 'cantidad', 'precio_unitario_compra', 'subtotal']
+        widgets = {
+            'id_producto': forms.Select(attrs={'class': 'form-select producto-select'}),
+            'cantidad': forms.NumberInput(attrs={'class': 'form-control cantidad-input', 'min': '1'}),
+            'precio_unitario_compra': forms.NumberInput(attrs={'class': 'form-control precio-input'}),
+            'subtotal': forms.NumberInput(attrs={'class': 'form-control subtotal-input', 'readonly': 'readonly'}),
+        }
+
+# Fábrica para manejar el encabezado y sus detalles juntos
+CompraFormSet = inlineformset_factory(
+    Compra, 
+    DetalleCompra, 
+    form=DetalleCompraForm, 
+    extra=1, # Cantidad de filas vacías iniciales
+    can_delete=True
+)        
