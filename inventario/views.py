@@ -489,16 +489,18 @@ def detalle_compra(request, id):
 @login_required
 def actualizar_estado_compra(request, id):
     if request.method == 'POST':
-        nuevo_estado = request.POST.get('estado')
         compra = get_object_or_404(Compra, id_compra=id)
-        
-        #lógica: si pasa a 'Recibido', sumar stock al inventario
-        compra.estado = nuevo_estado
+        nuevo_estado = request.POST.get('estado')
+        nuevo_estado_pago = request.POST.get('estado_pago')
+        if nuevo_estado:
+            compra.estado = nuevo_estado
+        if nuevo_estado_pago:
+            compra.estado_pago = nuevo_estado_pago
+            
         compra.save()
+        messages.success(request, "Estados actualizados correctamente.")
         
-        messages.success(request, f"Estado actualizado a {nuevo_estado}")
     return redirect('inventario:detalle_compra', id=id)
-
 @login_required
 def cancelar_compra(request, id):
     compra = get_object_or_404(Compra, id_compra=id)

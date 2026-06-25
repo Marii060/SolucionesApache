@@ -5,39 +5,46 @@
 
 {% block content %}
 <div class="container-fluid mt-4 px-md-4">
-    <!-- Encabezado con el formulario de estado -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2 class="fw-bold m-0 text-dark">Detalle de Compra: <span class="text-primary">{{ compra.codigo_interno }}</span></h2>
             <p class="text-muted m-0 mt-1">Factura: {{ compra.numero_factura }} | Registrada el {{ compra.fecha_recepcion|date:"d/m/Y H:i" }}</p>
         </div>
+        
         <div class="d-flex gap-2 align-items-center mb-4">
-    <a href="{% url 'inventario:lista_compras' %}" class="btn btn-primary fw-bold shadow-sm px-4 py-2" 
-       style="border-radius: 8px; flex: 0 0 150px; text-align: center;">
-         Volver
-    </a>
-    
-    <form method="POST" action="{% url 'inventario:actualizar_estado_compra' compra.id_compra %}" 
-          class="d-flex gap-2" style="flex: 1;">
-        {% csrf_token %}
-        
-        <select name="estado" class="form-select fw-bold border-secondary" 
-                style="border-radius: 8px; height: 44px; flex: 1;">
-            <option value="Pendiente" {% if compra.estado == 'Pendiente' %}selected{% endif %}>🟡 Pendiente</option>
-            <option value="Recibido" {% if compra.estado == 'Recibido' %}selected{% endif %}>🟢 Recibido</option>
-            <option value="Cancelado" {% if compra.estado == 'Cancelado' %}selected{% endif %}>🔴 Cancelado</option>
-        </select>
-        
-        <button type="submit" class="btn btn-success fw-bold shadow-sm px-4 py-2" 
-                style="border-radius: 8px; flex: 0 0 200px;">
-            <i class="fa-solid fa-save me-1"></i> Guardar
-        </button>
-    </form>
-</div>
+            <a href="{% url 'inventario:lista_compras' %}" class="btn btn-primary fw-bold shadow-sm px-4 py-2" 
+               style="border-radius: 8px; flex: 0 0 130px; text-align: center; height: 44px; display: flex; align-items: center; justify-content: center;">
+                <i class="fa-solid fa-arrow-left me-1"></i> Volver
+            </a>
+            
+            <form method="POST" action="{% url 'inventario:actualizar_estado_compra' compra.id_compra %}" 
+                  class="d-flex gap-2 align-items-center" style="flex: 1; flex-wrap: nowrap;">
+                {% csrf_token %}
+                
+                <div style="flex: 1;">
+                    <select name="estado" class="form-select fw-bold border-secondary" style="border-radius: 8px; height: 44px;">
+                        <option value="Pendiente" {% if compra.estado == 'Pendiente' %}selected{% endif %}>🟡 Mercancía: Pendiente</option>
+                        <option value="Recibido" {% if compra.estado == 'Recibido' %}selected{% endif %}>🟢 Mercancía: Recibida</option>
+                        <option value="Cancelado" {% if compra.estado == 'Cancelado' %}selected{% endif %}>🔴 Mercancía: Cancelada</option>
+                    </select>
+                </div>
+
+                <div style="flex: 1;">
+                    <select name="estado_pago" class="form-select fw-bold border-secondary" style="border-radius: 8px; height: 44px;">
+                        <option value="Pendiente" {% if compra.estado_pago == 'Pendiente' %}selected{% endif %}>💵 Pago: Pendiente</option>
+                        <option value="Pagado" {% if compra.estado_pago == 'Pagado' %}selected{% endif %}>✅ Pago: Realizado</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn btn-success fw-bold shadow-sm px-4" 
+                        style="border-radius: 8px; flex: 0 0 180px; height: 44px;">
+                    <i class="fa-solid fa-save me-1"></i> Guardar
+                </button>
+            </form>
+        </div>
     </div>
 
     <div class="row">
-        <!-- Columna Izquierda -->
         <div class="col-lg-4">
             <div class="card shadow-sm border-0 rounded-4 mb-4">
                 <div class="card-body p-4">
@@ -54,16 +61,22 @@
                         <span class="text-muted">Método Pago:</span>
                         <span class="fw-semibold">{{ compra.metodo_pago }}</span>
                     </div>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="text-muted">Estado Actual:</span>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted">Estado Mercancía:</span>
                         <span class="badge {% if compra.estado == 'Recibido' %}bg-success{% elif compra.estado == 'Pendiente' %}bg-warning text-dark{% else %}bg-danger{% endif %}">
                             {{ compra.estado }}
+                        </span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Estado de Pago:</span>
+                        <span class="badge {% if compra.estado_pago == 'Pagado' %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                            {{ compra.estado_pago }}
                         </span>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Columna Derecha -->
+        
         <div class="col-lg-8">
             <div class="card shadow-sm border-0 rounded-4">
                 <div class="card-body p-0">
