@@ -123,30 +123,16 @@ class Compra(models.Model):
     ]
 
     id_compra = models.AutoField(primary_key=True)
-    codigo_interno = models.CharField(max_length=20, unique=True) # Conservado como lo pediste
+    codigo_interno = models.CharField(max_length=20, unique=True) 
     numero_factura = models.CharField(max_length=50)
-    fecha_compra = models.DateTimeField()
+    fecha_compra = models.DateField()
     fecha_recepcion = models.DateTimeField(auto_now_add=True)
     metodo_pago = models.CharField(max_length=20, choices=METODO_PAGO_CHOICES, default='Efectivo')
     estado = models.CharField(max_length=20, choices=ESTADO_COMPRA_CHOICES, default='Recibido')
     total_compra = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     observaciones = models.TextField(blank=True, null=True)
     id_proveedor = models.ForeignKey(Proveedor, on_delete=models.CASCADE, db_column='id_proveedor')
-    # Doble relación con Usuarios 
-    id_usuario_registro = models.ForeignKey(
-        User, 
-        on_delete=models.CASCADE, 
-        related_name='compras_registradas', 
-        db_column='id_usuario_registro'
-    )
-    id_usuario_recepcion = models.ForeignKey(
-        User, 
-        on_delete=models.CASCADE, 
-        related_name='compras_recibidas', 
-        db_column='id_usuario_recepcion',
-        null=True, 
-        blank=True
-    )
+    id_usuario = models.ForeignKey(User, on_delete=models.CASCADE, db_column='id_usuario')
 
     class Meta:
         verbose_name = "Compra"
