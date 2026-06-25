@@ -54,7 +54,7 @@
                             <td class="fw-bold text-dark">{{ prov.razon_social }}</td>
                             <td class="text-muted">{{ prov.identificacion }}</td>
                             <td class="text-muted">{{ prov.telefono }}</td>
-                            <td class="fw-medium text-dark">$850.000</td> 
+                            <td class="fw-bold text-dark">$ {{ prov.total_acumulado|default:0|intcomma }}</td>
                             <td>
                                 {% if prov.activo %}
                                     <span class="badge" style="background-color: #dcfce7; color: #16a34a; padding: 6px 12px; border-radius: 6px;">Activo</span>
