@@ -3,8 +3,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Q
-from inventario.models import Categoria, MarcaProducto, Fabricante, Producto, MovimientoInventario
-from .forms import CategoriaForm, MarcaForm, FabricanteForm ,ProductoForm
+from inventario.models import Categoria, MarcaProducto, Fabricante, Producto, MovimientoInventario, Proveedor, Compra
+from .forms import CategoriaForm, MarcaForm, FabricanteForm ,ProductoForm, ProveedorForm, CompraForm, CompraFormSet
 
 @login_required
 def lista_categorias(request):
@@ -159,8 +159,94 @@ def cambiar_estado_fabricante(request, id):
     return redirect('inventario:lista_fabricantes')
 
 @login_required
+def lista_proveedores(request):
+    proveedores = Proveedor.objects.all().order_by('-fecha_creacion')
+    return render(request, 'inventario/lista_proveedores.html', {'proveedores': proveedores})
+
+@login_required
+def crear_proveedor(request):
+    if request.method == 'POST':
+        form = ProveedorForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, '¡Proveedor registrado con éxito!')
+            return redirect('inventario:lista_proveedores') 
+    else:
+        form = ProveedorForm()
+    
+    return render(request, 'inventario/registrar_proveedor.html', {'form': form, 'titulo': 'Nuevo Proveedor'})
+
+@login_required
+def editar_proveedor(request, id):
+    proveedor = get_object_or_404(Proveedor, id_proveedor=id)
+    if request.method == 'POST':
+        form = ProveedorForm(request.POST, instance=proveedor)
+        if form.is_valid():
+            form.save()
+            messages.success(request, '¡Proveedor actualizado correctamente!')
+            return redirect('inventario:lista_proveedores')
+    else:
+        form = ProveedorForm(instance=proveedor)
+    return render(request, 'inventario/registrar_proveedor.html', {'form': form, 'titulo': 'Editar Proveedor'})
+
+@login_required
+def cambiar_estado_proveedor(request, id):
+    proveedor = get_object_or_404(Proveedor, id_proveedor=id)
+    
+    #Invertimos el estado (Soft Delete)
+    proveedor.activo = not proveedor.activo
+    proveedor.save()
+    
+    accion = "activado" if proveedor.activo else "inactivado"
+    messages.success(request, f'¡El proveedor "{proveedor.razon_social}" ha sido {accion}!')
+    return redirect('inventario:lista_proveedores')
+
+@login_required
+def detalle_proveedor(request, id):
+    proveedor = get_object_or_404(Proveedor, id_proveedor=id)
+    return render(request, 'inventario/detalle_proveedor.html', {'proveedor': proveedor})
+
+@login_required
+def registrar_pago_proveedor(request, id):
+    proveedor = get_object_or_404(Proveedor, id_proveedor=id)
+    
+    # Datos base para cumplir con tu escenario práctico del flujo de compras
+    saldo_pendiente = 850000
+    compra_asociada = "OC-0155 (05/03/2026)"
+    
+    if request.method == 'POST':
+        monto_pagar = float(request.POST.get('monto_pagar', 0))
+        metodo_pago = request.POST.get('metodo_pago')
+        comprobante = request.POST.get('comprobante')
+        observaciones = request.POST.get('observaciones', '')
+        
+        # Validación lógica del Paso 3
+        if monto_pagar > saldo_pendiente:
+            messages.error(request, f'Error: El monto a pagar (${monto_pagar:,.0f}) no puede superar el saldo pendiente.')
+        elif monto_pagar <= 0:
+            messages.error(request, 'Error: El monto a pagar debe ser mayor a $0.')
+        else:
+            nuevo_saldo = saldo_pendiente - monto_pagar
+            messages.success(request, f'✓ ¡Confirmar Pago! Se registró el abono de ${monto_pagar:,.0f}. Nuevo saldo: ${nuevo_saldo:,.0f}. Comprobante: {comprobante}')
+            return redirect('inventario:lista_proveedores')
+            
+    return render(request, 'inventario/registrar_pago.html', {
+        'proveedor': proveedor,
+        'saldo_pendiente': saldo_pendiente,
+        'compra_asociada': compra_asociada
+    })
+
+@login_required
+def nueva_compra_placeholder(request, id):
+    # Esta vista es solo un "puente" temporal para que el botón no arroje error
+    # Cuando crees el módulo de compras, cambiaremos esto.
+    proveedor = get_object_or_404(Proveedor, id_proveedor=id)
+    messages.info(request, f'El módulo de compras para {proveedor.razon_social} está en construcción.')
+    return redirect('inventario:lista_proveedores')
+
+
+@login_required
 def lista_productos(request):
-    #Capturamos todos los parámetros de búsqueda y filtros
     query = request.GET.get('buscar', '')
     categoria_id = request.GET.get('categoria', '')
     marca_id = request.GET.get('marca', '')
@@ -356,3 +442,72 @@ def abastecer_stock(request, id):
         return redirect('inventario:lista_productos')
         
     return render(request, 'inventario/abastecer_producto.html', {'producto': producto})
+
+@login_required
+def lista_compras(request):
+    compras = Compra.objects.all().order_by('-fecha_recepcion')
+    return render(request, 'inventario/lista_compras.html', {'compras': compras})
+
+@login_required
+def registrar_compra(request):
+    if request.method == 'POST':
+        form = CompraForm(request.POST)
+        formset = CompraFormSet(request.POST)
+        
+        if form.is_valid() and formset.is_valid():
+            compra = form.save(commit=False)
+            compra.id_usuario = request.user 
+            compra.save()
+            # Guardamos los detalles y actualizamos inventario
+            detalles = formset.save(commit=False)
+            for detalle in detalles:
+                detalle.id_compra = compra
+                detalle.save()
+                # ACTUALIZACIÓN AUTOMÁTICA DE STOCK
+                producto = detalle.id_producto
+                producto.cantidad += detalle.cantidad
+                producto.save()
+                
+            messages.success(request, f'Compra {compra.codigo_interno} registrada y stock actualizado.')
+            return redirect('inventario:lista_compras')
+    else:
+        form = CompraForm()
+        formset = CompraFormSet()
+        
+    return render(request, 'inventario/registrar_compra.html', {'form': form, 'formset': formset})
+
+@login_required
+def detalle_compra(request, id):
+    compra = get_object_or_404(Compra, id_compra=id)
+    detalles = compra.detalles.all() 
+    
+    return render(request, 'inventario/detalle_compra.html', {
+        'compra': compra,
+        'detalles': detalles
+    })
+
+@login_required
+def actualizar_estado_compra(request, id):
+    if request.method == 'POST':
+        nuevo_estado = request.POST.get('estado')
+        compra = get_object_or_404(Compra, id_compra=id)
+        
+        #lógica: si pasa a 'Recibido', sumar stock al inventario
+        compra.estado = nuevo_estado
+        compra.save()
+        
+        messages.success(request, f"Estado actualizado a {nuevo_estado}")
+    return redirect('inventario:detalle_compra', id=id)
+
+@login_required
+def cancelar_compra(request, id):
+    compra = get_object_or_404(Compra, id_compra=id)
+    # Hacemos el "Soft Delete" contable: Cambiar a Cancelado
+    if compra.estado != 'Cancelado':
+        compra.estado = 'Cancelado'
+        compra.save()
+        messages.success(request, f'La compra {compra.codigo_interno} ha sido anulada (Cancelada).')
+    else:
+        messages.warning(request, 'Esta compra ya se encontraba cancelada.')
+        
+    return redirect('inventario:lista_compras')
