@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Q, Sum
 from inventario.models import Categoria, MarcaProducto, Fabricante, Producto, MovimientoInventario, Proveedor, Compra
 from .forms import CategoriaForm, MarcaForm, FabricanteForm ,ProductoForm, ProveedorForm, CompraForm, CompraFormSet
 
@@ -160,7 +160,10 @@ def cambiar_estado_fabricante(request, id):
 
 @login_required
 def lista_proveedores(request):
-    proveedores = Proveedor.objects.all().order_by('-fecha_creacion')
+    proveedores = Proveedor.objects.annotate(
+        total_acumulado=Sum('compra__total_compra')
+    ).order_by('-fecha_creacion')
+    
     return render(request, 'inventario/lista_proveedores.html', {'proveedores': proveedores})
 
 @login_required
