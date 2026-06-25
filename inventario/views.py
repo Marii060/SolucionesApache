@@ -206,44 +206,6 @@ def detalle_proveedor(request, id):
     proveedor = get_object_or_404(Proveedor, id_proveedor=id)
     return render(request, 'inventario/detalle_proveedor.html', {'proveedor': proveedor})
 
-@login_required
-def registrar_pago_proveedor(request, id):
-    proveedor = get_object_or_404(Proveedor, id_proveedor=id)
-    
-    # Datos base para cumplir con tu escenario práctico del flujo de compras
-    saldo_pendiente = 850000
-    compra_asociada = "OC-0155 (05/03/2026)"
-    
-    if request.method == 'POST':
-        monto_pagar = float(request.POST.get('monto_pagar', 0))
-        metodo_pago = request.POST.get('metodo_pago')
-        comprobante = request.POST.get('comprobante')
-        observaciones = request.POST.get('observaciones', '')
-        
-        # Validación lógica del Paso 3
-        if monto_pagar > saldo_pendiente:
-            messages.error(request, f'Error: El monto a pagar (${monto_pagar:,.0f}) no puede superar el saldo pendiente.')
-        elif monto_pagar <= 0:
-            messages.error(request, 'Error: El monto a pagar debe ser mayor a $0.')
-        else:
-            nuevo_saldo = saldo_pendiente - monto_pagar
-            messages.success(request, f'✓ ¡Confirmar Pago! Se registró el abono de ${monto_pagar:,.0f}. Nuevo saldo: ${nuevo_saldo:,.0f}. Comprobante: {comprobante}')
-            return redirect('inventario:lista_proveedores')
-            
-    return render(request, 'inventario/registrar_pago.html', {
-        'proveedor': proveedor,
-        'saldo_pendiente': saldo_pendiente,
-        'compra_asociada': compra_asociada
-    })
-
-@login_required
-def nueva_compra_placeholder(request, id):
-    # Esta vista es solo un "puente" temporal para que el botón no arroje error
-    # Cuando crees el módulo de compras, cambiaremos esto.
-    proveedor = get_object_or_404(Proveedor, id_proveedor=id)
-    messages.info(request, f'El módulo de compras para {proveedor.razon_social} está en construcción.')
-    return redirect('inventario:lista_proveedores')
-
 
 @login_required
 def lista_productos(request):
