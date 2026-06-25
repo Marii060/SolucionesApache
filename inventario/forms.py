@@ -80,7 +80,7 @@ class CompraForm(forms.ModelForm):
         model = Compra
         fields = [
             'codigo_interno', 'numero_factura', 'fecha_compra', 
-            'id_proveedor', 'metodo_pago', 'estado', 
+            'id_proveedor', 'metodo_pago', 'estado', 'estado_pago', 
             'observaciones', 'total_compra'
         ]
         widgets = {
@@ -90,6 +90,7 @@ class CompraForm(forms.ModelForm):
             'id_proveedor': forms.Select(attrs={'class': 'form-select'}),
             'metodo_pago': forms.Select(attrs={'class': 'form-select'}),
             'estado': forms.Select(attrs={'class': 'form-select'}),
+            'estado_pago': forms.Select(attrs={'class': 'form-select'}),
             'total_compra': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
             'observaciones': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'Notas adicionales...'}),
         }
