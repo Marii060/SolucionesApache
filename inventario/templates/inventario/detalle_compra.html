@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Detalle Compra - Soluciones Apache{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4 px-md-4">
+    <!-- Encabezado con el formulario de estado -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold m-0 text-dark">Detalle de Compra: <span class="text-primary">{{ compra.codigo_interno }}</span></h2>
+            <p class="text-muted m-0 mt-1">Factura: {{ compra.numero_factura }} | Registrada el {{ compra.fecha_recepcion|date:"d/m/Y H:i" }}</p>
+        </div>
+        <div class="d-flex gap-2 align-items-center mb-4">
+    <a href="{% url 'inventario:lista_compras' %}" class="btn btn-primary fw-bold shadow-sm px-4 py-2" 
+       style="border-radius: 8px; flex: 0 0 150px; text-align: center;">
+         Volver
+    </a>
+    
+    <form method="POST" action="{% url 'inventario:actualizar_estado_compra' compra.id_compra %}" 
+          class="d-flex gap-2" style="flex: 1;">
+        {% csrf_token %}
+        
+        <select name="estado" class="form-select fw-bold border-secondary" 
+                style="border-radius: 8px; height: 44px; flex: 1;">
+            <option value="Pendiente" {% if compra.estado == 'Pendiente' %}selected{% endif %}>🟡 Pendiente</option>
+            <option value="Recibido" {% if compra.estado == 'Recibido' %}selected{% endif %}>🟢 Recibido</option>
+            <option value="Cancelado" {% if compra.estado == 'Cancelado' %}selected{% endif %}>🔴 Cancelado</option>
+        </select>
+        
+        <button type="submit" class="btn btn-success fw-bold shadow-sm px-4 py-2" 
+                style="border-radius: 8px; flex: 0 0 200px;">
+            <i class="fa-solid fa-save me-1"></i> Guardar
+        </button>
+    </form>
+</div>
+    </div>
+
+    <div class="row">
+        <!-- Columna Izquierda -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 rounded-4 mb-4">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold text-muted mb-3"><i class="fa-solid fa-truck-field me-2"></i> PROVEEDOR</h6>
+                    <p class="fw-bold fs-5 text-dark mb-1">{{ compra.id_proveedor.razon_social }}</p>
+                    <p class="text-muted mb-3">NIT: {{ compra.id_proveedor.identificacion }}</p>
+                    
+                    <h6 class="fw-bold text-muted mb-2 mt-4"><i class="fa-solid fa-info-circle me-2"></i> DATOS DE FACTURA</h6>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Fecha Compra:</span>
+                        <span class="fw-semibold">{{ compra.fecha_compra|date:"d M Y" }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Método Pago:</span>
+                        <span class="fw-semibold">{{ compra.metodo_pago }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Estado Actual:</span>
+                        <span class="badge {% if compra.estado == 'Recibido' %}bg-success{% elif compra.estado == 'Pendiente' %}bg-warning text-dark{% else %}bg-danger{% endif %}">
+                            {{ compra.estado }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Columna Derecha -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-body p-0">
+                    <div class="p-4 border-bottom">
+                        <h6 class="fw-bold text-muted m-0"><i class="fa-solid fa-boxes-stacked me-2"></i> REPUESTOS RECIBIDOS</h6>
+                    </div>
+                    <table class="table align-middle table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Producto</th>
+                                <th>Cantidad</th>
+                                <th>Precio Unit.</th>
+                                <th class="text-end pe-4">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for det in detalles %}
+                            <tr>
+                                <td class="ps-4 fw-medium">{{ det.id_producto.nombre }}</td>
+                                <td>{{ det.cantidad }}</td>
+                                <td>$ {{ det.precio_unitario_compra|intcomma }}</td>
+                                <td class="text-end pe-4 fw-bold text-dark">$ {{ det.subtotal|intcomma }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot class="table-group-divider">
+                            <tr>
+                                <td colspan="3" class="text-end fw-bold pt-3">TOTAL DE LA FACTURA:</td>
+                                <td class="text-end pe-4 fw-bold fs-5 text-primary pt-3">$ {{ compra.total_compra|intcomma }}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

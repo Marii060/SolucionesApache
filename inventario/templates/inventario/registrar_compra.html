@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+
+{% block title %}Registrar Compra - Soluciones Apache{% endblock %}
+
+{% block content %}
+<form method="POST">
+    {% csrf_token %}
+    <div class="container-fluid mt-4 px-md-4">
+        
+        <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+            <div>
+                <h2 class="fw-bold m-0" style="color: #0f172a;">Registrar Orden de Compra</h2>
+                <p class="text-muted m-0 mt-1" style="font-size: 0.9rem;">Gestión de inventario <i class="fa-solid fa-angle-right mx-1" style="font-size: 0.7rem;"></i> Ingreso de mercancía</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{% url 'inventario:lista_compras' %}" class="btn btn-light bg-white border fw-bold px-4 shadow-sm" style="border-radius: 8px; color: #475569;">
+                    <i class="fa-solid fa-xmark me-1"></i> Cancelar
+                </a>
+                <button type="submit" class="btn fw-bold px-4 shadow-sm" style="background-color: #2563eb; color: white; border-radius: 8px;">
+                    <i class="fa-solid fa-floppy-disk me-1"></i> Guardar Compra
+                </button>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8">
+                
+                <div class="card shadow-sm border-0 rounded-4 mb-4">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold text-muted mb-4" style="font-size: 0.9rem;"><i class="fa-solid fa-file-invoice me-2"></i> INFORMACIÓN DE LA FACTURA</h6>
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label class="form-label fw-bold small text-muted">Proveedor <span class="text-danger">*</span></label>
+                                {{ form.id_proveedor }}
+                            </div>
+                            <div class="col-md-3 mb-3 mb-md-0">
+                                <label class="form-label fw-bold small text-muted">N° Orden/Interno <span class="text-danger">*</span></label>
+                                {{ form.codigo_interno }}
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold small text-muted">Factura Proveedor <span class="text-danger">*</span></label>
+                                {{ form.numero_factura }}
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4 mb-3 mb-md-0">
+                                <label class="form-label fw-bold small text-muted">Fecha de Compra <span class="text-danger">*</span></label>
+                                {{ form.fecha_compra }}
+                            </div>
+                            <div class="col-md-4 mb-3 mb-md-0">
+                                <label class="form-label fw-bold small text-muted">Condición de Pago <span class="text-danger">*</span></label>
+                                {{ form.metodo_pago }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold small text-muted">Estado Inicial <span class="text-danger">*</span></label>
+                                {{ form.estado }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0 rounded-4 mb-4">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h6 class="fw-bold text-muted m-0"><i class="fa-solid fa-cart-shopping me-2"></i> DETALLE DE PRODUCTOS</h6>
+                            <button type="button" id="add-form" class="btn btn-sm btn-outline-primary fw-bold">
+                                <i class="fa-solid fa-plus"></i> Agregar Producto
+                            </button>
+                        </div>
+
+                        {{ formset.management_form }}
+                        <div class="table-responsive">
+                            <table class="table align-middle" id="product-table">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width: 40%;">Producto</th>
+                                        <th style="width: 15%;">Cantidad</th>
+                                        <th style="width: 20%;">Precio Unit.</th>
+                                        <th style="width: 20%;">Subtotal</th>
+                                        <th style="width: 5%;">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="form-list">
+                                    {% for f in formset %}
+                                    <tr class="form-row">
+                                        <td>{{ f.id_producto }}</td>
+                                        <td>{{ f.cantidad }}</td>
+                                        <td>
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text">$</span>
+                                                {{ f.precio_unitario_compra }}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text">$</span>
+                                                {{ f.subtotal }}
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="form-check d-flex justify-content-center align-items-center">
+                                                {{ f.DELETE }}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0 rounded-4">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold text-muted mb-4" style="font-size: 0.9rem;"><i class="fa-solid fa-boxes-stacked me-2"></i> OBSERVACIONES</h6>
+                        <div class="row">
+                            <div class="col-12 mb-3"> {{ form.observaciones }} </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold small text-muted">Total de la Factura</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light">$</span>
+                                    {{ form.total_compra }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 mt-4 mt-lg-0">
+                <div class="card border-0 rounded-4 mb-4" style="background-color: #f8fafc; border: 1px solid #e2e8f0 !important;">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold text-primary mb-3"><i class="fa-solid fa-calculator me-2"></i> RESUMEN TOTAL</h6>
+                        <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                            <span class="text-muted fw-bold">TOTAL COMPRA</span>
+                            <span class="fs-4 fw-bold text-dark" id="display_total">$ 0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<style>
+    .select2-container .select2-selection--single { height: 31px !important; border: 1px solid #dee2e6 !important; border-radius: 0.25rem !important; }
+    .select2-container--default .select2-selection--single .select2-selection__arrow { height: 30px !important; }
+    .form-check input[type="checkbox"][name$="-DELETE"] { appearance: none; width: 32px; height: 32px; background-color: #fef2f2; border: 1px solid #fca5a5; border-radius: 6px; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: all 0.2s; }
+    .form-check input[type="checkbox"][name$="-DELETE"]::after { content: '\f2ed'; font-family: "Font Awesome 6 Free"; font-weight: 900; color: #dc2626; font-size: 14px; }
+</style>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#id_id_proveedor').select2({ placeholder: "🔍 Buscar proveedor...", width: '100%' });
+        
+        function initSelect2() {
+            $('.producto-select').not('.select2-hidden-accessible').select2({ placeholder: "Seleccionar...", width: '100%' });
+        }
+        initSelect2();
+
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('cantidad-input') || e.target.classList.contains('precio-input')) {
+                let row = e.target.closest('tr');
+                let cant = parseFloat(row.querySelector('.cantidad-input').value) || 0;
+                let prec = parseFloat(row.querySelector('.precio-input').value) || 0;
+                let sub = row.querySelector('.subtotal-input');
+                let valor = (cant * prec);
+                
+                // Formato limpio sin .00 innecesarios
+                sub.value = Number.isInteger(valor) ? valor : valor.toFixed(2);
+                
+                let total = 0;
+                document.querySelectorAll('.subtotal-input').forEach(i => total += parseFloat(i.value) || 0);
+                
+                let totalInput = document.getElementById('id_total_compra');
+                if(totalInput){
+                    totalInput.value = total;
+                    $('#display_total').text('$ ' + total.toLocaleString('es-CO'));
+                }
+            }
+        });
+
+        $('#add-form').click(function() {
+            let formIdx = $('#id_detalles-TOTAL_FORMS').val();
+            let lastRow = $('#form-list tr:last');
+            lastRow.find('.producto-select').select2('destroy');
+            let newRow = lastRow.clone(true);
+            newRow.find(':input').each(function() {
+                if ($(this).attr('name')) {
+                    $(this).attr('name', $(this).attr('name').replace('-' + (formIdx - 1) + '-', '-' + formIdx + '-'));
+                    $(this).attr('id', 'id_' + $(this).attr('name'));
+                    if ($(this).attr('type') !== 'checkbox' && $(this).attr('type') !== 'hidden') $(this).val('');
+                }
+            });
+            $('#form-list').append(newRow);
+            $('#id_detalles-TOTAL_FORMS').val(parseInt(formIdx) + 1);
+            initSelect2();
+        });
+    });
+</script>
+{% endblock %}
