@@ -45,7 +45,8 @@
                             <th class="pb-3 border-0">Fecha Compra</th>
                             <th class="pb-3 border-0">Proveedor</th>
                             <th class="pb-3 border-0">Total</th>
-                            <th class="pb-3 border-0">Estado</th>
+                            <th class="pb-3 border-0">Estado Mercancía</th>
+                            <th class="pb-3 border-0">Estado Pago</th>
                             <th class="pb-3 text-center border-0">Acciones</th>
                         </tr>
                     </thead>
@@ -67,11 +68,19 @@
                                     <span class="badge" style="background-color: #fef2f2; color: #dc2626; padding: 6px 12px; border-radius: 6px;">Cancelado</span>
                                 {% endif %}
                             </td>
+
+                            <td>
+                                {% if compra.estado_pago == 'Pagado' %}
+                                    <span class="badge" style="background-color: #dcfce7; color: #16a34a; padding: 6px 12px; border-radius: 6px;">Pagado</span>
+                                {% else %}
+                                    <span class="badge" style="background-color: #fef9c3; color: #ca8a04; padding: 6px 12px; border-radius: 6px;">Pendiente</span>
+                                {% endif %}
+                            </td>
                             
                             <td class="text-center">
                                 <a href="{% url 'inventario:detalle_compra' compra.id_compra %}" class="btn btn-sm btn-light border fw-semibold me-1" style="border-radius: 6px; color: #475569;" title="Ver Detalle">
-    <i class="fa-solid fa-eye"></i>
-</a>
+                                    <i class="fa-solid fa-eye"></i>
+                                </a>
                                 {% if compra.estado != 'Cancelado' %}
                                     <a href="{% url 'inventario:cancelar_compra' compra.id_compra %}" class="btn btn-sm" style="background-color: #fef2f2; color: #dc2626; border: 1px solid #fca5a5; border-radius: 6px;" title="Anular Compra" onclick="return confirm('¿Estás seguro de anular esta compra?');">
                                         <i class="fa-solid fa-trash"></i>
@@ -81,7 +90,7 @@
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="7" class="text-center py-5 text-muted">No hay compras registradas.</td>
+                            <td colspan="8" class="text-center py-5 text-muted">No hay compras registradas.</td>
                         </tr>
                         {% endfor %}
                     </tbody>
