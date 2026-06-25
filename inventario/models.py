@@ -121,6 +121,10 @@ class Compra(models.Model):
         ('Pendiente', 'Pendiente'),
         ('Cancelado', 'Cancelado'),
     ]
+    ESTADO_PAGO_CHOICES = [
+        ('Pagado', 'Pagado'),
+        ('Pendiente', 'Pendiente de Pago'),
+    ]
 
     id_compra = models.AutoField(primary_key=True)
     codigo_interno = models.CharField(max_length=20, unique=True) 
@@ -129,6 +133,7 @@ class Compra(models.Model):
     fecha_recepcion = models.DateTimeField(auto_now_add=True)
     metodo_pago = models.CharField(max_length=20, choices=METODO_PAGO_CHOICES, default='Efectivo')
     estado = models.CharField(max_length=20, choices=ESTADO_COMPRA_CHOICES, default='Recibido')
+    estado_pago = models.CharField(max_length=20, choices=ESTADO_PAGO_CHOICES, default='Pendiente')
     total_compra = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     observaciones = models.TextField(blank=True, null=True)
     id_proveedor = models.ForeignKey(Proveedor, on_delete=models.CASCADE, db_column='id_proveedor')
