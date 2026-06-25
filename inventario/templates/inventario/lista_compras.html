@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Compras - Soluciones Apache{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4 px-md-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold m-0" style="color: #0f172a;">Compras</h2>
+            <p class="text-muted m-0 mt-1">Historial de órdenes de compra a proveedores</p>
+        </div>
+        <a href="{% url 'inventario:registrar_compra' %}" class="btn fw-bold px-4 shadow-sm" style="background-color: #2563eb; color: white; border-radius: 8px;">
+            + Registrar Compra
+        </a>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm">
+                <i class="fa-solid fa-circle-check me-2"></i> {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body p-0">
+            <div class="d-flex justify-content-between align-items-center p-4 border-bottom">
+                <h6 class="fw-bold m-0" style="color: #0f172a;">Órdenes de Compra</h6>
+                <div class="input-group" style="width: 250px; border-radius: 8px; border: 1px solid #e2e8f0; background-color: #f8fafc;">
+                    <span class="input-group-text bg-transparent border-0 pe-2 text-muted">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </span>
+                    <input type="text" class="form-control border-0 bg-transparent shadow-none px-0" placeholder="Buscar compra...">
+                </div>
+            </div>
+
+            <div class="table-responsive p-4 pt-3">
+                <table class="table align-middle table-hover">
+                    <thead>
+                        <tr class="text-uppercase text-muted" style="font-size: 0.75rem; font-weight: 700; border-bottom: 2px solid #e2e8f0;">
+                            <th class="pb-3 border-0">N° Orden</th>
+                            <th class="pb-3 border-0">Factura</th>
+                            <th class="pb-3 border-0">Fecha Compra</th>
+                            <th class="pb-3 border-0">Proveedor</th>
+                            <th class="pb-3 border-0">Total</th>
+                            <th class="pb-3 border-0">Estado</th>
+                            <th class="pb-3 text-center border-0">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody style="font-size: 0.9rem;">
+                        {% for compra in compras %}
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td class="fw-bold text-dark">{{ compra.codigo_interno }}</td>
+                            <td class="text-muted">{{ compra.numero_factura }}</td>
+                            <td class="text-muted">{{ compra.fecha_compra|date:"d M Y" }}</td>
+                            <td class="fw-semibold text-dark">{{ compra.id_proveedor.razon_social }}</td>
+                            <td class="fw-bold text-success">$ {{ compra.total_compra|floatformat:0|intcomma }}</td>
+                            
+                            <td>
+                                {% if compra.estado == 'Recibido' %}
+                                    <span class="badge" style="background-color: #dcfce7; color: #16a34a; padding: 6px 12px; border-radius: 6px;">Recibido</span>
+                                {% elif compra.estado == 'Pendiente' %}
+                                    <span class="badge" style="background-color: #fef9c3; color: #ca8a04; padding: 6px 12px; border-radius: 6px;">Pendiente</span>
+                                {% else %}
+                                    <span class="badge" style="background-color: #fef2f2; color: #dc2626; padding: 6px 12px; border-radius: 6px;">Cancelado</span>
+                                {% endif %}
+                            </td>
+                            
+                            <td class="text-center">
+                                <a href="{% url 'inventario:detalle_compra' compra.id_compra %}" class="btn btn-sm btn-light border fw-semibold me-1" style="border-radius: 6px; color: #475569;" title="Ver Detalle">
+    <i class="fa-solid fa-eye"></i>
+</a>
+                                {% if compra.estado != 'Cancelado' %}
+                                    <a href="{% url 'inventario:cancelar_compra' compra.id_compra %}" class="btn btn-sm" style="background-color: #fef2f2; color: #dc2626; border: 1px solid #fca5a5; border-radius: 6px;" title="Anular Compra" onclick="return confirm('¿Estás seguro de anular esta compra?');">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted">No hay compras registradas.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

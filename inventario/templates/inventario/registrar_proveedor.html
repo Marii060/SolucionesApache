@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ titulo }} - Soluciones Apache{% endblock %}
+
+{% block content %}
+<form method="POST">
+    {% csrf_token %}
+    <div class="container-fluid mt-4 px-md-4">
+        
+        <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+            <div>
+                <h2 class="fw-bold m-0" style="color: #0f172a;">{{ titulo }}</h2>
+                <p class="text-muted m-0 mt-1" style="font-size: 0.9rem;">Proveedores <i class="fa-solid fa-angle-right mx-1" style="font-size: 0.7rem;"></i> Registrar nuevo proveedor</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{% url 'inventario:lista_proveedores' %}" class="btn btn-light bg-white border fw-bold px-4 shadow-sm" style="border-radius: 8px; color: #475569;">
+                    <i class="fa-solid fa-xmark me-1"></i> Cancelar
+                </a>
+                <button type="submit" class="btn fw-bold px-4 shadow-sm" style="background-color: #2563eb; color: white; border-radius: 8px;">
+                    <i class="fa-solid fa-floppy-disk me-1"></i> Guardar Proveedor
+                </button>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8">
+                
+                <div class="card shadow-sm border-0 rounded-4 mb-4">
+                    <div class="card-body p-4 p-md-5">
+                        <h6 class="fw-bold text-muted mb-4" style="font-size: 0.9rem;"><i class="fa-regular fa-building me-2"></i> INFORMACIÓN DEL PROVEEDOR</h6>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label class="form-label fw-bold small text-muted">Razón Social <span class="text-danger">*</span></label>
+                                {{ form.razon_social }}
+                                <div class="text-danger small mt-1">{{ form.razon_social.errors }}</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted">Nombre Comercial <span class="text-danger">*</span></label>
+                                {{ form.nombre }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label class="form-label fw-bold small text-muted">NIT / Identificación <span class="text-danger">*</span></label>
+                                {{ form.identificacion }}
+                                <p class="text-muted small mt-1 mb-0" style="font-size: 0.8rem;">Debe ser único en el sistema</p>
+                                <div class="text-danger small mt-1">{{ form.identificacion.errors }}</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted">Estado</label>
+                                {{ form.activo }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0 rounded-4">
+                    <div class="card-body p-4 p-md-5">
+                        <h6 class="fw-bold text-danger mb-4" style="font-size: 0.9rem;"><i class="fa-solid fa-phone me-2"></i> CONTACTO</h6>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label class="form-label fw-bold small text-muted">Teléfono <span class="text-danger">*</span></label>
+                                {{ form.telefono }}
+                                <div class="text-danger small mt-1">{{ form.telefono.errors }}</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted">Correo Electrónico <span class="text-danger">*</span></label>
+                                {{ form.correo }}
+                                <div class="text-danger small mt-1">{{ form.correo.errors }}</div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <label class="form-label fw-bold small text-muted">Dirección <span class="text-danger">*</span></label>
+                                {{ form.direccion }}
+                                <div class="text-danger small mt-1">{{ form.direccion.errors }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</form>
+{% endblock %}

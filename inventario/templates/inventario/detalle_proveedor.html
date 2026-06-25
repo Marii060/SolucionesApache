@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Perfil Proveedor - Soluciones Apache{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4 px-md-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+        <div>
+            <h2 class="fw-bold m-0" style="color: #0f172a;">{{ proveedor.razon_social }}</h2>
+            <p class="text-muted m-0 mt-1">Expediente e historial de transacciones comerciales</p>
+        </div>
+        <a href="{% url 'inventario:lista_proveedores' %}" class="btn btn-outline-secondary bg-white fw-semibold shadow-sm">
+            Volver al listado
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 rounded-4 mb-4">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold text-muted mb-3">DATOS CORPORATIVOS</h6>
+                    <p class="mb-1 small text-muted">NOMBRE COMERCIAL</p>
+                    <p class="fw-bold text-dark mb-3">{{ proveedor.nombre }}</p>
+                    <p class="mb-1 small text-muted">IDENTIFICACIÓN / NIT</p>
+                    <p class="fw-semibold text-dark mb-3">{{ proveedor.identificacion }}</p>
+                    <p class="mb-1 small text-muted">ESTADO OPERATIVO</p>
+                    <p class="mb-0">
+                        {% if proveedor.activo %}
+                            <span class="badge bg-success">Habilitado</span>
+                        {% else %}
+                            <span class="badge bg-danger">Inhabilitado</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold text-muted mb-3">INFORMACIÓN DE CONTACTO</h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <small class="text-muted d-block">TELÉFONO</small>
+                            <span class="fw-semibold text-dark">{{ proveedor.telefono }}</span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <small class="text-muted d-block">CORREO ELECTRÓNICO</small>
+                            <span class="fw-semibold text-dark">{{ proveedor.correo }}</span>
+                        </div>
+                        <div class="col-md-12">
+                            <small class="text-muted d-block">DIRECCIÓN FÍSICA</small>
+                            <span class="fw-semibold text-dark">{{ proveedor.direccion }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -174,13 +174,13 @@
                 </a>
             </div>
 
-            <a href="#" class="{% if 'compras' in request.path %}active{% endif %}">
-                <i class="fa-solid fa-cart-shopping fa-fw"></i> Compras
-            </a>
+            <a href="{% url 'inventario:lista_compras' %}" class="{% if 'compras' in request.path %}active{% endif %}">
+    <i class="fa-solid fa-cart-shopping fa-fw"></i> Compras
+</a>
 
-            <a href="#" class="{% if 'proveedores' in request.path %}active{% endif %}">
-                <i class="fa-solid fa-truck fa-fw"></i> Proveedores
-            </a>
+           <a href="{% url 'inventario:lista_proveedores' %}" class="{% if 'proveedores' in request.path %}active{% endif %}">
+    <i class="fa-solid fa-truck fa-fw"></i> Proveedores
+</a>
 
             <div class="sidebar-heading">Administración</div>
             <a href="#"><i class="fa-solid fa-chart-line"></i> Reportes</a>

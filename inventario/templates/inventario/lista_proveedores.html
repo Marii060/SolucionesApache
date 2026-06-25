@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block title %}Proveedores - Soluciones Apache{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4 px-md-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold m-0" style="color: #0f172a;">Proveedores</h2>
+            <p class="text-muted m-0 mt-1">Cuentas por pagar y gestión de suministros</p>
+        </div>
+        <a href="{% url 'inventario:crear_proveedor' %}" class="btn fw-bold px-4 shadow-sm" style="background-color: #2563eb; color: white; border-radius: 8px;">
+            + Nuevo Proveedor
+        </a>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm">
+                <i class="fa-solid fa-circle-check me-2"></i> {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body p-0">
+            <div class="d-flex justify-content-between align-items-center p-4 border-bottom">
+                <h6 class="fw-bold m-0" style="color: #0f172a;">Lista de Proveedores</h6>
+                <div class="input-group" style="width: 250px; border-radius: 8px; border: 1px solid #e2e8f0; background-color: #f8fafc;">
+                    <span class="input-group-text bg-transparent border-0 pe-2 text-muted">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </span>
+                    <input type="text" class="form-control border-0 bg-transparent shadow-none px-0" placeholder="Buscar proveedor...">
+                </div>
+            </div>
+
+            <div class="table-responsive p-4 pt-3">
+                <table class="table align-middle table-hover">
+                    <thead>
+                        <tr class="text-uppercase text-muted" style="font-size: 0.75rem; font-weight: 700; border-bottom: 2px solid #e2e8f0;">
+                            <th class="pb-3 border-0">Proveedor</th>
+                            <th class="pb-3 border-0">NIT</th>
+                            <th class="pb-3 border-0">Teléfono</th>
+                            <th class="pb-3 border-0">Compras</th>
+                            <th class="pb-3 border-0">Saldo Pendiente</th>
+                            <th class="pb-3 border-0">Estado</th>
+                            <th class="pb-3 text-center border-0">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody style="font-size: 0.9rem;">
+                        {% for prov in proveedores %}
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td class="fw-bold text-dark">{{ prov.razon_social }}</td>
+                            <td class="text-muted">{{ prov.identificacion }}</td>
+                            <td class="text-muted">{{ prov.telefono }}</td>
+                            <td class="fw-medium text-dark">$850.000</td> 
+                            <td class="fw-bold text-danger">$850.000</td> 
+                            <td>
+                                {% if prov.activo %}
+                                    <span class="badge" style="background-color: #dcfce7; color: #16a34a; padding: 6px 12px; border-radius: 6px;">Activo</span>
+                                {% else %}
+                                    <span class="badge" style="background-color: #fef2f2; color: #dc2626; padding: 6px 12px; border-radius: 6px;">Inactivo</span>
+                                {% endif %}
+                            </td>
+                            
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center align-items-center gap-1">
+                                    <a href="{% url 'inventario:detalle_proveedor' prov.id_proveedor %}" class="btn btn-sm btn-light border text-primary" style="border-radius: 6px;" title="Ver Perfil">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </a>
+                                    
+                                    <a href="{% url 'inventario:editar_proveedor' prov.id_proveedor %}" class="btn btn-sm btn-light border text-warning" style="border-radius: 6px;" title="Editar Proveedor">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </a>
+                                    
+                                    {% if prov.activo %}
+                                        <a href="{% url 'inventario:registrar_pago_proveedor' prov.id_proveedor %}" class="btn btn-sm btn-success fw-bold text-white shadow-sm" style="border-radius: 6px; background-color: #16a34a;">
+                                            Pagar
+                                        </a>
+                                    {% else %}
+                                        <button class="btn btn-sm btn-secondary fw-bold opacity-50 shadow-sm" style="border-radius: 6px;" disabled>Pagar</button>
+                                    {% endif %}
+                                    
+                                    <a href="{% url 'inventario:cambiar_estado_proveedor' prov.id_proveedor %}" 
+                                       class="btn btn-sm border {% if prov.activo %}btn-light text-danger border-danger-subtle{% else %}btn-light text-success border-success-subtle{% endif %}" 
+                                       style="border-radius: 6px;" 
+                                       title="{% if prov.activo %}Inactivar{% else %}Activar{% endif %}">
+                                        {% if prov.activo %}
+                                            <i class="fa-solid fa-trash"></i>
+                                        {% else %}
+                                            <i class="fa-solid fa-check"></i>
+                                        {% endif %}
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted">No hay proveedores registrados.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
