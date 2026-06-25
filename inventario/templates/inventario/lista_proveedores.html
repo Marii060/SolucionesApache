@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load humanize %}
 
 {% block title %}Proveedores - Soluciones Apache{% endblock %}
 
@@ -7,7 +8,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2 class="fw-bold m-0" style="color: #0f172a;">Proveedores</h2>
-            <p class="text-muted m-0 mt-1">Cuentas por pagar y gestión de suministros</p>
+            <p class="text-muted m-0 mt-1">Gestión de suministros y aliados</p>
         </div>
         <a href="{% url 'inventario:crear_proveedor' %}" class="btn fw-bold px-4 shadow-sm" style="background-color: #2563eb; color: white; border-radius: 8px;">
             + Nuevo Proveedor
@@ -43,7 +44,6 @@
                             <th class="pb-3 border-0">NIT</th>
                             <th class="pb-3 border-0">Teléfono</th>
                             <th class="pb-3 border-0">Compras</th>
-                            <th class="pb-3 border-0">Saldo Pendiente</th>
                             <th class="pb-3 border-0">Estado</th>
                             <th class="pb-3 text-center border-0">Acciones</th>
                         </tr>
@@ -55,7 +55,6 @@
                             <td class="text-muted">{{ prov.identificacion }}</td>
                             <td class="text-muted">{{ prov.telefono }}</td>
                             <td class="fw-medium text-dark">$850.000</td> 
-                            <td class="fw-bold text-danger">$850.000</td> 
                             <td>
                                 {% if prov.activo %}
                                     <span class="badge" style="background-color: #dcfce7; color: #16a34a; padding: 6px 12px; border-radius: 6px;">Activo</span>
@@ -74,14 +73,6 @@
                                         <i class="fa-solid fa-pen"></i>
                                     </a>
                                     
-                                    {% if prov.activo %}
-                                        <a href="{% url 'inventario:registrar_pago_proveedor' prov.id_proveedor %}" class="btn btn-sm btn-success fw-bold text-white shadow-sm" style="border-radius: 6px; background-color: #16a34a;">
-                                            Pagar
-                                        </a>
-                                    {% else %}
-                                        <button class="btn btn-sm btn-secondary fw-bold opacity-50 shadow-sm" style="border-radius: 6px;" disabled>Pagar</button>
-                                    {% endif %}
-                                    
                                     <a href="{% url 'inventario:cambiar_estado_proveedor' prov.id_proveedor %}" 
                                        class="btn btn-sm border {% if prov.activo %}btn-light text-danger border-danger-subtle{% else %}btn-light text-success border-success-subtle{% endif %}" 
                                        style="border-radius: 6px;" 
@@ -97,7 +88,7 @@
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="7" class="text-center py-5 text-muted">No hay proveedores registrados.</td>
+                            <td colspan="6" class="text-center py-5 text-muted">No hay proveedores registrados.</td>
                         </tr>
                         {% endfor %}
                     </tbody>
