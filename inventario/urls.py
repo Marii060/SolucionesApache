@@ -23,4 +23,17 @@ urlpatterns = [
     path('control/', views.control_inventario, name='control_inventario'),
     path('control/ajuste-manual/', views.ajuste_manual, name='ajuste_manual'),
     path('productos/abastecer/<int:id>/', views.abastecer_stock, name='abastecer_stock'),
+    path('proveedores/', views.lista_proveedores, name='lista_proveedores'),
+    path('proveedores/nuevo/', views.crear_proveedor, name='crear_proveedor'),
+    path('proveedores/editar/<int:id>/', views.editar_proveedor, name='editar_proveedor'),
+    path('proveedores/estado/<int:id>/', views.cambiar_estado_proveedor, name='cambiar_estado_proveedor'),
+    path('proveedores/<int:id>/', views.detalle_proveedor, name='detalle_proveedor'),
+    path('proveedores/<int:id>/pagar/', views.registrar_pago_proveedor, name='registrar_pago_proveedor'),
+        # Ruta temporal para "Nueva Compra" (Placeholder hasta que hagamos ese módulo)
+    path('proveedores/<int:id>/comprar/', views.nueva_compra_placeholder, name='nueva_compra_proveedor'),
+    path('compras/', views.lista_compras, name='lista_compras'),
+    path('compras/nueva/', views.registrar_compra, name='registrar_compra'),
+    path('compras/detalle/<int:id>/', views.detalle_compra, name='detalle_compra'),
+    path('compras/estado/<int:id>/', views.actualizar_estado_compra, name='actualizar_estado_compra'),
+    path('compras/cancelar/<int:id>/', views.cancelar_compra, name='cancelar_compra'),
 ]
