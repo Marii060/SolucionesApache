@@ -69,14 +69,7 @@
                             </td>
                             
                             <td class="text-center">
-                                <a href="{% url 'inventario:detalle_compra' compra.id_compra %}" class="btn btn-sm btn-light border fw-semibold me-1" style="border-radius: 6px; color: #475569;" title="Ver Detalle">
-                                    <i class="fa-solid fa-eye"></i>
-                                </a>
-                                {% if compra.estado != 'Cancelado' %}
-                                    <a href="{% url 'inventario:cancelar_compra' compra.id_compra %}" class="btn btn-sm" style="background-color: #fef2f2; color: #dc2626; border: 1px solid #fca5a5; border-radius: 6px;" title="Anular Compra" onclick="return confirm('¿Estás seguro de anular esta compra?');">
-                                        <i class="fa-solid fa-trash"></i>
-                                    </a>
-                                {% endif %}
+                                <a href="{% url 'inventario:detalle_compra' compra.id_compra %}" class="btn btn-sm btn-light border fw-semibold me-1" style="border-radius: 6px; color: #475569;" title="Ver Detalle"><i class="fa-solid fa-eye"></i></a>
                             </td>
                         </tr>
                         {% empty %}
