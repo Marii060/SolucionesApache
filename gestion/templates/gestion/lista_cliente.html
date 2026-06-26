@@ -32,6 +32,15 @@
             <div class="col-md-3"><h6 class="fw-bold mb-0 text-dark">Lista de Clientes</h6></div>
             <div class="col-md-9">
                 <form method="GET" class="d-flex justify-content-end gap-2">
+                    
+                    {% if ver_inactivos %}
+                        <a href="?ver_inactivos=false{% if request.GET.buscar %}&buscar={{ request.GET.buscar }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}" 
+                           class="btn btn-info text-white" style="border-radius: 8px;">Ver Activos</a>
+                    {% else %}
+                        <a href="?ver_inactivos=true{% if request.GET.buscar %}&buscar={{ request.GET.buscar }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}" 
+                           class="btn btn-outline-info" style="border-radius: 8px;">Ver Inactivos</a>
+                    {% endif %}
+
                     <div class="position-relative" style="width: 280px;">
                         <i class="fa-solid fa-magnifying-glass search-icon"></i>
                         <input type="text" name="buscar" class="form-control search-bar" placeholder="Nombre, documento, teléf..." value="{{ request.GET.buscar }}">
@@ -43,7 +52,7 @@
                         <option value="juridica" {% if request.GET.tipo == 'juridica' %}selected{% endif %}>Jurídica</option>
                     </select>
                     
-                    <button type="submit" class="d-none">Buscar</button>
+                    <button type="submit" class="btn btn-primary" style="border-radius: 8px;">Buscar</button>
                 </form>
             </div>
         </div>
@@ -56,8 +65,7 @@
                         <th class="fw-bold text-dark">DOCUMENTO</th>
                         <th class="fw-bold text-dark">TELÉFONO</th>
                         <th class="fw-bold text-dark">MOTOS</th>
-                        <th class="fw-bold text-dark">ÚLTIMO SERVICIO</th>
-                        <th class="fw-bold text-dark">SALDO CRÉDITO</th>
+                        <th class="fw-bold text-dark">ESTADO</th>
                         <th class="fw-bold text-dark text-center">ACCIONES</th>
                     </tr>
                 </thead>
@@ -81,25 +89,36 @@
                             </span>
                         </td>
                         <td>
-                            <div class="text-dark" style="font-size: 0.9rem;">10/03/2026</div>
-                            <div class="text-muted" style="font-size: 0.75rem;">Mantenimiento</div>
+                            {% if cliente.activo %}
+                                <span class="badge bg-success-subtle text-success">Activo</span>
+                            {% else %}
+                                <span class="badge bg-danger-subtle text-danger">Inactivo</span>
+                            {% endif %}
                         </td>
-                        <td><span class="fw-bold text-success">$0</span></td>
                         
                         <td class="text-center" style="white-space: nowrap;">
-                            <div class="d-flex justify-content-center gap-1">
-                                <a href="{% url 'gestion:detalle_cliente' cliente.id_cliente %}" class="btn btn-outline-secondary btn-action">Ver</a>
-                                <a href="{% url 'gestion:editar_cliente' cliente.id_cliente %}" class="btn btn-outline-warning btn-action"><i class="fa-solid fa-pen"></i></a>
-                                <a href="{% url 'gestion:eliminar_cliente' cliente.id_cliente %}" class="btn btn-outline-danger btn-action"><i class="fa-solid fa-trash"></i></a>
-                            </div>
-                        </td>
+    <div class="d-flex justify-content-center gap-1">
+        <a href="{% url 'gestion:detalle_cliente' cliente.id_cliente %}" class="btn btn-outline-secondary btn-action" title="Ver detalle">Ver</a>
+        
+        <a href="{% url 'gestion:editar_cliente' cliente.id_cliente %}" class="btn btn-outline-warning btn-action" title="Editar cliente">
+            <i class="fa-solid fa-pen"></i>
+        </a>
+        
+        {% if cliente.activo %}
+            <a href="{% url 'gestion:deshabilitar_cliente' cliente.id_cliente %}" class="btn btn-outline-danger btn-action" title="Deshabilitar cliente">
+                <i class="fa-solid fa-trash"></i>
+            </a>
+        {% else %}
+            <a href="{% url 'gestion:activar_cliente' cliente.id_cliente %}" class="btn btn-outline-success btn-action" title="Activar cliente">
+                <i class="fa-solid fa-check"></i>
+            </a>
+        {% endif %}
+    </div>
+</td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="7" class="text-center py-5 text-muted">
-                            <i class="fa-solid fa-folder-open fa-2x mb-3 text-light"></i><br>
-                            No hay clientes registrados en el sistema.
-                        </td>
+                        <td colspan="6" class="text-center py-5 text-muted">No hay registros encontrados.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -109,19 +128,16 @@
         <nav aria-label="Navegación de páginas" class="mt-4">
             <ul class="pagination justify-content-center">
                 {% if page_obj.has_previous %}
-                    <li class="page-item"><a class="page-link" href="?page=1{% if request.GET.buscar %}&buscar={{ request.GET.buscar }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}">&laquo; Primera</a></li>
-                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}">Anterior</a></li>
+                    <li class="page-item"><a class="page-link" href="?page=1{% if request.GET.buscar %}&buscar={{ request.GET.buscar }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}{% if ver_inactivos %}&ver_inactivos=true{% endif %}">&laquo; Primera</a></li>
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}{% if ver_inactivos %}&ver_inactivos=true{% endif %}">Anterior</a></li>
                 {% endif %}
-
                 <li class="page-item disabled"><span class="page-link">Pág {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span></li>
-
                 {% if page_obj.has_next %}
-                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}">Siguiente</a></li>
-                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}">Última &raquo;</a></li>
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}{% if ver_inactivos %}&ver_inactivos=true{% endif %}">Siguiente</a></li>
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}{% if ver_inactivos %}&ver_inactivos=true{% endif %}">Última &raquo;</a></li>
                 {% endif %}
             </ul>
         </nav>
-
     </div>
 </div>
 {% endblock %}
