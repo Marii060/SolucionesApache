@@ -9,7 +9,7 @@
         Inicio > Motos • {{ motos.paginator.count }} registradas
       </p>
     </div>
-    <a href="{% url 'gestion:registrar_moto' %}" class="btn btn-primary fw-bold">
+    <a href="{% url 'gestion:registrar_moto' %}" class="btn btn-primary fw-bold" style="border-radius: 8px;">
       + Registrar Moto
     </a>
   </div>
@@ -18,75 +18,113 @@
     <div class="card-body p-4">
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h5 class="fw-bold mb-0 text-dark small">Motos Registradas</h5>
-        <form method="GET" class="d-flex position-relative" style="width: 300px">
-          <i class="fa-solid fa-magnifying-glass position-absolute" style="top: 12px; left: 12px; color: #ccc"></i>
-          <input type="text" name="buscar" class="form-control ps-5" placeholder="Placa, marca, propietario..." value="{{ request.GET.buscar }}" />
+        
+        <form method="GET" class="d-flex gap-2 align-items-center">
+          {% if ver_inactivos %}
+              <a href="?ver_inactivos=false{% if request.GET.buscar %}&buscar={{ request.GET.buscar }}{% endif %}" 
+                 class="btn btn-info text-white" style="border-radius: 8px; white-space: nowrap;">
+                 Ver Activas
+              </a>
+              <input type="hidden" name="ver_inactivos" value="true">
+          {% else %}
+              <a href="?ver_inactivos=true{% if request.GET.buscar %}&buscar={{ request.GET.buscar }}{% endif %}" 
+                 class="btn btn-outline-info" style="border-radius: 8px; white-space: nowrap;">
+                 Ver Inactivas
+              </a>
+          {% endif %}
+
+          <div class="position-relative" style="width: 280px;">
+            <i class="fa-solid fa-magnifying-glass position-absolute" style="top: 12px; left: 12px; color: #ccc"></i>
+            <input type="text" name="buscar" class="form-control ps-5" placeholder="Placa, marca, propietario..." value="{{ request.GET.buscar }}" style="border-radius: 8px;"/>
+          </div>
+          <button type="submit" class="btn btn-primary d-none">Buscar</button>
         </form>
       </div>
 
-      <table class="table table-hover align-middle">
-        <thead>
-          <tr class="text-muted small text-uppercase">
-            <th>Placa</th>
-            <th>Marca / Modelo</th>
-            <th>Cilindraje</th>
-            <th>Kilometraje</th>
-            <th>Propietario</th>
-            <th>Último Servicio</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for moto in motos %}
-          <tr>
-            <td class="fw-bold text-primary">{{ moto.placa }}</td>
-            <td>
-              {{ moto.marca }} <span class="text-muted">{{ moto.modelo }}</span>
-            </td>
-            <td>{{ moto.cilindraje }}</td>
-            <td>{{ moto.kilometraje }}</td>
-            <td>{{ moto.id_cliente.nombre }}</td>
-            <td>
-    {% if moto.ultimo_servicio %}
-        <div class="d-flex flex-column">
-            <span class="small fw-bold">
-                {{ moto.ultimo_servicio.fecha_inicio|date:"d/m/Y" }}
-            </span>
-            <span class="badge 
-                {% if moto.ultimo_servicio.estado == 'Terminado' %}bg-success
-                {% elif moto.ultimo_servicio.estado == 'En Proceso' %}bg-warning text-dark
-                {% else %}bg-secondary{% endif %}">
-                {{ moto.ultimo_servicio.estado }}
-            </span>
-        </div>
-    {% else %}
-        <span class="text-muted small">Sin servicios</span>
-    {% endif %}
-</td>
-            <td>
-              <span class="badge bg-light text-dark border">Pendiente</span>
-            </td>
-            <td class="text-center" style="white-space: nowrap;">
-            <div class="d-flex justify-content-center gap-1">
-            <a href="{% url 'gestion:detalle_moto' moto.pk %}" class="btn btn-outline-secondary btn-action">Ver</a>
-            <a href="{% url 'gestion:editar_moto' moto.pk %}" class="btn btn-outline-warning btn-action"><i class="fa-solid fa-pen"></i></a>
-            <a href="{% url 'gestion:eliminar_moto' moto.pk %}" class="btn btn-outline-danger btn-action"><i class="fa-solid fa-trash"></i></a>
-            </div>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+      <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead>
+              <tr class="text-muted small text-uppercase">
+                <th>Placa</th>
+                <th>Marca / Modelo</th>
+                <th>Cilindraje</th>
+                <th>Kilometraje</th>
+                <th>Propietario</th>
+                <th>Último Servicio</th>
+                <th>Estado</th>
+                <th class="text-center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for moto in motos %}
+              <tr>
+                <td class="fw-bold text-primary">{{ moto.placa }}</td>
+                <td>
+                  {{ moto.marca }} <span class="text-muted">{{ moto.modelo }}</span>
+                </td>
+                <td>{{ moto.cilindraje }}</td>
+                <td>{{ moto.kilometraje }}</td>
+                <td>{{ moto.id_cliente.nombre }}</td>
+                <td>
+                    {% if moto.ultimo_servicio %}
+                        <div class="d-flex flex-column">
+                            <span class="small fw-bold">
+                                {{ moto.ultimo_servicio.fecha_inicio|date:"d/m/Y" }}
+                            </span>
+                            <span class="badge 
+                                {% if moto.ultimo_servicio.estado == 'Terminado' %}bg-success
+                                {% elif moto.ultimo_servicio.estado == 'En Proceso' %}bg-warning text-dark
+                                {% else %}bg-secondary{% endif %}">
+                                {{ moto.ultimo_servicio.estado }}
+                            </span>
+                        </div>
+                    {% else %}
+                        <span class="text-muted small">Sin servicios</span>
+                    {% endif %}
+                </td>
+                
+                <td>
+                    {% if moto.activo %}
+                        <span class="badge bg-success-subtle text-success border border-success-subtle">Activa</span>
+                    {% else %}
+                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Inactiva</span>
+                    {% endif %}
+                </td>
+                
+                <td class="text-center" style="white-space: nowrap;">
+                    <div class="d-flex justify-content-center gap-1">
+                        <a href="{% url 'gestion:detalle_moto' moto.pk %}" class="btn btn-outline-secondary btn-action" style="padding: 4px 12px; border-radius: 6px;">Ver</a>
+                        <a href="{% url 'gestion:editar_moto' moto.pk %}" class="btn btn-outline-warning btn-action" style="padding: 4px 12px; border-radius: 6px;"><i class="fa-solid fa-pen"></i></a>
+                        
+                        {% if moto.activo %}
+                            <a href="{% url 'gestion:deshabilitar_moto' moto.pk %}" class="btn btn-outline-danger btn-action" style="padding: 4px 12px; border-radius: 6px;" title="Deshabilitar moto">
+                                <i class="fa-solid fa-trash"></i>
+                            </a>
+                        {% else %}
+                            <a href="{% url 'gestion:activar_moto' moto.pk %}" class="btn btn-outline-success btn-action" style="padding: 4px 12px; border-radius: 6px;" title="Activar moto">
+                                <i class="fa-solid fa-check"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                  <td colspan="8" class="text-center py-5 text-muted">No se encontraron motos con esos criterios.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+      </div>
 
       <nav aria-label="Page navigation" class="mt-4">
         <ul class="pagination justify-content-center">
           {% if motos.has_previous %}
           <li class="page-item">
-            <a class="page-link" href="?page=1{% if request.GET.buscar %}&buscar={{ request.GET.buscar }}{% endif %}">&laquo;</a>
+            <a class="page-link" href="?page=1{% if request.GET.buscar %}&buscar={{ request.GET.buscar }}{% endif %}{% if ver_inactivos %}&ver_inactivos=true{% endif %}">&laquo;</a>
           </li>
           <li class="page-item">
-            <a class="page-link" href="?page={{ motos.previous_page_number }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar }}{% endif %}">Anterior</a>
+            <a class="page-link" href="?page={{ motos.previous_page_number }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar }}{% endif %}{% if ver_inactivos %}&ver_inactivos=true{% endif %}">Anterior</a>
           </li>
           {% endif %}
 
@@ -96,10 +134,10 @@
 
           {% if motos.has_next %}
           <li class="page-item">
-            <a class="page-link" href="?page={{ motos.next_page_number }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar }}{% endif %}">Siguiente</a>
+            <a class="page-link" href="?page={{ motos.next_page_number }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar }}{% endif %}{% if ver_inactivos %}&ver_inactivos=true{% endif %}">Siguiente</a>
           </li>
           <li class="page-item">
-            <a class="page-link" href="?page={{ motos.paginator.num_pages }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar }}{% endif %}">&raquo;</a>
+            <a class="page-link" href="?page={{ motos.paginator.num_pages }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar }}{% endif %}{% if ver_inactivos %}&ver_inactivos=true{% endif %}">&raquo;</a>
           </li>
           {% endif %}
         </ul>

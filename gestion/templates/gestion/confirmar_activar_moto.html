@@ -1,6 +1,6 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} 
 
-{% block title %}Eliminar Cliente - Soluciones Apache{% endblock %}
+{% block title %}Activar Moto - Soluciones Apache{% endblock %}
 
 {% block content %}
 <style>
@@ -15,8 +15,8 @@
     .icon-box {
         width: 60px;
         height: 60px;
-        background-color: #fee2e2;
-        color: #ef4444;
+        background-color: #dcfce7; /* Verde éxito */
+        color: #16a34a; 
         display: flex;
         align-items: center;
         justify-content: center;
@@ -27,22 +27,22 @@
 
 <div class="card card-custom bg-white text-center">
     <div class="icon-box">
-        <i class="fa-solid fa-trash-can fa-lg"></i>
+        <i class="fa-solid fa-check fa-lg"></i>
     </div>
     
-    <h4 class="fw-bold text-dark mb-3">¿Eliminar Registro?</h4>
+    <h4 class="fw-bold text-dark mb-3">¿Activar moto?</h4>
     <p class="text-muted mb-4">
-        ¿Estás seguro de que deseas eliminar a <strong>{{ cliente.nombre }}</strong>? 
-        Esta acción es permanente y no se podrá deshacer.
+        Vas a reactivar la moto con placa <strong>{{ moto.placa }}</strong>. 
+        Esta moto volverá a aparecer en tu listado principal y estará lista para nuevos registros de servicio.
     </p>
     
     <form method="POST">
         {% csrf_token %}
         <div class="d-grid gap-2">
-            <button type="submit" class="btn btn-danger fw-bold py-2" style="border-radius: 8px;">
-                Sí, eliminar definitivamente
+            <button type="submit" class="btn btn-success fw-bold py-2 text-white" style="border-radius: 8px;">
+                Sí, activar moto
             </button>
-            <a href="{% url 'gestion:lista_cliente' %}" class="btn btn-outline-secondary fw-bold py-2" style="border-radius: 8px; border: none;">
+            <a href="{% url 'gestion:lista_motos' %}" class="btn btn-outline-secondary fw-bold py-2" style="border-radius: 8px; border: none;">
                 Cancelar
             </a>
         </div>

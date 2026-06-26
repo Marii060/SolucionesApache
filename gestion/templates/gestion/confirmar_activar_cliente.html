@@ -1,0 +1,51 @@
+{% extends 'base.html' %} 
+
+{% block title %}Activar Cliente - Soluciones Apache{% endblock %}
+
+{% block content %}
+<style>
+    .card-custom { 
+        border-radius: 16px; 
+        border: 1px solid #f0f2f5; 
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
+        max-width: 450px; 
+        margin: 50px auto; 
+        padding: 30px;
+    }
+    .icon-box {
+        width: 60px;
+        height: 60px;
+        background-color: #dcfce7; /* Verde claro de éxito */
+        color: #16a34a; 
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        margin: 0 auto 20px;
+    }
+</style>
+
+<div class="card card-custom bg-white text-center">
+    <div class="icon-box">
+        <i class="fa-solid fa-check fa-lg"></i>
+    </div>
+    
+    <h4 class="fw-bold text-dark mb-3">¿Activar cliente?</h4>
+    <p class="text-muted mb-4">
+        Vas a reactivar a <strong>{{ cliente.nombre }}</strong>. 
+        El cliente volverá a aparecer en tu lista de clientes activos y estará disponible para nuevos servicios.
+    </p>
+    
+    <form method="POST">
+        {% csrf_token %}
+        <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-success fw-bold py-2 text-white" style="border-radius: 8px;">
+                Sí, activar cliente
+            </button>
+            <a href="{% url 'gestion:lista_cliente' %}" class="btn btn-outline-secondary fw-bold py-2" style="border-radius: 8px; border: none;">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

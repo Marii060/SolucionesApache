@@ -32,28 +32,28 @@
             <div class="col-md-3"><h6 class="fw-bold mb-0 text-dark">Lista de Clientes</h6></div>
             <div class="col-md-9">
                 <form method="GET" class="d-flex justify-content-end gap-2">
-                    
-                    {% if ver_inactivos %}
-                        <a href="?ver_inactivos=false{% if request.GET.buscar %}&buscar={{ request.GET.buscar }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}" 
-                           class="btn btn-info text-white" style="border-radius: 8px;">Ver Activos</a>
-                    {% else %}
-                        <a href="?ver_inactivos=true{% if request.GET.buscar %}&buscar={{ request.GET.buscar }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}" 
-                           class="btn btn-outline-info" style="border-radius: 8px;">Ver Inactivos</a>
-                    {% endif %}
+    {% if ver_inactivos %}
+        <a href="?ver_inactivos=false{% if request.GET.buscar %}&buscar={{ request.GET.buscar }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}" 
+           class="btn btn-info text-white" style="border-radius: 8px;">Ver Activos</a>
+        <input type="hidden" name="ver_inactivos" value="true">
+    {% else %}
+        <a href="?ver_inactivos=true{% if request.GET.buscar %}&buscar={{ request.GET.buscar }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}" 
+           class="btn btn-outline-info" style="border-radius: 8px;">Ver Inactivos</a>
+    {% endif %}
 
-                    <div class="position-relative" style="width: 280px;">
-                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                        <input type="text" name="buscar" class="form-control search-bar" placeholder="Nombre, documento, teléf..." value="{{ request.GET.buscar }}">
-                    </div>
-                    
-                    <select name="tipo" class="form-select text-muted" style="width: 160px; border-radius: 8px; font-size: 0.9rem; border-color: #e2e8f0;">
-                        <option value="">Todos los tipos</option>
-                        <option value="natural" {% if request.GET.tipo == 'natural' %}selected{% endif %}>Natural</option>
-                        <option value="juridica" {% if request.GET.tipo == 'juridica' %}selected{% endif %}>Jurídica</option>
-                    </select>
-                    
-                    <button type="submit" class="btn btn-primary" style="border-radius: 8px;">Buscar</button>
-                </form>
+    <div class="position-relative" style="width: 280px;">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text" name="buscar" class="form-control search-bar" placeholder="Nombre, documento, teléf..." value="{{ request.GET.buscar }}">
+    </div>
+    
+    <select name="tipo" class="form-select text-muted" style="width: 160px; border-radius: 8px; font-size: 0.9rem; border-color: #e2e8f0;">
+        <option value="">Todos los tipos</option>
+        <option value="natural" {% if request.GET.tipo == 'natural' %}selected{% endif %}>Natural</option>
+        <option value="juridica" {% if request.GET.tipo == 'juridica' %}selected{% endif %}>Jurídica</option>
+    </select>
+    
+    <button type="submit" class="d-none">Buscar</button>
+</form>
             </div>
         </div>
 
