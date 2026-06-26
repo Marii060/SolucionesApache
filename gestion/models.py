@@ -18,6 +18,7 @@ class Cliente(models.Model):
     correo = models.EmailField(unique=True)
     direccion = models.CharField(max_length=200)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
+    activo = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.numero_documento} - {self.nombre}"
