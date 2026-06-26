@@ -135,7 +135,7 @@ def activar_cliente(request, cliente_id):
         cliente.save()
         messages.success(request, '¡Cliente habilitado nuevamente!')
         return redirect('gestion:lista_cliente')
-    return render(request, 'gestion/confirmar_activar.html', {'cliente': cliente})
+    return render(request, 'gestion/confirmar_activar_cliente.html', {'cliente': cliente})
 
 #MOTOS
 @login_required
@@ -173,8 +173,16 @@ def registrar_moto(request, id_cliente=None):
 
 @login_required
 def lista_motos(request):
-    motos_list = Moto.objects.all().order_by('-id_moto')
-    buscar = request.GET.get('buscar')
+    # Capturamos si el usuario quiere ver las motos inactivas
+    ver_inactivos = request.GET.get('ver_inactivos') == 'true'
+    
+    #Filtramos según el estado activo/inactivo y mantenemos tu ordenación por ID
+    if ver_inactivos:
+        motos_list = Moto.objects.filter(activo=False).order_by('-id_moto')
+    else:
+        motos_list = Moto.objects.filter(activo=True).order_by('-id_moto')
+        
+    buscar = request.GET.get('buscar', '')
     if buscar:
         motos_list = motos_list.filter(
             Q(placa__icontains=buscar) | 
@@ -182,11 +190,16 @@ def lista_motos(request):
             Q(id_cliente__nombre__icontains=buscar)
         )
     
-    paginator = Paginator(motos_list, 7) 
+    paginator = Paginator(motos_list, 10) 
     page_number = request.GET.get('page')
     motos = paginator.get_page(page_number)
     
-    return render(request, 'gestion/lista_motos.html', {'motos': motos})
+    #Enviamos las variables necesarias al contexto del HTML
+    return render(request, 'gestion/lista_motos.html', {
+        'motos': motos,
+        'buscar': buscar,
+        'ver_inactivos': ver_inactivos  
+    })
 
 @login_required
 def detalle_moto(request, pk):
@@ -212,12 +225,24 @@ def editar_moto(request, pk):
     return render(request, 'gestion/registrar_moto.html', {'form': form, 'moto': moto})
 
 @login_required
-def eliminar_moto(request, pk):
+def deshabilitar_moto(request, pk):
     moto = get_object_or_404(Moto, pk=pk)
     if request.method == 'POST':
-        moto.delete()
+        moto.activo = False 
+        moto.save()
+        messages.success(request, '¡Moto deshabilitada correctamente!')
         return redirect('gestion:lista_motos')
-    return render(request, 'gestion/eliminar_moto.html', {'moto': moto})
+    return render(request, 'gestion/confirmar_deshabilitar_moto.html', {'moto': moto})
+
+@login_required
+def activar_moto(request, pk):
+    moto = get_object_or_404(Moto, pk=pk)
+    if request.method == 'POST':
+        moto.activo = True
+        moto.save()
+        messages.success(request, '¡Moto habilitada nuevamente!')
+        return redirect('gestion:lista_motos')
+    return render(request, 'gestion/confirmar_activar_moto.html', {'moto': moto})
 
 #Historial de servicios de una moto
 @login_required
