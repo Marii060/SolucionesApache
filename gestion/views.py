@@ -41,10 +41,18 @@ def dashboard(request):
 #CLIENTES
 @login_required
 def lista_clientes(request):
-    clientes = Cliente.objects.annotate(cantidad_motos=Count('moto')).order_by('-id_cliente')
+    # Capturamos si el usuario quiere ver inactivos
+    ver_inactivos = request.GET.get('ver_inactivos') == 'true'
+    
+    # Filtramos según el estado
+    if ver_inactivos:
+        clientes = Cliente.objects.filter(activo=False)
+    else:
+        clientes = Cliente.objects.filter(activo=True)
+    
+    # Aplicamos el resto de filtros (búsqueda y tipo)
     buscar = request.GET.get('buscar', '')
     tipo = request.GET.get('tipo', '')
-    estado = request.GET.get('estado', '')
     
     if buscar:
         clientes = clientes.filter(
@@ -52,7 +60,9 @@ def lista_clientes(request):
             Q(numero_documento__icontains=buscar)
         )
     if tipo:
-        clientes = clientes.filter(razon_social=tipo)
+        clientes = clientes.filter(tipo_persona=tipo)
+
+    clientes = clientes.annotate(cantidad_motos=Count('moto')).order_by('-id_cliente')
 
     paginator = Paginator(clientes, 8) 
     page_number = request.GET.get('page')
@@ -62,7 +72,7 @@ def lista_clientes(request):
         'page_obj': page_obj,
         'buscar': buscar,
         'tipo': tipo,
-        'estado': estado
+        'ver_inactivos': ver_inactivos  
     })
 
 @login_required
@@ -116,6 +126,16 @@ def deshabilitar_cliente(request, cliente_id):
         messages.success(request, '¡Cliente deshabilitado correctamente!')
         return redirect('gestion:lista_cliente')
     return render(request, 'gestion/confirmar_deshabilitar_cliente.html', {'cliente': cliente})
+
+@login_required
+def activar_cliente(request, cliente_id):
+    cliente = get_object_or_404(Cliente, pk=cliente_id)
+    if request.method == 'POST':
+        cliente.activo = True
+        cliente.save()
+        messages.success(request, '¡Cliente habilitado nuevamente!')
+        return redirect('gestion:lista_cliente')
+    return render(request, 'gestion/confirmar_activar.html', {'cliente': cliente})
 
 #MOTOS
 @login_required
