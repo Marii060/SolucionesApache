@@ -108,13 +108,14 @@ def editar_cliente(request, cliente_id):
     })
 
 @login_required
-def eliminar_cliente(request, cliente_id):
+def deshabilitar_cliente(request, cliente_id):
     cliente = get_object_or_404(Cliente, pk=cliente_id)
     if request.method == 'POST':
-        cliente.delete()
-        messages.success(request, '¡Cliente eliminado correctamente!')
+        cliente.activo = False 
+        cliente.save()
+        messages.success(request, '¡Cliente deshabilitado correctamente!')
         return redirect('gestion:lista_cliente')
-    return render(request, 'gestion/eliminar.html', {'cliente': cliente})
+    return render(request, 'gestion/confirmar_deshabilitar_cliente.html', {'cliente': cliente})
 
 #MOTOS
 @login_required
