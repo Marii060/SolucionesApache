@@ -466,15 +466,4 @@ def actualizar_estado_compra(request, id):
         messages.success(request, "Estados actualizados correctamente.")
         
     return redirect('inventario:detalle_compra', id=id)
-@login_required
-def cancelar_compra(request, id):
-    compra = get_object_or_404(Compra, id_compra=id)
-    # Hacemos el "Soft Delete" contable: Cambiar a Cancelado
-    if compra.estado != 'Cancelado':
-        compra.estado = 'Cancelado'
-        compra.save()
-        messages.success(request, f'La compra {compra.codigo_interno} ha sido anulada (Cancelada).')
-    else:
-        messages.warning(request, 'Esta compra ya se encontraba cancelada.')
-        
-    return redirect('inventario:lista_compras')
+
