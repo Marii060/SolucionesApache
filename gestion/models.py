@@ -32,6 +32,7 @@ class Moto(models.Model):
     kilometraje = models.CharField(max_length=30, null=True, blank=True)
     id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, db_column='id_cliente')
     observaciones = models.TextField(null=True, blank=True)
+    activo = models.BooleanField(default=True)
     
     @property
     def ultimo_servicio(self):
