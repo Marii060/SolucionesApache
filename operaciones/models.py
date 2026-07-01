@@ -68,7 +68,15 @@ class Venta(models.Model):
     num_factura = models.IntegerField(unique=True)
     fecha_venta = models.DateTimeField()
     tipo_pago = models.CharField(max_length=90)
-    total = models.DecimalField(max_digits=10, decimal_places=0)
+    total_venta = models.DecimalField(max_digits=12, decimal_places=2)
+    monto_iva = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    tipo_documento = models.CharField(
+        max_length=20, 
+        choices=[('RECIBO', 'Recibo de Venta'), ('FACTURA', 'Factura Electrónica')],
+        default='RECIBO',
+        verbose_name="Tipo Documento"
+    )
+    
     estado = models.BooleanField(default=True)
     observacion = models.CharField(max_length=100, blank=True, null=True)
     id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, db_column='id_cliente')
@@ -79,7 +87,7 @@ class Venta(models.Model):
         verbose_name_plural = "Ventas"
 
     def __str__(self):
-        return f"Factura {self.num_factura}"
+        return f"Factura {self.num_factura} - {self.tipo_documento}"
 
 # La lista de productos que el cliente se llevó en la factura.
 class DetalleVenta(models.Model):
