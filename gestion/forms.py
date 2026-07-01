@@ -88,7 +88,7 @@ class ConfiguracionSistemaForm(forms.ModelForm):
         widgets = {
             'tipo_documento': forms.Select(attrs={'class': 'form-select'}),
             'maneja_iva': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'iva_porcentaje': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'iva_porcentaje': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}), 
         }
     
     def __init__(self, *args, **kwargs):
