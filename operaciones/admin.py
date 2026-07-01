@@ -34,7 +34,7 @@ class DetalleVentaInline(admin.TabularInline):
 
 @admin.register(Venta)
 class VentaAdmin(admin.ModelAdmin):
-    list_display = ('num_factura', 'id_cliente', 'fecha_venta', 'total', 'tipo_pago')
+    list_display = ('num_factura', 'id_cliente', 'fecha_venta', 'total_venta', 'tipo_pago')
     list_filter = ('fecha_venta', 'tipo_pago')
     search_fields = ('num_factura', 'id_cliente__razon_social', 'id_cliente__nombre')
     inlines = [DetalleVentaInline]
