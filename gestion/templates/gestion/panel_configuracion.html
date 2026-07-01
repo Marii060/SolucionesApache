@@ -21,22 +21,11 @@
             <p class="text-muted m-0 mt-1">Ajuste los parámetros del taller y gestione las copias de seguridad de forma segura.</p>
         </div>
     </div>
-
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm mb-4" role="alert">
-                <i class="fa-solid fa-circle-check me-2"></i> {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        {% endfor %}
-    {% endif %}
-
-    <div class="row g-4">
-        
-        <div class="col-lg-8">
-            <form method="POST">
-                {% csrf_token %}
-                
+    <form method="POST">
+        {% csrf_token %}
+        <div class="row g-4">
+            
+            <div class="col-lg-8">
                 <div class="card card-config p-4 p-md-5 border">
                     <div class="config-title">
                         <i class="fa-solid fa-building text-primary me-2"></i> Datos del Taller y Razón Social
@@ -67,22 +56,19 @@
                             {{ form.direccion }}
                         </div>
                     </div>
-                    <div class="mt-4 text-end">
-                        <button type="submit" class="btn btn-primary fw-bold px-4 rounded-3" style="background-color: #2563eb;">
-                            <i class="fa-solid fa-save me-1"></i> Guardar datos del Taller
-                        </button>
-                    </div>
                 </div>
 
                 <div class="card card-config p-4 p-md-5 border">
                     <div class="config-title">
-                        <i class="fa-solid fa-cogs text-success me-2"></i> Parámetros de Operación del Sistema
+                        <i class="fa-solid fa-cogs text-success me-2"></i> Parámetros de Operación
                     </div>
                     <div class="row g-4">
                         <div class="col-md-4">
-                            <label class="form-label">IVA (%) para Recibos</label>
-                            {{ form.iva_porcentaje }}
-                        </div>
+    <label class="form-label">IVA (%) Aplicable</label>
+    <input type="number" name="iva_porcentaje" step="0.01" 
+           value="{{ form.iva_porcentaje.value|floatformat:'-2' }}" 
+           class="form-control" id="id_iva_porcentaje">
+</div>
                         <div class="col-md-3">
                             <label class="form-label">Símbolo Moneda</label>
                             {{ form.moneda_simbolo }}
@@ -100,47 +86,56 @@
                             {{ form.dias_credito_default }}
                         </div>
                     </div>
+                </div>
+
+                <div class="card card-config p-4 p-md-5 border">
+                    <div class="config-title">
+                        <i class="fa-solid fa-file-invoice-dollar text-danger me-2"></i> Configuración Fiscal (DIAN)
+                    </div>
+                    <div class="row g-4 align-items-center">
+                        <div class="col-md-3">
+                            <label class="form-label d-block">&nbsp;</label>
+                            <div class="form-check form-switch pt-2">
+                                {{ form.maneja_iva }}
+                                <label class="form-check-label fw-bold text-dark" for="{{ form.maneja_iva.id_for_label }}">Responsable de IVA</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Resolución DIAN</label>
+                            {{ form.resolucion_dian }}
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">Prefijo Factura</label>
+                            {{ form.prefijo_factura }}
+                        </div>
+                    </div>
                     <div class="mt-4 text-end">
-                        <button type="submit" class="btn btn-success fw-bold px-4 rounded-3">
-                            <i class="fa-solid fa-save me-1"></i> Guardar Parámetros
+                        <button type="submit" class="btn btn-primary fw-bold px-4 rounded-3">
+                            <i class="fa-solid fa-save me-1"></i> Guardar toda la Configuración
                         </button>
                     </div>
                 </div>
-            </form>
-        </div>
-
-        <div class="col-lg-4">
-            <div class="card card-config p-4 border sticky-top" style="top: 20px;">
-                <div class="config-title">
-                    <i class="fa-solid fa-database text-warning me-2"></i> Copias de Seguridad
-                </div>
-                
-                <p class="text-muted small mb-4">
-                    Descargue una copia de respaldo completa en formato JSON que incluye todos los módulos del sistema.
-                
-                <div class="d-grid mb-4">
-                    <a href="{% url 'gestion:backup_crear_manual' %}" class="btn btn-outline-warning fw-bold rounded-3">
-                        <i class="fa-solid fa-cloud-download me-1"></i> Descargar Backup
-                    </a>
-                </div>
-
-                <div class="small border p-3 rounded-3 bg-light">
-                    <h6 class="fw-bold m-0 mb-2" style="color: #1e293b;">Último respaldo</h6>
-                    <ul class="list-unstyled m-0 small text-muted">
-                        {% if config.ultima_copia_seguridad %}
-                            <li>
-                                <i class="fa-solid fa-check-circle text-success me-1"></i> Generado con éxito el: <br>
-                                <span class="fw-semibold text-dark mt-1 d-block">{{ config.ultima_copia_seguridad|date:"d/m/Y - g:i a" }}</span>
-                            </li>
-                        {% else %}
-                            <li class="text-center py-2 fs-7">No se han realizado copias en este equipo aún.</li>
-                        {% endif %}
-                    </ul>
-                </div>
-
             </div>
+
+            <div class="col-lg-4">
+                <div class="card card-config p-4 border sticky-top" style="top: 20px;">
+                    <div class="config-title">
+                        <i class="fa-solid fa-database text-warning me-2"></i> Copias de Seguridad
+                    </div>
+                    
+                    <p class="text-muted small mb-4">
+                        Descargue una copia de respaldo completa en formato JSON que incluye todos los módulos del sistema.
+                    </p>
+                
+                    <div class="d-grid mb-4">
+                        <a href="{% url 'gestion:backup_crear_manual' %}" class="btn btn-outline-warning fw-bold rounded-3">
+                            <i class="fa-solid fa-cloud-download me-1"></i> Descargar Backup
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
         </div>
-        
-    </div>
+    </form>
 </div>
 {% endblock %}

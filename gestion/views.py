@@ -8,6 +8,7 @@ from django.contrib import messages
 from django.db.models import Sum, Count, Q
 from django.http import HttpResponse
 from django.core import serializers
+from django.utils import timezone
 from gestion.models import Cliente, Moto, Log, ConfiguracionSistema
 from inventario.models import MarcaProducto, Categoria, Proveedor, Producto, MovimientoInventario, Compra, DetalleCompra
 from operaciones.models import ListaServicio, Servicio, DetalleServicio, Venta, DetalleVenta, Credito, CreditoPagado
@@ -320,7 +321,7 @@ def crear_backup_manual(request):
     response['Content-Disposition'] = f'attachment; filename="{nombre_archivo}"'
     
     config = ConfiguracionSistema.obtener_config()
-    config.ultima_copia_seguridad = datetime.datetime.now()
+    config.ultima_copia_seguridad = timezone.now()
     config.save()
     
     messages.success(request, '¡Backup generado exitosamente!')
