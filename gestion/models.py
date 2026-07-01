@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.cache import cache
+from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 
 class Cliente(models.Model):
@@ -63,7 +64,7 @@ class ConfiguracionSistema(models.Model):
 
     id = models.AutoField(primary_key=True)
     
-    #DATOS DEL TALLER
+    # DATOS DEL TALLER
     tipo_documento = models.CharField(
         max_length=20, 
         choices=TIPO_DOC_CHOICES, 
@@ -76,16 +77,20 @@ class ConfiguracionSistema(models.Model):
     email = models.EmailField(verbose_name="Email de Contacto")
     direccion = models.CharField(max_length=200, verbose_name="Dirección")
     
-    #PARÁMETROS DEL SISTEMA
+    # PARÁMETROS DEL SISTEMA
     iva_porcentaje = models.DecimalField(max_digits=5, decimal_places=2, default=19.00, verbose_name="IVA (%)")
     moneda_simbolo = models.CharField(max_length=5, default='$', verbose_name="Símbolo Moneda")
     moneda_nombre = models.CharField(max_length=20, default='COP', verbose_name="Nombre Moneda")
     stock_minimo_alerta = models.PositiveIntegerField(default=5, verbose_name="Stock Mínimo Alerta")
     dias_credito_default = models.PositiveIntegerField(default=30, verbose_name="Días Crédito (Defecto)")
     
-    #COPIAS DE SEGURIDAD
-    backup_automatico_activo = models.BooleanField(default=False, verbose_name="Backup Automático Activo")
+    # NUEVOS CAMPOS FISCALES Y LOGÍSTICOS
+    maneja_iva = models.BooleanField(default=False, verbose_name="¿Es responsable de IVA?")
+    resolucion_dian = models.CharField(max_length=50, blank=True, null=True, verbose_name="Resolución DIAN")
+    prefijo_factura = models.CharField(max_length=10, blank=True, null=True, verbose_name="Prefijo (ej: SETP)")
     
+    # COPIAS DE SEGURIDAD
+    backup_automatico_activo = models.BooleanField(default=False, verbose_name="Backup Automático Activo")
 
     class Meta:
         verbose_name = "Configuración del Sistema"
@@ -94,10 +99,18 @@ class ConfiguracionSistema(models.Model):
     def __str__(self):
         return f"Configuración del Sistema - {self.razon_social}"
 
-    # Singleton para asegurar que solo exista un registro
+    def clean(self):
+        """Lógica Fail-Safe: Evita inconsistencias de configuración."""
+        # Si el taller es responsable de IVA, obligatoriamente debe ser factura electrónica
+        if self.maneja_iva and self.tipo_documento == 'recibo':
+            raise ValidationError(
+                "Error: Si el taller es responsable de IVA, el 'Tipo de Documento' debe ser 'Factura electrónica'."
+            )
+
     def save(self, *args, **kwargs):
-        # Asegura que siempre se guarde con ID=1
+        # Asegura que siempre se guarde con ID=1 (Singleton)
         self.id = 1
+        self.full_clean() # Ejecuta el método clean() antes de guardar
         super().save(*args, **kwargs)
         # Limpia el cache al guardar
         cache.delete('configuracion_sistema')
