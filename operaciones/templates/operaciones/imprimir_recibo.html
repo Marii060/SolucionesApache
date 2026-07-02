@@ -1,44 +1,73 @@
+{% load humanize %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Recibo #{{ venta.num_factura }}</title>
     <style>
-        body { font-family: sans-serif; padding: 40px; }
-        .btn-volver { 
-            display: inline-block; padding: 10px 20px; background: #6c757d; 
-            color: white; text-decoration: none; border-radius: 5px; margin-top: 20px;
-        }
-        /* Esto oculta el botón cuando mandas a imprimir para que no salga en el papel */
-        @media print {
-            .no-print { display: none; }
-        }
+        body { font-family: 'Segoe UI', sans-serif; padding: 20px; color: #333; }
+        .receipt-container { max-width: 800px; margin: auto; border: 1px solid #ddd; padding: 30px; border-radius: 8px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .client-info { margin-bottom: 25px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background-color: #f8f9fa; text-align: left; padding: 12px; border-bottom: 2px solid #ddd; }
+        td { padding: 12px; border-bottom: 1px solid #eee; }
+        .text-right { text-align: right; }
+        .totals { margin-top: 30px; text-align: right; }
+        .total-final { font-weight: bold; font-size: 1.6em; color: #000; border-top: 2px solid #333; padding-top: 10px; }
     </style>
 </head>
 <body>
-    <h1>Recibo de Venta #{{ venta.num_factura }}</h1>
-    <p><strong>Cliente:</strong> {{ venta.id_cliente.nombre }}</p>
-    <p><strong>Total:</strong> $ {{ venta.total_venta }}</p>
-    <hr>
-    <h3>Productos:</h3>
-    <ul>
-        {% for detalle in venta.detalles_venta.all %}
-            <li>{{ detalle.id_producto.nombre }} - {{ detalle.cantidad }} unid.</li>
-        {% endfor %}
-    </ul>
 
-    <a href="{% url 'operaciones:lista_ventas' %}" class="btn-volver no-print">Volver a Ventas</a>
+<div class="receipt-container">
+    <div class="header">
+        <h1>Soluciones Apache</h1>
+        <p>Sistema de Gestión de Talleres</p>
+        <h3>RECIBO DE VENTA #{{ venta.num_factura }}</h3>
+    </div>
 
-   <script>
-    // Abre el diálogo de impresión automáticamente al cargar
-    window.onload = function() {
-        window.print();
-    };
+    <div class="client-info">
+        <h4>Datos del Cliente:</h4>
+        <p><strong>Nombre:</strong> {{ venta.id_cliente.nombre }}</p>
+        <p><strong>Identificación:</strong> {{ venta.id_cliente.numero_documento }}</p>
+        <p><strong>Teléfono:</strong> {{ venta.id_cliente.telefono|default:"No registrado" }}</p>
+        <p><strong>Fecha:</strong> {{ venta.fecha_venta|date:"d/m/Y - g:i a" }}</p>
+    </div>
 
-    //Cuando el usuario cierra el diálogo de impresión, CERRAR la ventana
-    window.onafterprint = function() {
-        window.close();
-    };
+    <table>
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th class="text-right">Cant.</th>
+                <th class="text-right">Precio Unit.</th>
+                <th class="text-right">Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for detalle in venta.detalles_venta.all %}
+            <tr>
+                <td>{{ detalle.id_producto.nombre }}</td>
+                <td class="text-right">{{ detalle.cantidad }}</td>
+                <td class="text-right">$ {{ detalle.precio_unitario|floatformat:0|intcomma }}</td>
+                <td class="text-right">$ {{ detalle.total|floatformat:0|intcomma }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" style="text-align:center;">No hay productos en esta venta.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="totals">
+        <p class="total-final">TOTAL: $ {{ venta.total_venta|floatformat:0|intcomma }}</p>
+    </div>
+</div>
+
+<script>
+    window.onload = function() { window.print(); };
+    window.onafterprint = function() { window.close(); };
 </script>
+
 </body>
 </html>
