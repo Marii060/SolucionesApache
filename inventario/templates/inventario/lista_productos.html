@@ -79,11 +79,13 @@
                             </td>
                             
                             <td>
-                                {% if producto.id_fabricante %}
-                                    <span class="badge bg-secondary-subtle text-secondary px-2 py-1 border">{{ producto.id_fabricante.nombre }}</span>
-                                {% else %}
-                                    <span class="text-muted small">Genérico</span>
-                                {% endif %}
+                                <span class="fw-semibold text-dark" style="font-size: 0.9rem;">
+                                    {% if producto.id_fabricante %}
+                                        {{ producto.id_fabricante.nombre }}
+                                    {% else %}
+                                        Genérico
+                                    {% endif %}
+                                </span>
                             </td>
                             
                             <td>
