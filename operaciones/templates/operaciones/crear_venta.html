@@ -1,0 +1,254 @@
+{% extends 'base.html' %} 
+
+{% block title %}Nueva Venta - Soluciones Apache{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold text-dark mb-0">Nueva Venta</h2>
+        <span class="text-muted small">Ventas > Registrar venta</span>
+    </div>
+    <a href="{% url 'operaciones:lista_ventas' %}" class="btn btn-primary fw-bold px-4 rounded-3">
+        Volver a la lista
+    </a>
+</div>
+
+<form method="POST" id="form-venta" action="{% url 'operaciones:crear_venta' %}">
+    {% csrf_token %}
+    
+    <input type="hidden" name="productos_json" id="productos_json" value="[]">
+    <input type="hidden" name="total_venta" id="total_venta_hidden" value="0">
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4" style="border-radius: 12px; border: 1px solid #e5e7eb;">
+                <div class="card-header bg-white border-bottom-0 pt-3 pb-0">
+                    <h6 class="fw-bold text-dark mb-0"><i class="fa-solid fa-user me-2"></i> PASO 1 — CLIENTE Y PAGO</h6>
+                </div>
+                <div class="card-body row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label text-muted small fw-bold mb-1">Cliente <span class="text-danger">*</span></label>
+                        {{ form.id_cliente }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted small fw-bold mb-1">Tipo de Pago <span class="text-danger">*</span></label>
+                        {{ form.tipo_pago }}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm mb-4" style="border-radius: 12px; border: 1px solid #e5e7eb;">
+                <div class="card-header bg-white border-bottom-0 pt-3 pb-0">
+                    <h6 class="fw-bold text-dark mb-0"><i class="fa-solid fa-box-open me-2 text-warning"></i> PASO 2 — PRODUCTOS</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2 mb-4">
+                        <div class="col-md-8">
+                            <select id="select_producto" class="form-select" style="border-radius: 8px;">
+                                <option value="">Buscar producto...</option>
+                                {% for producto in productos %}
+                                    <option value="{{ producto.id_producto }}" data-precio="{{ producto.precio_venta }}" data-nombre="{{ producto.nombre }}">
+                                        {{ producto.nombre }} - $ {{ producto.precio_venta|floatformat:"0" }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="number" id="input_cantidad" class="form-control text-center" value="1" min="1" style="border-radius: 8px;">
+                        </div>
+                        <div class="col-md-2 d-grid">
+                            <button type="button" id="btn_agregar" class="btn btn-primary fw-bold" style="border-radius: 8px;">+ Agregar</button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-borderless align-middle" id="tabla_productos">
+                            <thead class="border-bottom text-muted small">
+                                <tr>
+                                    <th class="fw-semibold pb-2">PRODUCTO</th>
+                                    <th class="fw-semibold pb-2 text-center" style="width: 80px;">CANT.</th>
+                                    <th class="fw-semibold pb-2 text-end">PRECIO</th>
+                                    <th class="fw-semibold pb-2 text-end">SUBTOTAL</th>
+                                    <th class="fw-semibold pb-2 text-center" style="width: 50px;"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="lista_carrito">
+                                <tr id="fila_vacia">
+                                    <td colspan="5" class="text-center text-muted py-4">No hay productos agregados.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="paso_3_container" class="card shadow-sm mb-4" style="border-radius: 12px; border: 1px solid #e5e7eb;">
+                <div class="card-header bg-white border-bottom-0 pt-3 pb-0">
+                    <h6 class="fw-bold text-dark mb-0"><i class="fa-solid fa-credit-card me-2 text-info"></i> PASO 3 — DETALLE DE PAGO</h6>
+                </div>
+                <div class="card-body">
+                    <div id="seccion_efectivo" class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-bold mb-1">Método</label>
+                            <select class="form-select" style="border-radius: 8px;"><option>Efectivo</option><option>Transferencia</option></select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-bold mb-1">Monto Recibido</label>
+                            <input type="number" id="input_recibido" class="form-control" placeholder="$ 0">
+                        </div>
+                        <div class="col-12 mt-2">
+                            <div id="caja_cambio" class="alert alert-success d-flex justify-content-between p-2 px-3 border-0" style="background-color: #dcfce7; color: #166534; border-radius: 8px;">
+                                <span class="fw-bold">Cambio:</span>
+                                <h5 class="fw-bold mb-0" id="texto_cambio">$ 0</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="seccion_credito" style="display: none;" class="alert alert-warning p-3 border-0">
+                        <p class="mb-0 small fw-bold">Venta a crédito: El saldo se registrará automáticamente en la cuenta del cliente.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm sticky-top" style="top: 20px; border-radius: 12px; border: 1px solid #e5e7eb;">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold text-muted mb-4"><i class="fa-solid fa-receipt me-2"></i> RESUMEN DE VENTA</h6>
+                    
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Subtotal</span>
+                        <span class="fw-semibold text-dark" id="resumen_subtotal">$ 0</span>
+                    </div>
+                    
+                    {% if tipo_doc == 'factura' %}
+                    <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
+                        <span class="text-muted">IVA ({{ iva_actual|floatformat:'0' }}%)</span>
+                        <span class="fw-semibold text-dark" id="resumen_iva">$ 0</span>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-4 mt-3 pt-3 border-top">
+                        <h4 class="fw-bold text-dark mb-0">TOTAL</h4>
+                        <h3 class="fw-bold text-dark mb-0" id="resumen_total">$ 0</h3>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 fw-bold py-2 mb-2">
+                        <i class="fa-solid fa-check-circle me-1"></i> Registrar Venta
+                    </button>
+                    </div>
+            </div>
+        </div>
+    </div>
+</form>
+<script>
+    $(document).ready(function() {
+        $('#select_producto').select2({ width: '100%' });
+        $('#id_cliente').select2({ width: '100%' });
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        let carrito = [];
+        const tipoDoc = "{{ tipo_doc }}"; 
+        const ivaPorcentaje = parseFloat("{{ iva_actual|default:0 }}".replace(',', '.'));
+
+        const selectProducto = document.getElementById('select_producto');
+        const inputCantidad = document.getElementById('input_cantidad');
+        const btnAgregar = document.getElementById('btn_agregar');
+        const listaCarrito = document.getElementById('lista_carrito');
+        const resumenSubtotal = document.getElementById('resumen_subtotal');
+        const resumenIva = document.getElementById('resumen_iva');
+        const resumenTotal = document.getElementById('resumen_total');
+        
+        // Elementos de Pago
+        const inputRecibido = document.getElementById('input_recibido');
+        const textoCambio = document.getElementById('texto_cambio');
+        const cajaCambio = document.getElementById('caja_cambio');
+        const tipoPagoSelect = document.getElementById('id_tipo_pago'); // ID que genera Django
+        const seccionEfectivo = document.getElementById('seccion_efectivo');
+        const seccionCredito = document.getElementById('seccion_credito');
+
+        const formatearMoneda = (v) => '$ ' + Math.round(v).toLocaleString('es-CO');
+
+        btnAgregar.addEventListener('click', () => {
+            if (!selectProducto.value) return alert("Selecciona un producto");
+            const op = selectProducto.options[selectProducto.selectedIndex];
+            
+            const existeIdx = carrito.findIndex(p => p.id === selectProducto.value);
+            const cant = parseInt(inputCantidad.value);
+            const prec = parseFloat(op.getAttribute('data-precio'));
+
+            if (existeIdx !== -1) {
+                carrito[existeIdx].cantidad += cant;
+                carrito[existeIdx].subtotal = carrito[existeIdx].cantidad * carrito[existeIdx].precio;
+            } else {
+                carrito.push({
+                    id: selectProducto.value,
+                    nombre: op.getAttribute('data-nombre'),
+                    precio: prec,
+                    cantidad: cant,
+                    subtotal: prec * cant
+                });
+            }
+            actualizarCarrito();
+            $('#select_producto').val("").trigger('change');
+            inputCantidad.value = 1;
+        });
+
+        function actualizarCarrito() {
+            listaCarrito.innerHTML = ''; 
+            let subtotalSuma = 0;
+            
+            carrito.forEach((item, idx) => {
+                subtotalSuma += item.subtotal;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${item.nombre}</td><td class="text-center">${item.cantidad}</td><td class="text-end">${formatearMoneda(item.precio)}</td><td class="text-end fw-bold">${formatearMoneda(item.subtotal)}</td><td><button type="button" class="btn btn-sm btn-outline-danger border-0" onclick="eliminar(${idx})"><i class="fa-solid fa-xmark"></i></button></td>`;
+                listaCarrito.appendChild(tr);
+            });
+            
+            // LÓGICA DIRECTA (SUMA)
+            let totalCalculado = subtotalSuma;
+            let valorIva = 0;
+
+            if (tipoDoc === 'factura') {
+                valorIva = subtotalSuma * (ivaPorcentaje / 100);
+                totalCalculado = subtotalSuma + valorIva;
+            }
+
+            resumenSubtotal.textContent = formatearMoneda(subtotalSuma);
+            if(resumenIva) resumenIva.textContent = formatearMoneda(valorIva);
+            resumenTotal.textContent = formatearMoneda(totalCalculado);
+            
+            document.getElementById('productos_json').value = JSON.stringify(carrito);
+            document.getElementById('total_venta_hidden').value = totalCalculado;
+            calcularCambio(totalCalculado);
+        }
+
+        window.eliminar = (idx) => { carrito.splice(idx, 1); actualizarCarrito(); };
+
+        // LÓGICA DE CAMBIO
+        inputRecibido.addEventListener('input', () => calcularCambio(parseFloat(document.getElementById('total_venta_hidden').value)));
+
+        function calcularCambio(totalVenta) {
+            const recibido = parseFloat(inputRecibido.value) || 0;
+            const cambio = recibido - totalVenta;
+            
+            if (recibido > 0) {
+                textoCambio.textContent = cambio >= 0 ? formatearMoneda(cambio) : "Faltan " + formatearMoneda(Math.abs(cambio));
+                cajaCambio.style.backgroundColor = cambio >= 0 ? '#dcfce7' : '#fee2e2';
+                cajaCambio.style.color = cambio >= 0 ? '#166534' : '#991b1b';
+            }
+        }
+
+        // LÓGICA DE PAGO
+        tipoPagoSelect.addEventListener('change', function() {
+            if (this.value === 'Credito') {
+                seccionEfectivo.style.display = 'none';
+                seccionCredito.style.display = 'block';
+            } else {
+                seccionEfectivo.style.display = 'flex';
+                seccionCredito.style.display = 'none';
+            }
+        });
+    });
+</script>
+{% endblock %}

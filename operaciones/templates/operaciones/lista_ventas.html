@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Ventas - Soluciones Apache{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4 px-md-4">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold m-0" style="color: #0f172a;">Gestión de Ventas</h2>
+            <p class="text-muted m-0 mt-1">Historial de recibos y facturas generadas.</p>
+        </div>
+        <a href="{% url 'operaciones:crear_venta' %}" class="btn btn-primary fw-bold px-4 rounded-3">
+            <i class="fa-solid fa-plus me-1"></i> Nueva Venta
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm p-3 mb-4 rounded-3">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <h5 class="m-0 fw-bold text-dark" style="font-size: 1.1rem;">Historial de Ventas</h5>
+            <form method="GET" class="d-flex align-items-center gap-2 m-0" id="form-filtros">
+                <div class="input-group" style="width: 250px;">
+                    <span class="input-group-text bg-white border-end-0 text-muted">
+                        <i class="fa-solid fa-search"></i>
+                    </span>
+                    <input type="text" name="buscar" class="form-control border-start-0 ps-0" 
+                           placeholder="N° recibo, cliente..." value="{{ request.GET.buscar }}">
+                </div>
+                <div style="width: 160px;">
+                    <input type="date" name="fecha_inicio" class="form-control" 
+                           value="{{ request.GET.fecha_inicio }}" onchange="this.form.submit()">
+                </div>
+                <div style="width: 120px;">
+                    <select name="tipo_pago" class="form-select" onchange="this.form.submit()">
+                        <option value="">Todo</option>
+                        <option value="Efectivo" {% if request.GET.tipo_pago == 'Efectivo' %}selected{% endif %}>Efectivo</option>
+                        <option value="Credito" {% if request.GET.tipo_pago == 'Credito' %}selected{% endif %}>Crédito</option>
+                    </select>
+                </div>
+                <button type="submit" class="d-none"></button>
+                {% if request.GET.buscar or request.GET.tipo_pago or request.GET.fecha_inicio %}
+                <a href="{% url 'operaciones:lista_ventas' %}" class="btn btn-light border text-danger" title="Limpiar filtros">
+                    <i class="fa-solid fa-times"></i>
+                </a>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-3">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light text-muted small text-uppercase">
+                    <tr>
+                        <th class="ps-4">Factura</th>
+                        <th>Fecha</th>
+                        <th>Cliente</th>
+                        <th>Tipo pago</th>
+                        <th>Estado</th>
+                        <th class="text-end">Total</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for venta in ventas %}
+                    <tr>
+                        <td class="ps-4 fw-bold text-primary align-middle">#{{ venta.num_factura }}</td>
+                        <td class="small align-middle">{{ venta.fecha_venta|date:"d/m/Y" }}</td>
+                        <td class="align-middle">{{ venta.id_cliente.nombre }}</td>
+                        
+                        <td class="align-middle">
+                            {% if venta.tipo_pago == 'Credito' %}
+                                <span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25 px-2">Crédito</span>
+                            {% else %}
+                                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2">Contado</span>
+                            {% endif %}
+                        </td>
+
+                        <td class="align-middle">
+                            {% if venta.tipo_pago == 'Credito' %}
+                                <span class="badge bg-warning text-dark">Pendiente</span>
+                            {% else %}
+                                <span class="badge bg-success text-white">Pagado</span>
+                            {% endif %}
+                        </td>
+
+                        <td class="text-end fw-bold align-middle">$ {{ venta.total_venta|floatformat:0|intcomma }}</td>
+
+                        <td class="text-center align-middle">
+                            <div class="d-flex justify-content-center gap-1">
+                                <a href="{% url 'operaciones:detalle_venta' venta.pk %}" class="btn btn-sm btn-outline-primary border-0" title="Ver detalle">
+                                    <i class="fa-solid fa-eye"></i>
+                                </a>
+                                <a href="{% url 'operaciones:imprimir_recibo' venta.pk %}" target="_blank" class="btn btn-sm btn-outline-secondary border-0" title="Imprimir">
+                                    <i class="fa-solid fa-print"></i>
+                                </a>
+                                {% if venta.estado %}
+                                <button type="button" class="btn btn-sm btn-outline-danger border-0" data-bs-toggle="modal" data-bs-target="#modalAnular{{ venta.pk }}" title="Anular venta">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+
+                    <div class="modal fade" id="modalAnular{{ venta.pk }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header border-0">
+                                    <h5 class="modal-title fw-bold text-danger">Anular Venta</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    ¿Estás segura de que deseas anular la venta <strong>#{{ venta.num_factura }}</strong> del cliente <strong>{{ venta.id_cliente.nombre }}</strong>? Esta acción es irreversible.
+                                </div>
+                                <div class="modal-footer border-0">
+                                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                                    <a href="{% url 'operaciones:anular_venta' venta.pk %}" class="btn btn-danger fw-bold">Sí, Anular</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5 text-muted">No se encontraron ventas registradas.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if ventas.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1{% if request.GET.urlencode %}&{{ request.GET.urlencode|cut:'page=' }}{% endif %}">&laquo;</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ ventas.previous_page_number }}{% if request.GET.urlencode %}&{{ request.GET.urlencode|cut:'page=' }}{% endif %}">Anterior</a>
+            </li>
+        {% endif %}
+
+        <li class="page-item active">
+            <span class="page-link fw-bold">{{ ventas.number }}</span>
+        </li>
+
+        {% if ventas.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ ventas.next_page_number }}{% if request.GET.urlencode %}&{{ request.GET.urlencode|cut:'page=' }}{% endif %}">Siguiente</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ ventas.paginator.num_pages }}{% if request.GET.urlencode %}&{{ request.GET.urlencode|cut:'page=' }}{% endif %}">&raquo;</a>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
+        </div>
+    </div>
+</div>
+{% endblock %}

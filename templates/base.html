@@ -34,7 +34,7 @@
             position: fixed;
             top: 0;
             left: 0;
-            background-color: #4b5f83;
+            background-color: #526a97;
             color: white;
             display: flex; 
             flex-direction: column; 
@@ -140,8 +140,7 @@
             </a>
 
             <div class="sidebar-heading">Comercial</div>
-            <a href="#"><i class="fa-solid fa-cart-shopping"></i> Ventas</a>
-            <a href="#"><i class="fa-solid fa-plus"></i> Nueva Venta</a>
+            <a href="{% url 'operaciones:lista_ventas' %}" class="{% if request.resolver_match.url_name == 'lista_ventas' %}active{% endif %}"><i class="fa-solid fa-cart-shopping"></i> Ventas
             <a href="#"><i class="fa-solid fa-credit-card"></i> Créditos</a> 
             <div class="sidebar-heading mt-3">Almacén</div>
             

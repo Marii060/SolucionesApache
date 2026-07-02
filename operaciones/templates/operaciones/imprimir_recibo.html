@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Recibo #{{ venta.num_factura }}</title>
+    <style>
+        body { font-family: sans-serif; padding: 40px; }
+        .btn-volver { 
+            display: inline-block; padding: 10px 20px; background: #6c757d; 
+            color: white; text-decoration: none; border-radius: 5px; margin-top: 20px;
+        }
+        /* Esto oculta el botón cuando mandas a imprimir para que no salga en el papel */
+        @media print {
+            .no-print { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <h1>Recibo de Venta #{{ venta.num_factura }}</h1>
+    <p><strong>Cliente:</strong> {{ venta.id_cliente.nombre }}</p>
+    <p><strong>Total:</strong> $ {{ venta.total_venta }}</p>
+    <hr>
+    <h3>Productos:</h3>
+    <ul>
+        {% for detalle in venta.detalles_venta.all %}
+            <li>{{ detalle.id_producto.nombre }} - {{ detalle.cantidad }} unid.</li>
+        {% endfor %}
+    </ul>
+
+    <a href="{% url 'operaciones:lista_ventas' %}" class="btn-volver no-print">Volver a Ventas</a>
+
+   <script>
+    // Abre el diálogo de impresión automáticamente al cargar
+    window.onload = function() {
+        window.print();
+    };
+
+    //Cuando el usuario cierra el diálogo de impresión, CERRAR la ventana
+    window.onafterprint = function() {
+        window.close();
+    };
+</script>
+</body>
+</html>
