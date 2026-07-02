@@ -1,13 +1,17 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+import json
+from django.utils import timezone
+from django.db import transaction
 from django.contrib.auth.decorators import login_required
+from decimal import Decimal
 from django.http import JsonResponse
 from django.db.models import Q
 from django.core.paginator import Paginator
-from operaciones.models import Servicio, DetalleServicio, ListaServicio 
+from operaciones.models import Servicio, DetalleServicio, ListaServicio, Venta, DetalleVenta, Credito
 from gestion.models import Cliente, Moto, ConfiguracionSistema
 from inventario.models import Producto
-from .forms import ServicioForm, ListaServicioForm
+from .forms import ServicioForm, ListaServicioForm, VentaForm
 
 @login_required
 def lista_catalogo(request):
@@ -262,7 +266,7 @@ def generar_recibo(request, servicio_id):
     mano_obra = 0
     repuestos = 0
     
-    # 1. Intentamos sumar los detalles (si los ingresaste uno por uno)
+    # Intentamos sumar los detalles (si los ingresaste uno por uno)
     for item in detalles:
         valor = float(item.total or (item.precio_unitario * item.cantidad) or 0)
         
@@ -270,8 +274,6 @@ def generar_recibo(request, servicio_id):
             repuestos += valor
         else:
             mano_obra += valor
-
-    # 2. 💡 EL SALVAVIDAS MATEMÁTICO (Aquí estaba el error de los ceros)
     # Si la orden no tiene detalles registrados uno a uno, tomamos los valores
     # directamente de la orden principal de tu modelo Servicio.
     if mano_obra == 0 and repuestos == 0:
@@ -283,13 +285,13 @@ def generar_recibo(request, servicio_id):
         if total_orden > mano_obra:
             repuestos = total_orden - mano_obra
 
-    # 3. Cálculos de Impuestos
+    # Cálculos de Impuestos
     porcentaje_iva = float(config.iva_porcentaje or 0)
     
     # El IVA se aplica ÚNICAMENTE a la bolsa de repuestos
     monto_iva = repuestos * (porcentaje_iva / 100)
     
-    # 4. Totales finales
+    # Totales finales
     subtotal_general = mano_obra + repuestos
     total_general = subtotal_general + monto_iva
 
@@ -304,3 +306,138 @@ def generar_recibo(request, servicio_id):
     }
     
     return render(request, 'operaciones/generar_recibo.html', contexto)
+
+@login_required
+def lista_ventas(request):
+    ventas = Venta.objects.all().order_by('-fecha_venta')
+    buscar = request.GET.get('buscar')
+    if buscar:
+        ventas = ventas.filter(
+            Q(num_factura__icontains=buscar) |
+            Q(id_cliente__nombre__icontains=buscar) | 
+            Q(id_cliente__numero_documento__icontains=buscar) 
+        )
+
+    tipo_pago = request.GET.get('tipo_pago')
+    if tipo_pago:
+        ventas = ventas.filter(tipo_pago=tipo_pago)
+
+    fecha_inicio = request.GET.get('fecha_inicio')
+    fecha_fin = request.GET.get('fecha_fin')
+
+    if fecha_inicio:
+        ventas = ventas.filter(fecha_venta__gte=fecha_inicio)
+    if fecha_fin:
+        ventas = ventas.filter(fecha_venta__lte=fecha_fin + ' 23:59:59')
+
+    paginator = Paginator(ventas, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'operaciones/lista_ventas.html', {'ventas': page_obj})
+
+@login_required
+def crear_venta(request):
+    if request.method == 'GET':
+        form = VentaForm()
+        productos = Producto.objects.filter(disponible=True)
+        config = ConfiguracionSistema.obtener_config()
+        
+        return render(request, 'operaciones/crear_venta.html', {
+            'form': form,
+            'productos': productos,
+            'iva_actual': config.iva_porcentaje,
+            'tipo_doc': config.tipo_documento
+        })
+        
+    elif request.method == 'POST':
+        form = VentaForm(request.POST)
+        productos_json = request.POST.get('productos_json')
+        subtotal_recibido = Decimal(request.POST.get('total_venta', 0))
+
+        if form.is_valid() and productos_json:
+            try:
+                with transaction.atomic():
+                    config = ConfiguracionSistema.obtener_config()
+                    
+                    monto_iva = Decimal('0.00')
+                    total_final = subtotal_recibido
+                    tipo_doc_venta = 'RECIBO'
+                    
+                    if config.maneja_iva:
+                        iva_factor = config.iva_porcentaje / Decimal('100')
+                        monto_iva = (subtotal_recibido * iva_factor).quantize(Decimal('1.00'))
+                        total_final = subtotal_recibido + monto_iva
+                        tipo_doc_venta = 'FACTURA'
+
+                    venta = form.save(commit=False)
+                    ultima_venta = Venta.objects.order_by('-num_factura').first()
+                    venta.num_factura = (ultima_venta.num_factura + 1) if ultima_venta else 1
+                    
+                    venta.fecha_venta = timezone.now()
+                    venta.total_venta = total_final 
+                    venta.monto_iva = monto_iva     
+                    venta.tipo_documento = tipo_doc_venta 
+                    venta.id_usuario = request.user
+                    venta.save()
+
+                    productos_data = json.loads(productos_json)
+                    for item in productos_data:
+                        producto = Producto.objects.get(id_producto=item['id'])
+                        DetalleVenta.objects.create(
+                            id_venta=venta,
+                            id_producto=producto,
+                            cantidad=item['cantidad'],
+                            precio_unitario=item['precio'],
+                            total=item['subtotal'],
+                            tipo='Producto'
+                        )
+                        producto.cantidad -= int(item['cantidad'])
+                        producto.save()
+
+                    if venta.tipo_pago == 'Credito':
+                        Credito.objects.create(
+                            cliente=venta.id_cliente,
+                            venta=venta,
+                            valor_total=venta.total_venta, 
+                            saldo_pendiente=venta.total_venta,
+                            estado='ACTIVO'
+                        )
+
+                    messages.success(request, f'¡Venta #{venta.num_factura} ({tipo_doc_venta}) registrada con éxito!')
+                    return redirect('operaciones:lista_ventas')
+                    
+            except Exception as e:
+                messages.error(request, f'Error al registrar la venta: {str(e)}')
+                return redirect('operaciones:crear_venta')
+        else:
+            messages.error(request, 'Datos inválidos.')
+            return redirect('operaciones:crear_venta')
+
+@login_required
+def detalle_venta(request, pk):
+    venta = get_object_or_404(Venta, pk=pk)
+    return render(request, 'operaciones/detalle_venta.html', {'venta': venta})
+
+@login_required
+def anular_venta(request, pk):
+    venta = get_object_or_404(Venta, pk=pk)
+    
+    # Solo anulamos si no está anulada ya
+    if venta.estado:
+        venta.estado = False # Marcamos como anulada (o inactiva)
+        venta.save()
+        messages.warning(request, f'Venta #{venta.num_factura} anulada correctamente.')
+    
+    return redirect('operaciones:lista_ventas')
+
+@login_required
+def imprimir_recibo(request, pk):
+    venta = get_object_or_404(Venta, pk=pk)
+    # Por ahora, simplemente renderizamos una página que el navegador pueda imprimir
+    # Luego crearemos el PDF cuando necesites un archivo descargable
+    return render(request, 'operaciones/imprimir_recibo.html', {'venta': venta})
+
+
+
+ 

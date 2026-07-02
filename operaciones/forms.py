@@ -1,5 +1,5 @@
 from django import forms
-from .models import Servicio, ListaServicio
+from .models import Servicio, ListaServicio, Venta
 
 class ListaServicioForm(forms.ModelForm):
     class Meta:
@@ -37,3 +37,40 @@ class ServicioForm(forms.ModelForm):
             'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
             'estado': forms.Select(attrs={'class': 'form-select'}),
         }
+
+class VentaForm(forms.ModelForm):
+    # Definimos las opciones estáticas para el tipo de pago
+    OPCIONES_PAGO = [
+        ('Efectivo', 'Efectivo'),
+        ('Credito', 'Crédito'),
+    ]
+    
+    # Sobrescribimos el campo para que sea un select desplegable
+    tipo_pago = forms.ChoiceField(
+        choices=OPCIONES_PAGO, 
+        widget=forms.Select(attrs={'class': 'form-select', 'required': True})
+    )
+
+    class Meta:
+        model = Venta
+        # Solo le pedimos al usuario los datos que realmente necesita ingresar
+        fields = ['id_cliente', 'tipo_pago', 'observacion']
+        
+        # Le aplicamos las clases de Bootstrap para que se vea moderno
+        widgets = {
+            'id_cliente': forms.Select(attrs={
+                'class': 'form-select', 
+                'required': True
+            }),
+            'observacion': forms.Textarea(attrs={
+                'class': 'form-control', 
+                'rows': 2, 
+                'placeholder': 'Escribe aquí si hay alguna nota adicional sobre esta venta...'
+            }),
+        }
+        
+        labels = {
+            'id_cliente': 'Seleccionar Cliente',
+            'tipo_pago': 'Método de Pago',
+            'observacion': 'Observaciones (Opcional)',
+        }        
