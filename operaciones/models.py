@@ -51,7 +51,7 @@ class DetalleServicio(models.Model):
     id_detalle_servicio = models.AutoField(primary_key=True)
     id_servicio = models.ForeignKey(Servicio, on_delete=models.CASCADE, related_name='detalles', db_column='id_servicio')
     id_producto = models.ForeignKey(Producto, on_delete=models.CASCADE, null=True, blank=True, db_column='id_producto')
-    id_lista_servicio = models.ForeignKey(ListaServicio, on_delete=models.CASCADE, db_column='id_lista_servicio')
+    id_lista_servicio = models.ForeignKey(ListaServicio, on_delete=models.CASCADE, db_column='id_lista_servicio', null=True, blank=True)
     cantidad = models.IntegerField(default=1)
     precio_unitario = models.DecimalField(max_digits=12, decimal_places=2)
     total = models.DecimalField(max_digits=12, decimal_places=2, default=0)
