@@ -421,7 +421,7 @@
             <td class="fw-bold text-dark">
                 ${opcion.dataset.nombre}
                 <input type="hidden" name="productos_id[]" value="${opcion.value}">
-            </td>
+                <input type="hidden" name="productos_precio[]" value="${precio}"> </td>
             <td class="text-center">
                 <input type="number" name="productos_cant[]" class="form-control input-custom text-center mx-auto" value="1" min="1" style="width: 80px; padding: 4px;" onchange="actualizarSubtotalProducto(this, ${precio})">
             </td>
