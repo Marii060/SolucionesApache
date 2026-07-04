@@ -427,7 +427,7 @@ def reportes_estadisticas(request):
     mes_seleccionado = request.GET.get('mes', timezone.now().strftime('%Y-%m'))
     fecha = datetime.strptime(mes_seleccionado, '%Y-%m')
     
-    # 1. Cálculos Globales
+    # Cálculos Globales
     ultimo_dia = calendar.monthrange(fecha.year, fecha.month)[1]
     fin_mes = datetime(fecha.year, fecha.month, ultimo_dia, 23, 59, 59)
     
@@ -440,7 +440,7 @@ def reportes_estadisticas(request):
     total_compras = Compra.objects.filter(fecha_compra__year=fecha.year, fecha_compra__month=fecha.month).aggregate(total=Sum('total_compra'))['total'] or 0
     cartera_pendiente = Credito.objects.filter(estado='ACTIVO', fecha_creacion__lte=fin_mes).aggregate(total=Sum('saldo_pendiente'))['total'] or 0
     
-    # 2. Desglose Semanal (4 Semanas fijas)
+    #Desglose Semanal (4 Semanas fijas)
     desglose_semanal = []
     rangos = [
         ('Semana 1', 1, 7), 
@@ -485,8 +485,6 @@ def reportes_estadisticas(request):
         'top_productos': top_productos,
         'desglose_semanal': desglose_semanal
     }
-
-    # 3. Exportación a PDF restaurada
     if 'exportar' in request.GET:
         pdf = render_to_pdf('operaciones/reporte_pdf.html', contexto)
         if pdf:

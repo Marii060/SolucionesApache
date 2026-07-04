@@ -23,22 +23,24 @@
     
     <style>
         body {
-            background-color: #dbdee0;
+            background-color: #f3faff;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
-        /*ESTILOS DE LA BARRA LATERAL*/
+        /* ESTILOS DE LA BARRA LATERAL CON DEGRADADO FRESCO */
         .sidebar {
             height: 100vh;
             width: 260px;
             position: fixed;
             top: 0;
             left: 0;
-            background-color: #526a97;
+            /* Degradado azul vibrante */
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #4a90e2 100%);
             color: white;
             display: flex; 
             flex-direction: column; 
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            box-shadow: 4px 0 15px rgba(0,0,0,0.2);
+            transition: background 0.3s ease;
         }
         
         .sidebar-brand {
@@ -46,7 +48,7 @@
             font-size: 1.2rem;
             font-weight: bold;
             text-align: center;
-            border-bottom: 1px solid #3d4f70;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
             margin-bottom: 10px;
         }
 
@@ -58,7 +60,7 @@
         .sidebar-heading {
             font-size: 0.75rem;
             text-transform: uppercase;
-            color: #8c9bb3;
+            color: rgba(255,255,255,0.6);
             padding: 15px 25px 5px;
             font-weight: bold;
             letter-spacing: 1px;
@@ -67,7 +69,7 @@
         .sidebar a {
             padding: 12px 25px;
             text-decoration: none;
-            color: #b0c0d8;
+            color: #d1d9e6;
             display: block;
             font-size: 0.95rem;
             transition: all 0.3s;
@@ -81,11 +83,11 @@
 
         .sidebar a:hover, .sidebar a.active {
             color: white;
-            background-color: #1e2a40;
-            border-left: 4px solid #4f46e5;
+            background-color: rgba(0,0,0,0.2);
+            border-left: 4px solid #fff;
         }
 
-        /*ESTILOS DEL CONTENIDO PRINCIPAL*/
+        /* ESTILOS DEL CONTENIDO PRINCIPAL */
         .main-content {
             margin-left: 260px;
             padding: 30px;
@@ -93,11 +95,14 @@
 
         .sidebar-footer {
             padding: 20px;
-            border-top: 1px solid #3d4f70;
+            border-top: 1px solid rgba(255,255,255,0.1);
         }
         .logout-btn {
             width: 100%;
+            background-color: rgba(220, 53, 69, 0.9);
+            border: none;
         }
+        
         input[type="number"]::-webkit-outer-spin-button,
         input[type="number"]::-webkit-inner-spin-button {
             -webkit-appearance: none;
@@ -140,8 +145,12 @@
             </a>
 
             <div class="sidebar-heading">Comercial</div>
-            <a href="{% url 'operaciones:lista_ventas' %}" class="{% if request.resolver_match.url_name == 'lista_ventas' %}active{% endif %}"><i class="fa-solid fa-cart-shopping"></i> Ventas
-            <a href="{% url 'operaciones:lista_creditos' %}" class="{% if request.resolver_match.url_name == 'lista_creditos' %}active{% endif %}"><i class="fa-solid fa-credit-card"></i> Créditos</a>
+            <a href="{% url 'operaciones:lista_ventas' %}" class="{% if request.resolver_match.url_name == 'lista_ventas' %}active{% endif %}">
+                <i class="fa-solid fa-cart-shopping"></i> Ventas
+            </a>
+            <a href="{% url 'operaciones:lista_creditos' %}" class="{% if request.resolver_match.url_name == 'lista_creditos' %}active{% endif %}">
+                <i class="fa-solid fa-credit-card"></i> Créditos
+            </a>
 
             <div class="sidebar-heading mt-3">Almacén</div>
             
@@ -151,37 +160,23 @@
             </a>
 
             <div class="collapse {% if request.resolver_match.app_name == 'inventario' %}show{% endif %}" id="collapseInventario">
-
-                <a href="{% url 'inventario:lista_productos' %}" class="ms-4 {% if 'productos' in request.path %}active{% endif %}">
-                    Productos
-                </a>
-                
-                <a href="{% url 'inventario:lista_marcas' %}" class="ms-4 {% if 'marcas' in request.path %}active{% endif %}">
-                    Marcas
-                </a>
-
-                <a href="{% url 'inventario:lista_categorias' %}" class="ms-4 {% if 'categorias' in request.path %}active{% endif %}">
-                    Categorías
-                </a>
-                
-                 <a href="{% url 'inventario:lista_fabricantes' %}" class="ms-4 {% if 'fabricantes' in request.path %}active{% endif %}">
-                    Fabricantes
-                </a>
-    
-
-                <a href="{% url 'inventario:control_inventario' %}" class="ms-4 {% if 'control' in request.path %}active{% endif %}">
-                    Control de Inventario
-                </a>
+                <a href="{% url 'inventario:lista_productos' %}" class="ms-4 {% if 'productos' in request.path %}active{% endif %}">Productos</a>
+                <a href="{% url 'inventario:lista_marcas' %}" class="ms-4 {% if 'marcas' in request.path %}active{% endif %}">Marcas</a>
+                <a href="{% url 'inventario:lista_categorias' %}" class="ms-4 {% if 'categorias' in request.path %}active{% endif %}">Categorías</a>
+                <a href="{% url 'inventario:lista_fabricantes' %}" class="ms-4 {% if 'fabricantes' in request.path %}active{% endif %}">Fabricantes</a>
+                <a href="{% url 'inventario:control_inventario' %}" class="ms-4 {% if 'control' in request.path %}active{% endif %}">Control de Inventario</a>
             </div>
 
             <a href="{% url 'inventario:lista_compras' %}" class="{% if 'compras' in request.path %}active{% endif %}">
-    <i class="fa-solid fa-cart-shopping fa-fw"></i> Compras</a>
+                <i class="fa-solid fa-cart-shopping fa-fw"></i> Compras
+            </a>
 
-           <a href="{% url 'inventario:lista_proveedores' %}" class="{% if 'proveedores' in request.path %}active{% endif %}">
-    <i class="fa-solid fa-truck fa-fw"></i> Proveedores</a>
+            <a href="{% url 'inventario:lista_proveedores' %}" class="{% if 'proveedores' in request.path %}active{% endif %}">
+                <i class="fa-solid fa-truck fa-fw"></i> Proveedores
+            </a>
 
             <div class="sidebar-heading">Administración</div>
-           <a href="{% url 'operaciones:reportes_estadisticas' %}"><i class="fa-solid fa-chart-line"></i> Reportes</a>
+            <a href="{% url 'operaciones:reportes_estadisticas' %}"><i class="fa-solid fa-chart-line"></i> Reportes</a>
             <a href="{% url 'gestion:panel' %}" class="{% if request.resolver_match.url_name == 'panel' %}active{% endif %}">
                 <i class="fa-solid fa-gear"></i> Configuración
             </a>
@@ -199,15 +194,15 @@
 
     <div class="main-content">
         <div class="container mt-3">
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show shadow-sm" role="alert" style="border-radius: 8px;">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        {% endfor %}
-    {% endif %}
-</div>
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show shadow-sm" role="alert" style="border-radius: 8px;">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
         {% block content %}
         {% endblock %}
     </div>
