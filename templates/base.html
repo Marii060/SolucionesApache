@@ -175,15 +175,13 @@
             </div>
 
             <a href="{% url 'inventario:lista_compras' %}" class="{% if 'compras' in request.path %}active{% endif %}">
-    <i class="fa-solid fa-cart-shopping fa-fw"></i> Compras
-</a>
+    <i class="fa-solid fa-cart-shopping fa-fw"></i> Compras</a>
 
            <a href="{% url 'inventario:lista_proveedores' %}" class="{% if 'proveedores' in request.path %}active{% endif %}">
-    <i class="fa-solid fa-truck fa-fw"></i> Proveedores
-</a>
+    <i class="fa-solid fa-truck fa-fw"></i> Proveedores</a>
 
             <div class="sidebar-heading">Administración</div>
-            <a href="#"><i class="fa-solid fa-chart-line"></i> Reportes</a>
+           <a href="{% url 'operaciones:reportes_estadisticas' %}"><i class="fa-solid fa-chart-line"></i> Reportes</a>
             <a href="{% url 'gestion:panel' %}" class="{% if request.resolver_match.url_name == 'panel' %}active{% endif %}">
                 <i class="fa-solid fa-gear"></i> Configuración
             </a>

@@ -28,4 +28,6 @@ urlpatterns = [
     path('creditos/detalle/<int:credito_id>/', views.detalle_credito, name='detalle_credito'),
     #ruta AJAX que usa el buscador del formulario
     path('creditos/obtener-por-cliente/<int:cliente_id>/', views.obtener_creditos_cliente, name='obtener_creditos_cliente'),
-]
+    #rutas para reportes
+    path('reportes/', views.reportes_estadisticas, name='reportes_estadisticas'),
+    ]
