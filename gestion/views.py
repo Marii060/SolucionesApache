@@ -24,19 +24,30 @@ def dashboard(request):
     total_clientes = Cliente.objects.count()
     total_motos = Moto.objects.count() 
     
+    # Cálculos de cartera
     suma_creditos = Credito.objects.aggregate(total=Sum('valor_total'))['total'] or 0
     suma_pagos = CreditoPagado.objects.aggregate(total=Sum('monto_pago'))['total'] or 0
     total_cartera = suma_creditos - suma_pagos
     
+    # Cálculo de productos
     total_productos = Producto.objects.count()
+
+    #Cálculo de Ventas del Mes
+    now = timezone.now()
+    ventas_mes = Venta.objects.filter(
+        fecha_venta__month=now.month, 
+        fecha_venta__year=now.year
+    ).count()
     
     contexto = {
         'total_clientes': total_clientes,
         'total_motos': total_motos,
         'total_cartera': total_cartera,
         'total_recaudado': suma_pagos,
-        'total_productos': total_productos, 
+        'total_productos': total_productos,
+        'ventas_mes': ventas_mes, 
     }
+    
     return render(request, 'gestion/dashboard.html', contexto)
 
 #CLIENTES

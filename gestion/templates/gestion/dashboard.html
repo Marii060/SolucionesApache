@@ -64,22 +64,20 @@
     <div class="col-md-4">
         <div class="card text-white shadow-sm h-100" style="background-color: #6f42c1; border: none; border-radius: 12px;">
             <div class="card-body position-relative">
-                <!-- 🌟 AQUÍ REEMPLAZAMOS EL CERO POR LA VARIABLE -->
                 <h1 class="display-5 fw-bold mb-0">{{ total_productos }}</h1>
                 <p class="small text-uppercase fw-bold mb-0">PRODUCTOS</p>
                 <i class="fa-solid fa-box fa-3x position-absolute opacity-25" style="top: 20px; right: 20px;"></i>
             </div>
         </div>
     </div>
-
-    <div class="col-md-4">
-        <div class="card text-white shadow-sm h-100" style="background-color: #20c997; border: none; border-radius: 12px;">
-            <div class="card-body position-relative">
-                <h1 class="display-5 fw-bold mb-0">0</h1>
-                <p class="small text-uppercase fw-bold mb-0">VENTAS DEL MES</p>
-                <i class="fa-solid fa-cart-shopping fa-3x position-absolute opacity-25" style="top: 20px; right: 20px;"></i>
-            </div>
+<div class="col-md-4">
+    <div class="card text-white shadow-sm h-100" style="background-color: #20c997; border: none; border-radius: 12px;">
+        <div class="card-body position-relative">
+            <h1 class="display-5 fw-bold mb-0">{{ ventas_mes }}</h1>
+            <p class="small text-uppercase fw-bold mb-0">VENTAS DEL MES</p>
+            <i class="fa-solid fa-cart-shopping fa-3x position-absolute opacity-25" style="top: 20px; right: 20px;"></i>
         </div>
     </div>
+</div>
 </div>
 {% endblock %}
