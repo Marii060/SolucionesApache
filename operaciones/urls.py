@@ -22,4 +22,10 @@ urlpatterns = [
     path('ventas/detalle/<int:pk>/', views.detalle_venta, name='detalle_venta'),
     path('ventas/recibo/<int:pk>/', views.imprimir_recibo, name='imprimir_recibo'),
     path('ventas/anular/<int:pk>/', views.anular_venta, name='anular_venta'),
+    #rutas para créditos
+    path('creditos/', views.lista_creditos, name='lista_creditos'),
+    path('creditos/registrar-abono/', views.registrar_abono, name='registrar_abono'),
+    path('creditos/detalle/<int:credito_id>/', views.detalle_credito, name='detalle_credito'),
+    #ruta AJAX que usa el buscador del formulario
+    path('creditos/obtener-por-cliente/<int:cliente_id>/', views.obtener_creditos_cliente, name='obtener_creditos_cliente'),
 ]

@@ -1,5 +1,5 @@
 from django import forms
-from .models import Servicio, ListaServicio, Venta
+from .models import Servicio, ListaServicio, Venta, CreditoPagado
 
 class ListaServicioForm(forms.ModelForm):
     class Meta:
@@ -73,4 +73,25 @@ class VentaForm(forms.ModelForm):
             'id_cliente': 'Seleccionar Cliente',
             'tipo_pago': 'Método de Pago',
             'observacion': 'Observaciones (Opcional)',
+        }        
+        
+
+class AbonoForm(forms.ModelForm):
+    class Meta:
+        model = CreditoPagado
+        fields = ['monto_pago', 'metodo_pago']
+        widgets = {
+            'monto_pago': forms.NumberInput(attrs={
+                'class': 'form-control', 
+                'placeholder': 'Ej: 50000',
+                'min': '1'
+            }),
+            'metodo_pago': forms.Select(attrs={'class': 'form-select'}, choices=[
+                ('Efectivo', 'Efectivo'),
+                ('Transferencia', 'Transferencia'),
+            ]),
+        }
+        labels = {
+            'monto_pago': 'Monto a abonar ($)',
+            'metodo_pago': 'Método de pago',
         }        

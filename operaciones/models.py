@@ -109,6 +109,7 @@ class Credito(models.Model):
     venta = models.ForeignKey(Venta, on_delete=models.CASCADE, null=True, blank=True)
     servicio = models.ForeignKey(Servicio, on_delete=models.CASCADE, null=True, blank=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_vencimiento = models.DateField(null=True, blank=True)
     valor_total = models.DecimalField(max_digits=10, decimal_places=0) 
     saldo_pendiente = models.DecimalField(max_digits=10, decimal_places=0) 
     

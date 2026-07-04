@@ -8,10 +8,10 @@ from decimal import Decimal
 from django.http import JsonResponse
 from django.db.models import Q
 from django.core.paginator import Paginator
-from operaciones.models import Servicio, DetalleServicio, ListaServicio, Venta, DetalleVenta, Credito
+from operaciones.models import Servicio, DetalleServicio, ListaServicio, Venta, DetalleVenta, Credito, CreditoPagado
 from gestion.models import Cliente, Moto, ConfiguracionSistema
 from inventario.models import Producto
-from .forms import ServicioForm, ListaServicioForm, VentaForm
+from .forms import ServicioForm, ListaServicioForm, VentaForm, AbonoForm
 
 @login_required
 def lista_catalogo(request):
@@ -312,6 +312,108 @@ def imprimir_recibo(request, pk):
     venta = get_object_or_404(Venta, pk=pk)
     return render(request, 'operaciones/imprimir_recibo.html', {'venta': venta})
 
+@login_required
+def lista_creditos(request):
+    query = request.GET.get('buscar', '')
+    estado_filtro = request.GET.get('estado', 'Todos')
+    creditos = Credito.objects.all().order_by('-fecha_creacion')
 
+    if query:
+        creditos = creditos.filter(Q(cliente__nombre__icontains=query) | Q(venta__num_factura__icontains=query))
+    if estado_filtro != 'Todos':
+        creditos = creditos.filter(estado=estado_filtro)
 
+    # Fecha actual para comparar vencimientos
+    today = timezone.now().date() 
+
+    for c in creditos:
+        # 1. Cálculo de porcentaje
+        if c.valor_total and c.valor_total > 0:
+            pagado = c.valor_total - c.saldo_pendiente
+            c.porcentaje = int((pagado / c.valor_total) * 100)
+        else:
+            c.porcentaje = 0
+        if c.estado == 'PAGADO':
+            c.status_label = "Pagado"
+            c.badge_color = "bg-success"
+        elif hasattr(c, 'fecha_vencimiento') and c.fecha_vencimiento and c.fecha_vencimiento < today:
+            c.status_label = "Vencido"
+            c.badge_color = "bg-danger" 
+        else:
+            c.status_label = "Vigente"
+            c.badge_color = "bg-warning text-dark"
+
+    paginator = Paginator(creditos, 10)
+    page_number = request.GET.get('page')
+    creditos_page = paginator.get_page(page_number)
+
+    return render(request, 'operaciones/lista_creditos.html', {
+        'creditos': creditos_page,
+        'query': query,
+        'estado_actual': estado_filtro
+    })
+
+@login_required
+def obtener_creditos_cliente(request, cliente_id):
+    # Traemos solo los créditos activos de ese cliente
+    creditos = Credito.objects.filter(cliente_id=cliente_id, estado='ACTIVO')
+    creditos_data = [
+        {
+            'id': c.id, 
+            'texto': f"Factura: {c.venta.num_factura if c.venta else 'N/A'} - Saldo: ${c.saldo_pendiente:,.0f}"
+        } 
+        for c in creditos
+    ]
+    return JsonResponse(creditos_data, safe=False)
+
+@login_required
+def registrar_abono(request):
+    # Intentamos obtener el crédito si viene desde la URL
+    credito_id = request.GET.get('credito_id')
+    credito_pre = None
+    if credito_id:
+        credito_pre = get_object_or_404(Credito, pk=credito_id)
+
+    if request.method == 'POST':
+        form = AbonoForm(request.POST)
+        # El credito_id aquí viene del formulario
+        c_id = request.POST.get('credito_id') 
+        
+        if form.is_valid() and c_id:
+            with transaction.atomic():
+                abono = form.save(commit=False)
+                abono.credito = get_object_or_404(Credito, pk=c_id)
+                abono.usuario = request.user
+                abono.save()
+                messages.success(request, "Abono registrado correctamente.")
+                return redirect('operaciones:lista_creditos')
+
+    form = AbonoForm()
+    clientes = Cliente.objects.all()
+    return render(request, 'operaciones/registrar_abono.html', {
+        'form': form, 
+        'clientes': clientes,
+        'credito_pre': credito_pre 
+    })
+
+@login_required
+def detalle_credito(request, credito_id):
+    credito = get_object_or_404(Credito, pk=credito_id)
+    # Obtenemos los abonos usando el related_name='abonos'
+    abonos = credito.abonos.all().order_by('-fecha_pago')
+    return render(request, 'operaciones/detalle_credito.html', {
+        'credito': credito,
+        'abonos': abonos
+    })
  
+def obtener_creditos_cliente(request, cliente_id):
+    creditos = Credito.objects.filter(cliente_id=cliente_id, estado='ACTIVO')
+    creditos_data = [
+        {
+            'id': c.id, 
+            'saldo': float(c.saldo_pendiente), 
+            'texto': f"Factura: {c.venta.num_factura if c.venta else 'N/A'} - Saldo: ${c.saldo_pendiente:,.0f}"
+        } 
+        for c in creditos
+    ]
+    return JsonResponse(creditos_data, safe=False) 
