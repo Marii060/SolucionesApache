@@ -4,13 +4,17 @@ import json
 from django.utils import timezone
 from django.db import transaction
 from django.contrib.auth.decorators import login_required
+from datetime import datetime
+from .utils import render_to_pdf
 from decimal import Decimal
+import calendar
 from django.http import JsonResponse
-from django.db.models import Q
+from django.db.models import Q, Sum
+from django.http import HttpResponse
 from django.core.paginator import Paginator
 from operaciones.models import Servicio, DetalleServicio, ListaServicio, Venta, DetalleVenta, Credito, CreditoPagado
 from gestion.models import Cliente, Moto, ConfiguracionSistema
-from inventario.models import Producto
+from inventario.models import Producto, Compra
 from .forms import ServicioForm, ListaServicioForm, VentaForm, AbonoForm
 
 @login_required
@@ -417,3 +421,77 @@ def obtener_creditos_cliente(request, cliente_id):
         for c in creditos
     ]
     return JsonResponse(creditos_data, safe=False) 
+
+@login_required
+def reportes_estadisticas(request):
+    mes_seleccionado = request.GET.get('mes', timezone.now().strftime('%Y-%m'))
+    fecha = datetime.strptime(mes_seleccionado, '%Y-%m')
+    
+    # 1. Cálculos Globales
+    ultimo_dia = calendar.monthrange(fecha.year, fecha.month)[1]
+    fin_mes = datetime(fecha.year, fecha.month, ultimo_dia, 23, 59, 59)
+    
+    # Ingresos Totales
+    ingresos_servicios = Servicio.objects.filter(fecha_inicio__year=fecha.year, fecha_inicio__month=fecha.month).aggregate(total=Sum('valor_total'))['total'] or 0
+    detalles_venta = DetalleVenta.objects.filter(id_venta__fecha_venta__year=fecha.year, id_venta__fecha_venta__month=fecha.month)
+    ingresos_productos = detalles_venta.aggregate(total=Sum('total'))['total'] or 0
+    
+    # Compras y Cartera
+    total_compras = Compra.objects.filter(fecha_compra__year=fecha.year, fecha_compra__month=fecha.month).aggregate(total=Sum('total_compra'))['total'] or 0
+    cartera_pendiente = Credito.objects.filter(estado='ACTIVO', fecha_creacion__lte=fin_mes).aggregate(total=Sum('saldo_pendiente'))['total'] or 0
+    
+    # 2. Desglose Semanal (4 Semanas fijas)
+    desglose_semanal = []
+    rangos = [
+        ('Semana 1', 1, 7), 
+        ('Semana 2', 8, 14), 
+        ('Semana 3', 15, 21), 
+        ('Semana 4', 22, ultimo_dia)
+    ]
+    
+    for label, inicio, fin in rangos:
+        # Filtros por semana
+        ventas_sem = Venta.objects.filter(fecha_venta__year=fecha.year, fecha_venta__month=fecha.month, fecha_venta__day__range=(inicio, fin))
+        abonos_sem = CreditoPagado.objects.filter(fecha_pago__year=fecha.year, fecha_pago__month=fecha.month, fecha_pago__day__range=(inicio, fin))
+        
+        # Cálculos de ingresos
+        efectivo = ventas_sem.filter(tipo_pago__icontains='Efectivo').aggregate(total=Sum('total_venta'))['total'] or 0
+        creditos = ventas_sem.filter(tipo_pago__icontains='Credito').aggregate(total=Sum('total_venta'))['total'] or 0
+        abonos = abonos_sem.aggregate(total=Sum('monto_pago'))['total'] or 0
+        
+        desglose_semanal.append({
+            'semana': label,
+            'fechas': f"{inicio:02d} - {fin:02d}",
+            'efectivo': efectivo,
+            'creditos': creditos,
+            'abonos': abonos,
+            'total': efectivo + creditos + abonos,
+            'qty': ventas_sem.count()
+        })
+        
+    # Top 5 Productos
+    top_productos = detalles_venta.values('id_producto__nombre').annotate(
+        total_qty=Sum('cantidad'),
+        total_sales=Sum('total')
+    ).order_by('-total_qty')[:5]
+
+    contexto = {
+        'mes_seleccionado': mes_seleccionado,
+        'ingresos_servicios': ingresos_servicios,
+        'ingresos_productos': ingresos_productos,
+        'total_compras': total_compras,
+        'cartera_pendiente': cartera_pendiente,
+        'flujo_efectivo': (ingresos_servicios + ingresos_productos) - total_compras,
+        'top_productos': top_productos,
+        'desglose_semanal': desglose_semanal
+    }
+
+    # 3. Exportación a PDF restaurada
+    if 'exportar' in request.GET:
+        pdf = render_to_pdf('operaciones/reporte_pdf.html', contexto)
+        if pdf:
+            response = HttpResponse(pdf, content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="Reporte_{mes_seleccionado}.pdf"'
+            return response
+
+    return render(request, 'operaciones/reportes.html', contexto)
