@@ -41,20 +41,6 @@ class Moto(models.Model):
     def __str__(self):
         return f"{self.placa} - {self.modelo}"
 
-class Log(models.Model):
-    id_log = models.AutoField(primary_key=True)
-    fecha_hora = models.DateTimeField(auto_now_add=True, db_column='fecha_hora') # Mapeo explícito
-    accion_realizada = models.CharField(max_length=100, db_column='accion_realizada')
-    descripcion = models.CharField(max_length=100, blank=True, null=True, db_column='descripcion')
-    id_usuario = models.ForeignKey(User, on_delete=models.CASCADE, db_column='id_usuario')
-
-    class Meta:
-        db_table = 'log' 
-        verbose_name = "Registro de Sistema (Log)"
-        verbose_name_plural = "Registros de Sistema (Logs)"
-
-    def __str__(self):
-        return f"{self.fecha_hora} - {self.id_usuario.username}: {self.accion_realizada}"
 
 class ConfiguracionSistema(models.Model):
     TIPO_DOC_CHOICES = [

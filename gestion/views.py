@@ -9,7 +9,7 @@ from django.db.models import Sum, Count, Q
 from django.http import HttpResponse
 from django.core import serializers
 from django.utils import timezone
-from gestion.models import Cliente, Moto, Log, ConfiguracionSistema
+from gestion.models import Cliente, Moto, ConfiguracionSistema
 from inventario.models import MarcaProducto, Categoria, Proveedor, Producto, MovimientoInventario, Compra, DetalleCompra
 from operaciones.models import ListaServicio, Servicio, DetalleServicio, Venta, DetalleVenta, Credito, CreditoPagado
 from .forms import ClienteForm, MotoForm, ConfiguracionSistemaForm
@@ -301,8 +301,7 @@ def crear_backup_manual(request):
         DetalleVenta,    
         DetalleServicio,  
         Credito,          
-        CreditoPagado,    
-        Log,              
+        CreditoPagado,                
     ]
     
     data_consolidada = []

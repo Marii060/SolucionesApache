@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Cliente, Moto, Log
+from .models import Cliente, Moto
 
 # Esto permite que al abrir un cliente, veas y agregues sus motos ahí mismo.
 class MotoInline(admin.TabularInline):
@@ -28,10 +28,3 @@ class MotoAdmin(admin.ModelAdmin):
     # Permite buscar la placa de la moto o el nombre de su dueño
     search_fields = ('placa', 'id_cliente__razon_social', 'id_cliente__nombre')
     
-@admin.register(Log)
-class LogAdmin(admin.ModelAdmin):
-    # Mostramos a qué hora, quién y qué hizo
-    list_display = ('fecha_hora', 'id_usuario', 'accion_realizada')
-    list_filter = ('fecha_hora', 'id_usuario')
-    search_fields = ('accion_realizada', 'id_usuario__username', 'descripcion')    
-       
