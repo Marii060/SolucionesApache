@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Reportes y Estadísticas{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-md-4 mt-4">
+    <!-- Encabezado y Controles -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold">Reportes y Estadísticas</h2>
+            <p class="text-muted">Resumen del negocio para el mes de {{ mes_seleccionado }}</p>
+        </div>
+        
+        <!-- Botones en Azul -->
+        <div class="d-flex gap-2">
+            <form method="GET" class="d-flex gap-2">
+                <input type="month" name="mes" class="form-control" value="{{ mes_seleccionado }}" style="width: 200px;">
+                <button type="submit" class="btn btn-primary"><i class="fa-solid fa-filter"></i> Filtrar</button>
+                <button type="submit" name="exportar" value="true" class="btn btn-primary" target="_blank"><i class="fa-solid fa-file-pdf"></i> Exportar</button>
+            </form>
+            <a href="{% url 'gestion:dashboard' %}" class="btn btn-primary"><i class="fa-solid fa-arrow-left"></i> Volver</a>
+        </div>
+    </div>
+
+    <!-- Módulo 1: Resumen Financiero -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white fw-bold">Resumen Financiero - {{ mes_seleccionado }}</div>
+        <div class="card-body">
+            <div class="row text-center">
+                <div class="col-md-3">
+                    <p class="text-muted small mb-0">Ingresos Servicios</p>
+                    <h4 class="text-primary">${{ ingresos_servicios|intcomma }}</h4>
+                </div>
+                <div class="col-md-3">
+                    <p class="text-muted small mb-0">Ventas Productos</p>
+                    <h4 class="text-primary">${{ ingresos_productos|intcomma }}</h4>
+                </div>
+                <div class="col-md-3">
+                    <p class="text-muted small mb-0">Compras (Inversión)</p>
+                    <h4 class="text-danger">${{ total_compras|intcomma }}</h4>
+                </div>
+                <div class="col-md-3 border-start">
+                    <p class="text-muted small mb-0">Flujo (Ingresos - Compras)</p>
+                    <h4 class="{% if flujo_efectivo < 0 %}text-danger{% else %}text-success{% endif %}">
+                        ${{ flujo_efectivo|intcomma }}
+                    </h4>
+                </div>
+            </div>
+            
+            {% if cartera_pendiente > 0 %}
+            <div class="alert alert-warning mt-3 mb-0 text-center">
+                Cartera pendiente de cobro: <strong>${{ cartera_pendiente|intcomma }}</strong>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Módulo 2: Desglose Semanal (4 semanas) -->
+        <div class="col-md-7 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white fw-bold">Desglose de Ingresos por Semana</div>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0 text-center">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="text-start ps-4">SEMANA</th>
+                                <th>FECHAS</th>
+                                <th>EFECTIVO</th>
+                                <th>CRÉDITOS</th>
+                                <th>ABONOS</th>
+                                <th>TOTAL</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in desglose_semanal %}
+                            <tr>
+                                <td class="text-start ps-4 fw-bold">{{ item.semana }}</td>
+                                <td>{{ item.fechas }}</td>
+                                <td>${{ item.efectivo|intcomma }}</td>
+                                <td>${{ item.creditos|intcomma }}</td>
+                                <td>${{ item.abonos|intcomma }}</td>
+                                <td class="fw-bold">${{ item.total|intcomma }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Módulo 3: Top 5 Productos -->
+        <div class="col-md-5 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white fw-bold">Top 5 Productos Más Vendidos</div>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0 text-center">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="text-start ps-4">PRODUCTO</th>
+                                <th>UNIDADES</th>
+                                <th>TOTAL</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in top_productos %}
+                            <tr>
+                                <td class="text-start ps-4">{{ p.id_producto__nombre }}</td>
+                                <td>{{ p.total_qty }}</td>
+                                <td class="fw-bold">${{ p.total_sales|intcomma }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
