@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Registrar Abono - Soluciones Apache{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4 px-md-4">
+    <!-- Encabezado con Botón Cancelar -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold" style="color: #0f172a;">Registrar Abono</h2>
+            <p class="text-muted mb-0">Procesar pago a crédito de cliente</p>
+        </div>
+        <a href="{% url 'operaciones:lista_creditos' %}" class="btn btn-primary fw-bold px-4 rounded-">
+             Cancelar
+        </a>
+    </div>
+
+    <form method="POST" id="abonoForm">
+        {% csrf_token %}
+        <div class="row g-4">
+            <!-- Columna Izquierda: Información -->
+            <div class="col-lg-8">
+                <div class="card card-custom mb-4 border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-4"><i class="fa-solid fa-user me-2"></i> Selección de Crédito</h5>
+                        
+                        <div class="row">
+                            {% if credito_pre %}
+                                <!-- Caso: Viene desde la lista (Pre-seleccionado) -->
+                                <div class="col-md-12">
+                                    <div class="alert alert-info border-0">
+                                        <strong>Crédito seleccionado:</strong> Factura {{ credito_pre.venta.num_factura }} | 
+                                        Cliente: {{ credito_pre.cliente.nombre }}
+                                        <input type="hidden" name="credito_id" value="{{ credito_pre.id }}">
+                                        <select id="creditoSelect" class="d-none">
+                                            <option value="{{ credito_pre.id }}" data-saldo="{{ credito_pre.saldo_pendiente }}" selected></option>
+                                        </select>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <!-- Caso: Registro manual -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="fw-bold small text-muted text-uppercase">Cliente</label>
+                                    <select id="clienteSelect" class="form-select input-custom" required>
+                                        <option value="">Buscar por nombre o documento...</option>
+                                        {% for c in clientes %}
+                                            <option value="{{ c.id_cliente }}">{{ c.nombre }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="fw-bold small text-muted text-uppercase">Crédito Activo</label>
+                                    <select name="credito_id" id="creditoSelect" class="form-select input-custom" required>
+                                        <option value="">Seleccione un cliente primero...</option>
+                                    </select>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card card-custom border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-4"><i class="fa-solid fa-money-bill-wave me-2"></i> Datos del Abono</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="fw-bold small text-muted text-uppercase">Monto del Abono ($)</label>
+                                {{ form.monto_pago }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="fw-bold small text-muted text-uppercase">Método de Pago</label>
+                                {{ form.metodo_pago }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Columna Derecha: Resumen -->
+            <div class="col-lg-4">
+                <div class="card card-custom border-0 shadow-sm sticky-top" style="top: 20px;">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3">Resumen</h5>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Saldo actual:</span>
+                            <span id="txtSaldoActual" class="fw-bold">$0</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Este abono:</span>
+                            <span id="txtMontoAbono" class="fw-bold">$0</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between fs-4">
+                            <span class="fw-bold">Nuevo saldo:</span>
+                            <span id="txtNuevoSaldo" class="fw-bold text-primary">$0</span>
+                        </div>
+                        
+                        <!-- Botón Confirmar solo (Cancelar movido arriba) -->
+                        <button type="submit" class="btn btn-success w-100 mt-4 py-3 fw-bold">
+                            <i class="fa-solid fa-check"></i> Confirmar Abono
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Inicializar Select2 solo si no estamos en modo pre-seleccionado
+        {% if not credito_pre %}
+        $('#clienteSelect').select2({ width: '100%' });
+        
+        // Cargar créditos cuando cambia el cliente
+        $('#clienteSelect').on('change', function() {
+            const clienteId = $(this).val();
+            const creditSelect = $('#creditoSelect');
+            
+            if(clienteId) {
+                fetch(`/operaciones/creditos/obtener-por-cliente/${clienteId}/`)
+                    .then(res => res.json())
+                    .then(data => {
+                        creditSelect.empty().append('<option value="">Seleccione un crédito</option>');
+                        data.forEach(c => {
+                            creditSelect.append(`<option value="${c.id}" data-saldo="${c.saldo}">${c.texto}</option>`);
+                        });
+                    });
+            }
+        });
+        {% else %}
+        // Si hay crédito pre-seleccionado, disparar el cálculo inicial
+        actualizarResumen();
+        {% endif %}
+
+        // Función para actualizar cálculos
+        function actualizarResumen() {
+            const selectedOption = $('#creditoSelect option:selected');
+            const saldoActual = parseFloat(selectedOption.data('saldo')) || 0;
+            const abono = parseFloat($('input[name="monto_pago"]').val()) || 0;
+            const nuevoSaldo = saldoActual - abono;
+
+            $('#txtSaldoActual').text('$' + saldoActual.toLocaleString());
+            $('#txtMontoAbono').text('$' + abono.toLocaleString());
+            $('#txtNuevoSaldo').text('$' + nuevoSaldo.toLocaleString());
+        }
+
+        // Eventos de actualización
+        $('#creditoSelect').on('change', actualizarResumen);
+        $('input[name="monto_pago"]').on('input', actualizarResumen);
+    });
+</script>
+{% endblock %}
