@@ -356,6 +356,4 @@ def crear_backup_manual(request):
     config = ConfiguracionSistema.obtener_config()
     config.ultima_copia_seguridad = timezone.now()
     config.save()
-    
-    messages.success(request, '¡Backup generado exitosamente!')
     return response
