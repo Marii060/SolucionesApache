@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login, logout
 import json
 import datetime
 from django.core.paginator import Paginator
@@ -14,12 +15,33 @@ from inventario.models import MarcaProducto, Categoria, Proveedor, Producto, Mov
 from operaciones.models import ListaServicio, Servicio, DetalleServicio, Venta, DetalleVenta, Credito, CreditoPagado
 from .forms import ClienteForm, MotoForm, ConfiguracionSistemaForm
 
-def personal_required(user):
-    return user.is_staff
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        
+        user = authenticate(request, username=username, password=password)
+        
+        if user is not None:
+            #Si es admin, no dejamos entrar al portal
+            if user.is_staff or user.is_superuser:
+                messages.error(request, "Acceso restringido. Por favor, ingresa por la ruta administrativa oficial.")
+                return render(request, 'registration/login.html') 
+            
+            # Si es un usuario normal, permitimos el acceso
+            login(request, user)
+            return redirect('gestion:dashboard')
+        else:
+            messages.error(request, "Usuario o contraseña incorrectos.")
+            
+    return render(request, 'registration/login.html')
+
+def logout_view(request):
+    logout(request)
+    return redirect('gestion:login')
 
 #DASHBOARD
-@login_required
-@user_passes_test(personal_required, login_url='login')
+@login_required 
 def dashboard(request):
     total_clientes = Cliente.objects.count()
     total_motos = Moto.objects.count() 
