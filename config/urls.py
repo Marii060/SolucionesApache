@@ -3,8 +3,6 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # Aquí activamos todo el sistema de Login
-    path('cuentas/', include('django.contrib.auth.urls')),
     # Conectamos las rutas de gestión
     path('gestion/', include('gestion.urls')), 
     path('operaciones/', include('operaciones.urls')), 
