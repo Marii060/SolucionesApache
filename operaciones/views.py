@@ -364,6 +364,7 @@ def obtener_creditos_cliente(request, cliente_id):
     creditos_data = [
         {
             'id': c.id, 
+            'saldo': float(c.saldo_pendiente), 
             'texto': f"Factura: {c.venta.num_factura if c.venta else 'N/A'} - Saldo: ${c.saldo_pendiente:,.0f}"
         } 
         for c in creditos
@@ -410,18 +411,6 @@ def detalle_credito(request, credito_id):
         'abonos': abonos
     })
  
-def obtener_creditos_cliente(request, cliente_id):
-    creditos = Credito.objects.filter(cliente_id=cliente_id, estado='ACTIVO')
-    creditos_data = [
-        {
-            'id': c.id, 
-            'saldo': float(c.saldo_pendiente), 
-            'texto': f"Factura: {c.venta.num_factura if c.venta else 'N/A'} - Saldo: ${c.saldo_pendiente:,.0f}"
-        } 
-        for c in creditos
-    ]
-    return JsonResponse(creditos_data, safe=False) 
-
 @login_required
 def reportes_estadisticas(request):
     mes_seleccionado = request.GET.get('mes', timezone.now().strftime('%Y-%m'))
