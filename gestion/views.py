@@ -313,7 +313,8 @@ def panel_configuracion(request):
 
 @login_required
 def crear_backup_manual(request):
-    if not request.user.is_superuser:
+    #Validamos is_staff para incluir a todos los administradores
+    if not request.user.has_perm('gestion.can_create_backup'):
         messages.error(request, 'No tienes permisos para realizar copias de seguridad.')
         return redirect('gestion:panel')
 
@@ -324,11 +325,11 @@ def crear_backup_manual(request):
         Categoria,
         Proveedor,
         ListaServicio,
-        Moto,          
-        Producto,      
-        Compra,       
-        Venta,        
-        Servicio,      
+        Moto,           
+        Producto,       
+        Compra,         
+        Venta,          
+        Servicio,       
         MovimientoInventario,
         DetalleCompra,    
         DetalleVenta,    
