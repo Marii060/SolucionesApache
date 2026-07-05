@@ -13,6 +13,7 @@
             + Nueva Marca
         </a>
     </div>
+
     <div class="card shadow-sm border-0 rounded-4">
         <div class="card-body p-0">
             <div class="d-flex flex-wrap justify-content-between align-items-center p-4 border-bottom">
@@ -31,10 +32,10 @@
                 <table class="table align-middle table-hover border-bottom-0" style="margin-bottom: 0;">
                     <thead>
                         <tr class="text-uppercase text-muted" style="font-size: 0.75rem; font-weight: 700; border-bottom: 2px solid #e2e8f0;">
-                            <th class="pb-3" style="width: 30%; border: none;">Nombre</th>
-                            <th class="pb-3" style="width: 40%; border: none;">Descripción</th>
-                            <th class="pb-3 text-center" style="width: 15%; border: none;">Productos</th>
-                            <th class="pb-3 text-center" style="width: 15%; border: none;">Acciones</th>
+                            <th class="pb-3" style="width: 25%; border: none;">Nombre</th>
+                            <th class="pb-3" style="width: 35%; border: none;">Descripción</th>
+                            <th class="pb-3 text-center" style="width: 15%; border: none;">Estado</th>
+                            <th class="pb-3 text-center" style="width: 25%; border: none;">Acciones</th>
                         </tr>
                     </thead>
                     <tbody style="font-size: 0.9rem;">
@@ -43,15 +44,30 @@
                             <td class="fw-bold text-dark">{{ marca.nombre }}</td>
                             <td class="text-muted text-break">{{ marca.descripcion|default:"---" }}</td>
                             
-                            <td class="text-center fw-bold text-dark">
-                                <span class="px-2.5 py-1 rounded-3" style="background-color: #f8fafc; border: 1px solid #e2e8f0;">
-                                    {{ marca.producto_set.count }}
-                                </span>
+                            <td class="text-center">
+                                {% if marca.estado %}
+                                    <span class="badge" style="background-color: #dcfce7; color: #166534; border-radius: 6px;">Activo</span>
+                                {% else %}
+                                    <span class="badge" style="background-color: #fee2e2; color: #991b1b; border-radius: 6px;">Inactivo</span>
+                                {% endif %}
                             </td>
                             
                             <td class="text-center">
-                                <a href="{% url 'inventario:editar_marca' marca.id_marca %}" class="btn btn-sm me-1" style="background-color: #fff7ed; color: #ea580c; border: 1px solid #fdba74; border-radius: 6px;" title="Editar"><i class="fa-solid fa-pen"></i></a>
-                                <a href="{% url 'inventario:cambiar_estado_marca' marca.id_marca %}" class="btn btn-sm" style="background-color: #fef2f2; color: #dc2626; border: 1px solid #fca5a5; border-radius: 6px;" title="Activar/Desactivar"><i class="fa-solid fa-trash"></i></a>
+                                <a href="{% url 'inventario:editar_marca' marca.id_marca %}" class="btn btn-sm me-1" style="background-color: #fff7ed; color: #ea580c; border: 1px solid #fdba74; border-radius: 6px;" title="Editar">
+                                    <i class="fa-solid fa-pen"></i>
+                                </a>
+                                
+                                <a href="{% url 'inventario:cambiar_estado_marca' marca.id_marca %}" class="btn btn-sm" 
+                                   style="background-color: {% if marca.estado %}#fef2f2{% else %}#f0fdf4{% endif %}; 
+                                          color: {% if marca.estado %}#dc2626{% else %}#16a34a{% endif %}; 
+                                          border: 1px solid {% if marca.estado %}#fca5a5{% else %}#bbf7d0{% endif %}; border-radius: 6px;" 
+                                   title="{% if marca.estado %}Desactivar{% else %}Activar{% endif %}">
+                                   {% if marca.estado %}
+                                       <i class="fa-solid fa-ban"></i>
+                                   {% else %}
+                                       <i class="fa-solid fa-check"></i>
+                                   {% endif %}
+                                </a>
                             </td>
                         </tr>
                         {% empty %}
