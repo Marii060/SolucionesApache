@@ -38,18 +38,14 @@
                                 {% endif %}
                             </td>
                             <td class="text-center">
-                                <a href="{% url 'inventario:editar_fabricante' fabricante.id_fabricante %}" class="btn btn-sm btn-outline-primary border-0">
+                                <!-- Botón Editar -->
+                                <a href="{% url 'inventario:editar_fabricante' fabricante.id_fabricante %}" class="btn btn-sm btn-outline-primary border-0 me-2" title="Editar">
                                     <i class="fa-solid fa-pen"></i>
                                 </a>
-                                <td class="text-center">
-    <a href="{% url 'inventario:editar_fabricante' fabricante.id_fabricante %}" class="btn btn-sm btn-outline-primary border-0">
-        <i class="fa-solid fa-pen"></i>
-    </a>
-    
-    <a href="{% url 'inventario:cambiar_estado_fabricante' fabricante.id_fabricante %}" class="btn btn-sm {% if fabricante.estado %}btn-outline-danger{% else %}btn-outline-success{% endif %} border-0" title="{% if fabricante.estado %}Deshabilitar{% else %}Habilitar{% endif %}">
-        <i class="fa-solid {% if fabricante.estado %}fa-ban{% else %}fa-check{% endif %}"></i>
-    </a>
-</td>
+                                <!-- Botón Habilitar/Deshabilitar -->
+                                <a href="{% url 'inventario:cambiar_estado_fabricante' fabricante.id_fabricante %}" class="btn btn-sm {% if fabricante.estado %}btn-outline-danger{% else %}btn-outline-success{% endif %} border-0" title="{% if fabricante.estado %}Deshabilitar{% else %}Habilitar{% endif %}">
+                                    <i class="fa-solid {% if fabricante.estado %}fa-ban{% else %}fa-check{% endif %}"></i>
+                                </a>
                             </td>
                         </tr>
                         {% empty %}
