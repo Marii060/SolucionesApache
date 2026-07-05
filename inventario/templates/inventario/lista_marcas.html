@@ -1,4 +1,4 @@
-{% extends 'base.html' %} 
+{% extends 'base.html' %}
 
 {% block title %}Marcas - Soluciones Apache{% endblock %}
 
@@ -51,7 +51,7 @@
                             
                             <td class="text-center">
                                 <a href="{% url 'inventario:editar_marca' marca.id_marca %}" class="btn btn-sm me-1" style="background-color: #fff7ed; color: #ea580c; border: 1px solid #fdba74; border-radius: 6px;" title="Editar"><i class="fa-solid fa-pen"></i></a>
-                                <a href="{% url 'inventario:eliminar_marca' marca.id_marca %}" class="btn btn-sm" style="background-color: #fef2f2; color: #dc2626; border: 1px solid #fca5a5; border-radius: 6px;" title="Eliminar"><i class="fa-solid fa-trash"></i></a>
+                                <a href="{% url 'inventario:cambiar_estado_marca' marca.id_marca %}" class="btn btn-sm" style="background-color: #fef2f2; color: #dc2626; border: 1px solid #fca5a5; border-radius: 6px;" title="Activar/Desactivar"><i class="fa-solid fa-trash"></i></a>
                             </td>
                         </tr>
                         {% empty %}
