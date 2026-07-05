@@ -104,16 +104,17 @@ def editar_marca(request, id):
     return render(request, 'inventario/registrar_marca.html', {'form': form, 'marca': marca})
 
 @login_required
-def eliminar_marca(request, id):
+def cambiar_estado_marca(request, id):
     marca = get_object_or_404(MarcaProducto, id_marca=id)
     
-    #Solo elimina si no tiene productos
-    if marca.producto_set.exists():
-        messages.error(request, f'No puedes eliminar la marca "{marca.nombre}" porque tiene productos asociados en el inventario.')
-    else:
-        marca.delete()
-        messages.success(request, f'¡La marca "{marca.nombre}" ha sido eliminada!')
-        
+    # Invertimos el estado actual
+    marca.estado = not marca.estado
+    marca.save()
+    
+    # Creamos un mensaje dinámico
+    accion = "habilitada" if marca.estado else "deshabilitada"
+    messages.success(request, f'¡La marca "{marca.nombre}" ha sido {accion} correctamente!')
+    
     return redirect('inventario:lista_marcas')
 
 @login_required
