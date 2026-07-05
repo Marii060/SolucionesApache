@@ -23,8 +23,10 @@
         </div>
 
         <div class="row">
+            <!-- Columna Izquierda: Información, Detalles y Observaciones (col-lg-8) -->
             <div class="col-lg-8">
                 
+                <!-- 1. Información de la Factura -->
                 <div class="card shadow-sm border-0 rounded-4 mb-4">
                     <div class="card-body p-4">
                         <h6 class="fw-bold text-muted mb-4" style="font-size: 0.9rem;"><i class="fa-solid fa-file-invoice me-2"></i> INFORMACIÓN DE LA FACTURA</h6>
@@ -44,23 +46,27 @@
                         </div>
 
                         <div class="row mb-3">
-    <div class="col-md-3 mb-3 mb-md-0">
-        <label class="form-label fw-bold small text-muted">Fecha Compra <span class="text-danger">*</span></label>
-        {{ form.fecha_compra }}
-    </div>
-    <div class="col-md-3 mb-3 mb-md-0">
-        <label class="form-label fw-bold small text-muted">Condición Pago <span class="text-danger">*</span></label>
-        {{ form.metodo_pago }}
-    </div>
-    <div class="col-md-3 mb-3 mb-md-0">
-        <label class="form-label fw-bold small text-muted">Estado Mercancía <span class="text-danger">*</span></label>
-        {{ form.estado }}
-    </div>
-    <div class="col-md-3">
-        <label class="form-label fw-bold small text-muted">Estado de Pago <span class="text-danger">*</span></label>
-        {{ form.estado_pago }}
-    </div>
-</div>
+                            <div class="col-md-3 mb-3 mb-md-0">
+                                <label class="form-label fw-bold small text-muted">Fecha Compra <span class="text-danger">*</span></label>
+                                {{ form.fecha_compra }}
+                            </div>
+                            <div class="col-md-3 mb-3 mb-md-0">
+                                <label class="form-label fw-bold small text-muted">Condición Pago <span class="text-danger">*</span></label>
+                                {{ form.metodo_pago }}
+                            </div>
+                            <div class="col-md-3 mb-3 mb-md-0">
+                                <label class="form-label fw-bold small text-muted">Estado Mercancía <span class="text-danger">*</span></label>
+                                {{ form.estado }}
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold small text-muted">Estado de Pago <span class="text-danger">*</span></label>
+                                {{ form.estado_pago }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Detalle de Productos (Ahora alineado a la izquierda) -->
                 <div class="card shadow-sm border-0 rounded-4 mb-4">
                     <div class="card-body p-4">
                         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -112,7 +118,8 @@
                     </div>
                 </div>
 
-                <div class="card shadow-sm border-0 rounded-4">
+                <!-- 3. Observaciones (Ahora alineado a la izquierda) -->
+                <div class="card shadow-sm border-0 rounded-4 mb-4">
                     <div class="card-body p-4">
                         <h6 class="fw-bold text-muted mb-4" style="font-size: 0.9rem;"><i class="fa-solid fa-boxes-stacked me-2"></i> OBSERVACIONES</h6>
                         <div class="row">
@@ -129,8 +136,9 @@
                 </div>
             </div>
 
-            <div class="col-lg-4 mt-4 mt-lg-0">
-                <div class="card border-0 rounded-4 mb-4" style="background-color: #f8fafc; border: 1px solid #e2e8f0 !important;">
+            <!-- Columna Derecha: Resumen Total (col-lg-4) -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0 rounded-4 mb-4" style="background-color: #f8fafc; border: 1px solid #e2e8f0 !important;">
                     <div class="card-body p-4">
                         <h6 class="fw-bold text-primary mb-3"><i class="fa-solid fa-calculator me-2"></i> RESUMEN TOTAL</h6>
                         <div class="d-flex justify-content-between align-items-center pt-3 border-top">
@@ -170,7 +178,6 @@
                 let sub = row.querySelector('.subtotal-input');
                 let valor = (cant * prec);
                 
-                // Formato limpio sin .00 innecesarios
                 sub.value = Number.isInteger(valor) ? valor : valor.toFixed(2);
                 
                 let total = 0;
