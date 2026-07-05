@@ -81,6 +81,11 @@ class ConfiguracionSistema(models.Model):
     class Meta:
         verbose_name = "Configuración del Sistema"
         verbose_name_plural = "Configuraciones del Sistema"
+    
+    class Meta:
+        permissions = [
+            ("can_create_backup", "Puede crear copias de seguridad"),
+        ]
 
     def __str__(self):
         return f"Configuración del Sistema - {self.razon_social}"
