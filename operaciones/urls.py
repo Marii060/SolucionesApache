@@ -14,7 +14,6 @@ urlpatterns = [
     path('servicios/<int:id>/', views.detalle_servicio, name='detalle_servicio'),
     path('servicios/<int:id>/estado/', views.actualizar_estado, name='actualizar_estado'),
     path('servicio/recibo/<int:servicio_id>/', views.generar_recibo, name='generar_recibo'),
-    path('servicios/<int:id>/mecanico/', views.asignar_mecanico, name='asignar_mecanico'),
     #rutas para ventas
     path('ventas/', views.lista_ventas, name='lista_ventas'),
     path('ventas/nueva/', views.crear_venta, name='crear_venta'),
