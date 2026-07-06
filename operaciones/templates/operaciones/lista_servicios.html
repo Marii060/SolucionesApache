@@ -81,13 +81,8 @@
                                     </span>
                                 </div>
                             </td>
-                            
                             <td class="text-muted">
-                                {% if orden.mecanico %}
-                                    {{ orden.mecanico }}
-                                {% else %}
-                                    <span class="text-warning small fw-semibold">Sin asignar</span>
-                                {% endif %}
+                                {{ orden.mecanico|default:"Sin asignar" }}
                             </td>
                             
                             <td class="text-muted text-break">
@@ -126,25 +121,16 @@
                                         </button>
                                     {% endif %}
 
-                                    {% if orden.estado == 'Pendiente' or orden.estado == 'Terminado' %}
+                                    {% if orden.estado == 'Pendiente' or orden.estado == 'Terminado' or orden.estado == 'En Proceso' %}
                                         <button type="button" class="btn btn-sm text-white" style="background-color: #2563eb; border-radius: 6px; padding: 4px 10px;" data-bs-toggle="modal" data-bs-target="#modalEstado{{ orden.id_servicio }}">
                                             Actualizar estado
                                         </button>
-                                    {% elif orden.estado == 'En Proceso' %}
-                                        {% if not orden.mecanico %}
-                                            <button type="button" class="btn btn-sm text-white" style="background-color: #d97706; border-radius: 6px; padding: 4px 10px;" data-bs-toggle="modal" data-bs-target="#modalMecanico{{ orden.id_servicio }}">
-                                                Asignar mecánico
-                                            </button>
-                                        {% else %}
-                                            <button type="button" class="btn btn-sm text-white" style="background-color: #2563eb; border-radius: 6px; padding: 4px 10px;" data-bs-toggle="modal" data-bs-target="#modalEstado{{ orden.id_servicio }}">
-                                                Actualizar estado
-                                            </button>
-                                        {% endif %}
                                     {% endif %}
                                 </div>
                             </td>
                         </tr>
 
+                        <!-- Modal Estado -->
                         <div class="modal fade" id="modalEstado{{ orden.id_servicio }}" tabindex="-1" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content" style="border-radius: 12px;">
@@ -166,31 +152,6 @@
                                         <div class="modal-footer border-top-0 pb-4 px-4 gap-2">
                                             <button type="button" class="btn btn-light border fw-semibold" style="border-radius: 8px;" data-bs-dismiss="modal">Regresar</button>
                                             <button type="submit" class="btn btn-primary fw-semibold" style="border-radius: 8px; background-color: #2563eb;">Confirmar Cambio</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="modal fade" id="modalMecanico{{ orden.id_servicio }}" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered">
-                                <div class="modal-content" style="border-radius: 12px;">
-                                    <div class="modal-header border-bottom-0 pt-4 px-4">
-                                        <h5 class="fw-bold text-dark m-0">Asignación de Personal Técnico</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <form method="POST" action="{% url 'operaciones:asignar_mecanico' orden.id_servicio %}">
-                                        {% csrf_token %}
-                                        <div class="modal-body px-4">
-                                            <p class="text-muted small">Escriba el nombre del operario responsable de intervenir la motocicleta:</p>
-                                            <div class="mb-2">
-                                                <label class="form-label small fw-bold text-muted text-uppercase">Nombre del Mecánico</label>
-                                                <input type="text" name="mecanico_nombre" class="form-control p-2.5" style="border-radius: 8px; background-color: #f8fafc;" value="{{ orden.mecanico|default:'' }}" placeholder="Ej: Carlos Mandiola" required>
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer border-top-0 pb-4 px-4 gap-2">
-                                            <button type="button" class="btn btn-light border fw-semibold" style="border-radius: 8px;" data-bs-dismiss="modal">Cancelar</button>
-                                            <button type="submit" class="btn btn-warning fw-semibold text-white" style="border-radius: 8px; background-color: #d97706; border: none;">Asignar Técnico</button>
                                         </div>
                                     </form>
                                 </div>
