@@ -41,6 +41,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'config.middleware.RestringirAccesoAdminMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -125,3 +126,12 @@ LOGOUT_REDIRECT_URL = 'login'
 
 # A dónde enviar a los intrusos que intenten entrar sin sesión
 LOGIN_URL = 'login'
+
+# Duración de la sesión en segundos (86400 = 24 horas)
+SESSION_COOKIE_AGE = 86400 
+
+# Asegura que la sesión se guarde en cada petición (útil si notas que se cierra sola)
+SESSION_SAVE_EVERY_REQUEST = True
+
+# Asegura que el motor de sesiones sea el estándar de base de datos
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
