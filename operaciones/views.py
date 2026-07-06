@@ -181,21 +181,6 @@ def actualizar_estado(request, id):
         orden.save()
     return redirect('operaciones:lista_servicios')
 
-@login_required
-def asignar_mecanico(request, id):
-    if request.method == 'POST':
-        orden = get_object_or_404(Servicio, id_servicio=id)
-        mecanico_nombre = request.POST.get('mecanico_nombre', '').strip()
-
-        if not mecanico_nombre:
-            messages.error(request, "Debes ingresar un nombre para asignar al mecánico.")
-            return redirect('operaciones:lista_servicios')
-        
-        orden.mecanico = mecanico_nombre[:100]
-        orden.save()
-        messages.success(request, "Mecánico asignado correctamente.")
-        
-    return redirect('operaciones:lista_servicios')
 
 @login_required
 def generar_recibo(request, servicio_id):
