@@ -51,7 +51,7 @@ class ProductoForm(forms.ModelForm):
         model = Producto
         fields = [
             'codigo_interno', 'codigo_barras', 'nombre', 'id_categoria', 'id_marca',
-            'id_fabricante', # <-- Agregamos el campo aquí
+            'id_fabricante', 
             'descripcion', 'precio_compra', 'precio_venta', 'stock_minimo', 'cantidad',
             'disponible', 'proveedores'
         ]
@@ -61,7 +61,7 @@ class ProductoForm(forms.ModelForm):
             'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre completo del repuesto o artículo...'}),
             'id_categoria': forms.Select(attrs={'class': 'form-select'}),
             'id_marca': forms.Select(attrs={'class': 'form-select'}),
-            'id_fabricante': forms.Select(attrs={'class': 'form-select'}), # <-- Le damos estilo de Bootstrap aquí
+            'id_fabricante': forms.Select(attrs={'class': 'form-select'}), 
             'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'Detalles técnicos o aplicación...'}),
             'precio_compra': forms.NumberInput(attrs={'class': 'form-control'}),
             'precio_venta': forms.NumberInput(attrs={'class': 'form-control'}),
