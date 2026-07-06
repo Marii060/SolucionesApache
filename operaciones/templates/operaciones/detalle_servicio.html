@@ -8,7 +8,6 @@
     .card-premium { border: none; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); background: #ffffff; }
     .badge-status { padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; }
     
-    /* Colores dinámicos para los estados */
     .status-pendiente { background-color: #f1f5f9; color: #475569; }
     .status-proceso { background-color: #dbeafe; color: #2563eb; }
     .status-terminado { background-color: #dcfce7; color: #16a34a; }
@@ -88,10 +87,17 @@
                             <td><span class="badge text-primary mb-1" style="background-color: #eff6ff; font-size: 0.75rem;">Mano de Obra</span><br><strong>Servicios técnicos y diagnósticos aplicados</strong></td>
                             <td class="text-end fw-bold text-dark">$ {{ orden.valor_mano_obra|default:0|floatformat:0|intcomma }}</td>
                         </tr>
+                        
+                        <!-- Aquí empieza la corrección: recorremos insumos_usados -->
+                        {% for insumo in insumos_usados %}
                         <tr>
-                            <td><span class="badge text-success mb-1" style="background-color: #dcfce7; font-size: 0.75rem;">Repuestos</span><br><strong>Insumos y piezas utilizadas en la orden</strong></td>
-                            <td class="text-end fw-bold text-dark">$ {{ total_repuestos|default:0|floatformat:0|intcomma }}</td>
+                            <td>
+                                <span class="badge text-success mb-1" style="background-color: #dcfce7; font-size: 0.75rem;">Repuesto</span><br>
+                                <strong>{{ insumo.id_producto.nombre }}</strong> <small class="text-muted">(Cant: {{ insumo.cantidad }})</small>
+                            </td>
+                            <td class="text-end fw-bold text-dark">$ {{ insumo.total|default:0|floatformat:0|intcomma }}</td>
                         </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>

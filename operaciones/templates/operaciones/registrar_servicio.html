@@ -26,7 +26,6 @@
     .table-modern th { background-color: #f8fafc; color: #475569; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0; padding: 12px 16px; }
     .table-modern td { padding: 12px 16px; vertical-align: middle; border-bottom: 1px solid #f1f5f9; }
 
-    /* Fix visual para el Buscador Select2 dentro de diseño*/
     .select2-container .select2-selection--single {
         height: 44px !important;
         border: 1px solid #e2e8f0 !important;
@@ -113,9 +112,6 @@
                                 <label class="form-label fw-bold small text-muted text-uppercase">Motocicleta</label>
                                 <select name="moto" id="motoSelect" class="form-select input-custom" required>
                                     <option value=""></option>
-                                    {% for m in motos %}
-                                        <option value="{{ m.id_moto }}">{{ m.marca }} {{ m.modelo }} — Placa: {{ m.placa }}</option>
-                                    {% endfor %}
                                 </select>
                             </div>
                         </div>
@@ -123,7 +119,6 @@
                         <div class="row mb-4">
                             <div class="col-md-6 mb-3 mb-md-0">
                                 <label class="form-label fw-bold small text-muted text-uppercase">Mecánico Asignado</label>
-                                <!-- Se agregó 'required' para asegurar que el dato llegue -->
                                 <input type="text" name="mecanico" maxlength="100" required class="form-control" placeholder="Nombre del mecánico...">
                             </div>
                             <div class="col-md-6">
@@ -193,7 +188,7 @@
                                     <option value="" data-precio="0"></option>
                                     {% for p in productos %}
                                         <option value="{{ p.id_producto }}" data-nombre="{{ p.nombre }}" data-precio="{{ p.precio_venta }}">
-                                            {{ p.nombre }} - ${{ p.precio_venta|floatformat:0|intcomma }} (Disponibles: {{ p.cantidad }})
+                                            {{ p.nombre }} - ${{ p.precio_venta|floatformat:0|intcomma }} (Disp: {{ p.cantidad }})
                                         </option>
                                     {% endfor %}
                                 </select>
@@ -255,7 +250,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </form>
 </div>
@@ -263,129 +257,53 @@
 
 {% block extra_js %}
 <script>
-    //ACTIVACIÓN DE LOS BUSCADORES
     $(document).ready(function() {
-        $('#clienteSelect').select2({
-            placeholder: "Buscar por nombre o documento...",
-            allowClear: true,
-            width: '100%'
-        });
+        $('#clienteSelect').select2({ placeholder: "Buscar cliente...", allowClear: true, width: '100%' });
+        $('#motoSelect').select2({ placeholder: "Seleccione una moto...", allowClear: true, width: '100%' });
+        $('#selectServicio').select2({ placeholder: "Buscar servicio...", allowClear: true, width: '100%' });
+        $('#selectProducto').select2({ placeholder: "Buscar producto...", allowClear: true, width: '100%' });
 
-        $('#motoSelect').select2({
-            placeholder: "Buscar por placa o marca...",
-            allowClear: true,
-            width: '100%'
-        });
-
-        $('#selectServicio').select2({
-            placeholder: "Buscar servicio de mano de obra...",
-            allowClear: true,
-            width: '100%'
-        });
-
-        $('#selectProducto').select2({
-            placeholder: "Buscar producto en el inventario...",
-            allowClear: true,
-            width: '100%'
-        });
-
-        // MAGIA DE LAS MOTOS AUTOMÁTICAS (AJAX)
         $('#clienteSelect').on('change', function() {
-            const clienteId = $(this).val(); 
+            const clienteId = $(this).val();
             const motoSelect = $('#motoSelect');
-
-            // 1. Limpiamos las opciones actuales de las motos
             motoSelect.empty().append('<option value=""></option>');
-
             if (clienteId) {
-                // 2. Construimos la URL correcta usando el patrón de Django
                 const url = "{% url 'operaciones:obtener_motos_cliente' 0 %}".replace('0', clienteId);
-
-                fetch(url)
-                    .then(response => response.json())
-                    .then(data => {
-                        // 3. Llenamos el desplegable con las motos devueltas por Python
-                        data.forEach(moto => {
-                            const newOption = new Option(moto.texto, moto.id, false, false);
-                            motoSelect.append(newOption);
-                        });
-                        
-                        // Si solo hay 1 moto, la pre-seleccionamos
-                        if (data.length === 1) {
-                            motoSelect.val(data[0].id);
-                        }
-                        
-                        // Refrescamos visualmente el buscador de Select2
-                        motoSelect.trigger('change'); 
-                    })
-                    .catch(error => console.error('Error buscando motos:', error));
+                fetch(url).then(res => res.json()).then(data => {
+                    data.forEach(moto => {
+                        motoSelect.append(new Option(moto.texto, moto.id));
+                    });
+                    
+                    // Si solo hay 1 moto, la pre-seleccionamos
+                    if (data.length === 1) {
+                        motoSelect.val(data[0].id);
+                    }
+                    
+                    // Disparamos el evento para que Select2 se actualice visualmente
+                    motoSelect.trigger('change.select2'); 
+                });
             } else {
-                motoSelect.trigger('change');
+                motoSelect.trigger('change.select2');
             }
         });
     });
 
-    //CALCULADORA DE PRECIOS Y STEPPER
-    let totalServicios = 0;
-    let totalProductos = 0;
-
-    const formatearDinero = (valor) => {
-        return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(valor);
-    };
+    const formatearDinero = (valor) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(valor);
 
     function actualizarTotales() {
-        totalServicios = 0;
-        document.querySelectorAll('.precio-servicio').forEach(el => {
-            totalServicios += parseFloat(el.dataset.valor);
-        });
+        let totalServicios = 0;
+        document.querySelectorAll('.precio-servicio').forEach(el => totalServicios += parseFloat(el.dataset.valor));
 
-        totalProductos = 0;
-        document.querySelectorAll('.subtotal-producto').forEach(el => {
-            totalProductos += parseFloat(el.dataset.valor);
-        });
+        let totalProductos = 0;
+        document.querySelectorAll('.subtotal-producto').forEach(el => totalProductos += parseFloat(el.dataset.valor));
 
         document.getElementById('resumenServicios').innerText = formatearDinero(totalServicios);
         document.getElementById('resumenProductos').innerText = formatearDinero(totalProductos);
         document.getElementById('resumenTotal').innerText = formatearDinero(totalServicios + totalProductos);
         
-        // AQUÍ ACTUALIZAMOS EL VALOR DEL CAMPO OCULTO
         document.getElementById('valor_mano_obra').value = totalServicios;
         document.getElementById('total_productos_oculto').value = totalProductos;
-        
-           
-        //LLAMADA A LA FUNCIÓN QUE ANIMA EL STEPPER
         actualizarBarraProgreso();
-    }
-
-    //LA NUEVA FUNCIÓN PARA EL STEPPER DINÁMICO
-    function actualizarBarraProgreso() {
-        const numServicios = document.querySelectorAll('#tablaServicios tbody tr').length;
-        const numProductos = document.querySelectorAll('#tablaProductos tbody tr').length;
-        const barra = document.querySelector('.stepper-progress');
-        const items = document.querySelectorAll('.step-item');
-
-        //Reiniciamos los estados visuales
-        items[1].classList.remove('completed', 'active');
-        items[2].classList.remove('completed', 'active');
-        items[3].classList.remove('completed', 'active');
-
-        //Evaluamos en qué paso estamos
-        if (numServicios === 0 && numProductos === 0) {
-            //Estamos eligiendo Servicios (o recién empezamos)
-            barra.style.width = '33%';
-            items[1].classList.add('active'); 
-        } else if (numServicios > 0 && numProductos === 0) {
-            // Ya hay servicios, pasamos a Repuestos
-            barra.style.width = '66%';
-            items[1].classList.add('completed');
-            items[2].classList.add('active'); 
-        } else if (numProductos > 0) {
-            //Ya hay repuestos, estamos listos para Confirmar
-            barra.style.width = '100%';
-            items[1].classList.add('completed');
-            items[2].classList.add('completed');
-            items[3].classList.add('active'); 
-        }
     }
 
     function agregarServicio() {
@@ -407,6 +325,7 @@
         `;
         tbody.appendChild(tr);
         select.value = ""; 
+        $('#selectServicio').trigger('change.select2');
         actualizarTotales();
     }
 
@@ -422,9 +341,10 @@
             <td class="fw-bold text-dark">
                 ${opcion.dataset.nombre}
                 <input type="hidden" name="productos_id[]" value="${opcion.value}">
-                <input type="hidden" name="productos_precio[]" value="${precio}"> </td>
+                <input type="hidden" name="productos_precio[]" value="${precio}">
+            </td>
             <td class="text-center">
-                <input type="number" name="productos_cant[]" class="form-control input-custom text-center mx-auto" value="1" min="1" style="width: 80px; padding: 4px;" onchange="actualizarSubtotalProducto(this, ${precio})">
+                <input type="number" name="productos_cant[]" class="form-control input-custom text-center mx-auto" value="1" min="1" required style="width: 80px; padding: 4px;" onchange="actualizarSubtotalProducto(this, ${precio})">
             </td>
             <td class="text-muted">${formatearDinero(precio)}</td>
             <td class="text-dark fw-bold subtotal-producto" data-valor="${precio}">${formatearDinero(precio)}</td>
@@ -434,13 +354,15 @@
         `;
         tbody.appendChild(tr);
         select.value = ""; 
+        $('#selectProducto').trigger('change.select2');
         actualizarTotales();
     }
 
-    function actualizarSubtotalProducto(inputElement, precioUnitario) {
-        const cantidad = parseInt(inputElement.value) || 1;
+    function actualizarSubtotalProducto(input, precioUnitario) {
+        const cantidad = parseInt(input.value) || 1;
         const subtotal = cantidad * precioUnitario;
-        const tdSubtotal = inputElement.closest('tr').querySelector('.subtotal-producto');
+        const row = input.closest('tr');
+        const tdSubtotal = row.querySelector('.subtotal-producto');
         tdSubtotal.dataset.valor = subtotal;
         tdSubtotal.innerText = formatearDinero(subtotal);
         actualizarTotales();
@@ -449,6 +371,17 @@
     function eliminarFila(btn) {
         btn.closest('tr').remove();
         actualizarTotales();
+    }
+
+    function actualizarBarraProgreso() {
+        const barra = document.querySelector('.stepper-progress');
+        const items = document.querySelectorAll('.step-item');
+        const numS = document.querySelectorAll('#tablaServicios tbody tr').length;
+        const numP = document.querySelectorAll('#tablaProductos tbody tr').length;
+        
+        if (numS > 0 && numP > 0) { barra.style.width = '100%'; items[3].classList.add('active'); }
+        else if (numS > 0) { barra.style.width = '66%'; items[2].classList.add('active'); }
+        else { barra.style.width = '33%'; }
     }
 </script>
 {% endblock %}

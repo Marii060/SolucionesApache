@@ -171,7 +171,18 @@ def obtener_motos_cliente(request, cliente_id):
 @login_required
 def detalle_servicio(request, id):
     orden = get_object_or_404(Servicio, id_servicio=id)
-    return render(request, 'operaciones/detalle_servicio.html', {'orden': orden})
+    
+    # Buscamos los detalles que son de tipo 'Repuesto'
+    insumos_usados = DetalleServicio.objects.filter(id_servicio=orden, tipo='Repuesto')
+    
+    # Calculamos el total de repuestos para el resumen
+    total_repuestos = insumos_usados.aggregate(total=Sum('total'))['total'] or 0
+    
+    return render(request, 'operaciones/detalle_servicio.html', {
+        'orden': orden, 
+        'insumos_usados': insumos_usados,
+        'total_repuestos': total_repuestos
+    })
 
 @login_required
 def actualizar_estado(request, id):
