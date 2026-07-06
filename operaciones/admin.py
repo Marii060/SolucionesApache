@@ -10,7 +10,7 @@ class DetalleServicioInline(admin.TabularInline):
 @admin.register(Servicio)
 class ServicioAdmin(admin.ModelAdmin):
     # Columnas que se verán en la lista general de servicios
-    list_display = ('codigo_servicio', 'id_moto', 'id_usuario', 'estado', 'fecha_inicio', 'valor_total')
+    list_display = ('codigo_servicio', 'id_moto', 'id_usuario', 'estado', 'mecanico', 'fecha_inicio', 'valor_total')
     
     # Filtros laterales para buscar más rápido
     list_filter = ('estado', 'fecha_inicio')
