@@ -94,7 +94,7 @@
                 <td class="text-center" style="white-space: nowrap;">
                     <div class="d-flex justify-content-center gap-1">
                         <a href="{% url 'gestion:detalle_moto' moto.pk %}" class="btn btn-outline-secondary btn-action" style="padding: 4px 12px; border-radius: 6px;">Ver</a>
-                        <a href="{% url 'gestion:editar_moto' moto.pk %}" class="btn btn-outline-warning btn-action" style="padding: 4px 12px; border-radius: 6px;"><i class="fa-solid fa-pen"></i></a>
+                        <a href="{% url 'gestion:editar_moto' moto.pk %}" class="btn btn-outline-warning btn-action" style="padding: 4px 12px; border-radius: 6px;" title="Editar moto"><i class="fa-solid fa-pen"></i></a>
                         
                         {% if moto.activo %}
                             <a href="{% url 'gestion:deshabilitar_moto' moto.pk %}" class="btn btn-outline-danger btn-action" style="padding: 4px 12px; border-radius: 6px;" title="Deshabilitar moto">
