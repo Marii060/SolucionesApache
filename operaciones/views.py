@@ -57,15 +57,6 @@ def editar_catalogo(request, id):
     return render(request, 'operaciones/registrar_catalogo.html', {'form': form, 'servicio': servicio})
 
 @login_required
-def eliminar_catalogo(request, id):
-    servicio = get_object_or_404(ListaServicio, id_lista_servicio=id)
-    if request.method == 'POST':
-        servicio.delete()
-        messages.success(request, '¡Servicio eliminado del catálogo exitosamente!')
-        return redirect('operaciones:lista_catalogo')
-    return render(request, 'operaciones/eliminar_catalogo.html', {'servicio': servicio})
-
-@login_required
 def lista_servicios(request):
     query = request.GET.get('buscar', '')
     estado_filtro = request.GET.get('estado', 'Todos')
