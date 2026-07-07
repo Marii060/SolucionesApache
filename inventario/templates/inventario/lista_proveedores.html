@@ -18,12 +18,22 @@
         <div class="card-body p-0">
             <div class="d-flex justify-content-between align-items-center p-4 border-bottom">
                 <h6 class="fw-bold m-0" style="color: #0f172a;">Lista de Proveedores</h6>
-                <div class="input-group" style="width: 250px; border-radius: 8px; border: 1px solid #e2e8f0; background-color: #f8fafc;">
-                    <span class="input-group-text bg-transparent border-0 pe-2 text-muted">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                    </span>
-                    <input type="text" class="form-control border-0 bg-transparent shadow-none px-0" placeholder="Buscar proveedor...">
-                </div>
+                
+                <!-- Formulario de búsqueda corregido -->
+                <form method="GET" class="d-flex align-items-center" action="{% url 'inventario:lista_proveedores' %}">
+                    <div class="input-group" style="width: 250px; border-radius: 8px; border: 1px solid #e2e8f0; background-color: #f8fafc;">
+                        <span class="input-group-text bg-transparent border-0 pe-2 text-muted">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+                        <input type="text" name="buscar" class="form-control border-0 bg-transparent shadow-none px-0" 
+                               placeholder="Buscar proveedor..." value="{{ request.GET.buscar }}">
+                    </div>
+                    {% if request.GET.buscar %}
+                        <a href="{% url 'inventario:lista_proveedores' %}" class="btn btn-sm btn-link text-danger ms-2" title="Limpiar búsqueda">
+                            <i class="fa-solid fa-times"></i>
+                        </a>
+                    {% endif %}
+                </form>
             </div>
 
             <div class="table-responsive p-4 pt-3">

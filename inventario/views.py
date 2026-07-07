@@ -161,12 +161,25 @@ def cambiar_estado_fabricante(request, id):
 
 @login_required
 def lista_proveedores(request):
+    #Obtenemos el valor de la búsqueda
+    busqueda = request.GET.get('buscar')
+    
+    #Iniciamos el queryset con la anotación que ya tenías
     proveedores = Proveedor.objects.annotate(
         total_acumulado=Sum('compra__total_compra')
-    ).order_by('-fecha_creacion')
+    )
+    
+    #si hay algo en el buscador, filtramos
+    if busqueda:
+        # Filtramos por razón social o por el NIT (identificación)
+        proveedores = proveedores.filter(
+            Q(razon_social__icontains=busqueda) | Q(identificacion__icontains=busqueda)
+        )
+    
+    #Ordenamos al final
+    proveedores = proveedores.order_by('-fecha_creacion')
     
     return render(request, 'inventario/lista_proveedores.html', {'proveedores': proveedores})
-
 @login_required
 def crear_proveedor(request):
     if request.method == 'POST':
