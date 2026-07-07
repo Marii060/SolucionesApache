@@ -3,7 +3,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Recibo #{{ venta.num_factura }}</title>
+    <title>RECIBO DE VENTA {{ venta.numero_venta }}</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; padding: 20px; color: #333; }
         .receipt-container { max-width: 800px; margin: auto; border: 1px solid #ddd; padding: 30px; border-radius: 8px; }
@@ -22,7 +22,7 @@
 <div class="receipt-container">
     <div class="header">
         <h1>Soluciones Apache</h1>
-        <h3>RECIBO DE VENTA #{{ venta.num_factura }}</h3>
+        <h3>RECIBO DE VENTA #{{ venta.numero_venta }}</h3>
     </div>
 
     <div class="client-info">

@@ -65,7 +65,7 @@
                 <tbody>
                     {% for venta in ventas %}
                     <tr>
-                        <td class="ps-4 fw-bold text-primary align-middle">#{{ venta.num_factura }}</td>
+                        <td class="ps-4 fw-bold text-primary align-middle">{{ venta.numero_venta }}</td>
                         <td class="small align-middle">{{ venta.fecha_venta|date:"d/m/Y" }}</td>
                         <td class="align-middle">{{ venta.id_cliente.nombre }}</td>
                         
@@ -112,7 +112,7 @@
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    ¿Estás segura de que deseas anular la venta <strong>#{{ venta.num_factura }}</strong> del cliente <strong>{{ venta.id_cliente.nombre }}</strong>? Esta acción es irreversible.
+                                    ¿Estás segura de que deseas anular la venta <strong>{{ venta.numero_venta }}</strong> del cliente <strong>{{ venta.id_cliente.nombre }}</strong>? Esta acción es irreversible.
                                 </div>
                                 <div class="modal-footer border-0">
                                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>

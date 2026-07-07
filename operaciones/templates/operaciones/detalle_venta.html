@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
 {% load humanize %}
 
-{% block title %}Detalle Venta #{{ venta.num_factura }}{% endblock %}
+{% block title %}Detalle Venta #{{ venta.numero_venta }}{% endblock %}
 
 {% block content %}
 <div class="container-fluid mt-4 px-md-4">
     
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="fw-bold text-dark mb-0">Detalle de Venta #{{ venta.num_factura }}</h2>
+            <h2 class="fw-bold text-dark mb-0">Detalle de Venta #{{ venta.numero_venta }}</h2>
             <span class="text-muted small">Ventas > Historial > Detalle</span>
         </div>
         <div>

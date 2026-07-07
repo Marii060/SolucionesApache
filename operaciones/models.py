@@ -82,6 +82,11 @@ class Venta(models.Model):
     id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, db_column='id_cliente')
     id_usuario = models.ForeignKey(User, on_delete=models.CASCADE, db_column='id_usuario')
 
+    @property
+    def numero_venta(self):
+        #Esto crea un formato
+        return f"V-{self.pk:04d}"
+
     class Meta:
         verbose_name = "Venta"
         verbose_name_plural = "Ventas"

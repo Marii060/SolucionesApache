@@ -283,7 +283,7 @@ def crear_venta(request):
                             estado='ACTIVO'
                         )
 
-                    messages.success(request, f'¡Venta #{venta.num_factura} registrada con éxito!')
+                    messages.success(request, f'¡Venta {venta.numero_venta} registrada con éxito!')
                     return redirect('operaciones:lista_ventas')
             except Exception as e:
                 messages.error(request, f'Error al registrar la venta: {str(e)}')
