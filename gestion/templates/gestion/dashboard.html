@@ -12,9 +12,9 @@
 <p>{% now "l d \d\e F \d\e Y" %}</p>
 </p>
     </div>
-    <button class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">
-        + Nueva Orden
-    </button>
+    <a href="{% url 'operaciones:crear_servicio' %}" class="btn fw-bold px-4 shadow-sm" style="background-color: #2563eb; color: white; border-radius: 8px;">
+            + Nueva Orden
+        </a>
 </div>
 
 <p class="text-muted small fw-bold mb-3">RESUMEN GENERAL</p>
