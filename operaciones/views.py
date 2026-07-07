@@ -303,7 +303,7 @@ def anular_venta(request, pk):
     if venta.estado:
         venta.estado = False
         venta.save()
-        messages.warning(request, f'Venta #{venta.num_factura} anulada correctamente.')
+        messages.warning(request, f'Venta #{venta.numero_venta} anulada correctamente.')
     return redirect('operaciones:lista_ventas')
 
 @login_required
