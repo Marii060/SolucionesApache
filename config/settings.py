@@ -41,6 +41,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'config.middleware.RestringirAccesoAdminMiddleware',
 ]
 
@@ -135,3 +136,9 @@ SESSION_SAVE_EVERY_REQUEST = True
 
 # Asegura que el motor de sesiones sea el estándar de base de datos
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+
+#Es donde tú trabajas los archivos (el taller).
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+#Es donde el sistema entrega los archivos al usuario (la vitrina).
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
