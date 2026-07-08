@@ -23,30 +23,41 @@ class ClienteForm(forms.ModelForm):
         
         widgets = {
             'tipo_documento': forms.Select(attrs={'class': 'form-select'}),
-            'numero_documento': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej. 1098765432'}),
+            # Cambiamos a NumberInput para forzar números y agregamos required: True
+            'numero_documento': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Ej. 1098765432', 'required': True}),
             'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre completo del cliente'}),
             'correo': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'ejemplo@correo.com'}),
-            'telefono': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej. 3101234567'}),
+            # Cambiamos a NumberInput para forzar números y agregamos required: True
+            'telefono': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Ej. 3101234567', 'required': True}),
             'direccion': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Aquí hacemos que el campo sea opcional
         self.fields['razon_social'].required = False
-        
-        # Opcional: Si quieres asegurarte de que 'nombre' no tenga valores iniciales extraños:
-        self.fields ['nombre'].initial = ''
+        self.fields['nombre'].initial = ''
     
-def clean_numero_documento(self):
+    def clean_numero_documento(self):
         documento = self.cleaned_data.get('numero_documento')
         
+        # Validamos que solo sean números (por si intentan saltarse el navegador)
+        if documento and not str(documento).isdigit():
+            raise ValidationError("El documento solo debe contener números.")
+
         # Buscamos si existe otro cliente con ese mismo documento
-        # 'exclude(pk=self.instance.pk)' es importante para que al editar un cliente no nos marque error a nosotros mismos
         if Cliente.objects.filter(numero_documento=documento).exclude(pk=self.instance.pk).exists():
             raise ValidationError("¡Atención! Este número de documento ya se encuentra registrado.")
         
         return documento
+
+    def clean_telefono(self):
+        telefono = self.cleaned_data.get('telefono')
+        
+        # Validamos que solo sean números
+        if telefono and not str(telefono).isdigit():
+            raise ValidationError("El teléfono solo debe contener números.")
+            
+        return telefono
         
 class MotoForm(forms.ModelForm):
     id_cliente = forms.ModelChoiceField(
