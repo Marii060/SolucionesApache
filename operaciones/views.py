@@ -376,15 +376,32 @@ def registrar_abono(request):
 
     if request.method == 'POST':
         form = AbonoForm(request.POST)
-        # El credito_id aquí viene del formulario
         c_id = request.POST.get('credito_id') 
         
         if form.is_valid() and c_id:
             with transaction.atomic():
+                # 1. Guardamos el abono
                 abono = form.save(commit=False)
-                abono.credito = get_object_or_404(Credito, pk=c_id)
+                credito = get_object_or_404(Credito, pk=c_id)
+                abono.credito = credito
                 abono.usuario = request.user
                 abono.save()
+                
+                # 2. Refrescamos el objeto crédito para obtener el saldo actualizado
+                # esto es vital porque al salvar el abono, el modelo Credito 
+                # probablemente recalculó su saldo internamente
+                credito.refresh_from_db()
+                
+                # 3. Verificamos si el crédito quedó saldado
+                # (Asegúrate de que 'estado' sea el nombre de tu campo, 
+                # quizás sea 'PAGADO' o 'PAGAD0' según tu base de datos)
+                if credito.saldo_pendiente <= 0 or credito.estado == 'PAGADO':
+                    if credito.venta:
+                        # ACTUALIZAMOS EL ESTADO DE LA VENTA
+                        # Reemplaza 'estado_pago' por el nombre real de tu campo en el modelo Venta
+                        credito.venta.estado_pago = 'Pagado' 
+                        credito.venta.save()
+                
                 messages.success(request, "Abono registrado correctamente.")
                 return redirect('operaciones:lista_creditos')
 
@@ -395,7 +412,7 @@ def registrar_abono(request):
         'clientes': clientes,
         'credito_pre': credito_pre 
     })
-
+    
 @login_required
 def detalle_credito(request, credito_id):
     credito = get_object_or_404(Credito, pk=credito_id)

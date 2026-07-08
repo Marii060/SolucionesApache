@@ -78,13 +78,14 @@ class Venta(models.Model):
     )
     
     estado = models.BooleanField(default=True)
+    # Campo agregado para rastrear el estado del pago
+    estado_pago = models.CharField(max_length=20, default='Pendiente')
     observacion = models.CharField(max_length=100, blank=True, null=True)
     id_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, db_column='id_cliente')
     id_usuario = models.ForeignKey(User, on_delete=models.CASCADE, db_column='id_usuario')
 
     @property
     def numero_venta(self):
-        #Esto crea un formato
         return f"V-{self.pk:04d}"
 
     class Meta:
@@ -94,7 +95,7 @@ class Venta(models.Model):
     def __str__(self):
         return f"Factura {self.num_factura} - {self.tipo_documento}"
 
-# La lista de productos que el cliente se llevó en la factura.
+
 class DetalleVenta(models.Model):
     id_detalle_venta = models.AutoField(primary_key=True)
     cantidad = models.IntegerField()
@@ -108,8 +109,8 @@ class DetalleVenta(models.Model):
         verbose_name = "Detalle de Venta"
         verbose_name_plural = "Detalles de Ventas"
 
+
 class Credito(models.Model):
-    # La deuda principal
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
     venta = models.ForeignKey(Venta, on_delete=models.CASCADE, null=True, blank=True)
     servicio = models.ForeignKey(Servicio, on_delete=models.CASCADE, null=True, blank=True)
@@ -146,24 +147,27 @@ class CreditoPagado(models.Model):
     def __str__(self):
         return f"Abono de ${self.monto_pago} al Crédito {self.credito.id if self.credito else 'Sin asignar'}"
           
-          
-    #Automatización para que cada vez que se guarde un nuevo abono, se actualice el saldo pendiente del crédito correspondiente. Si el saldo llega a 0 o menos, el crédito se marca como PAGADO.
     def save(self, *args, **kwargs):
-        #Preguntamos si es un abono nuevo (si no tiene ID, apenas se va a guardar)
+        # Preguntamos si es un abono nuevo
         es_nuevo = self.pk is None
         
-        #Primero guardamos el abono en la base de datos normalmente
+        # Primero guardamos el abono en la base de datos normalmente
         super().save(*args, **kwargs)
         
-        #Si es un abono nuevo y está conectado a un crédito, hacemos la matemática
+        # Si es un abono nuevo y está conectado a un crédito
         if es_nuevo and self.credito:
             # Le restamos el monto pagado al saldo pendiente
             self.credito.saldo_pendiente -= self.monto_pago
             
-            # Si el cliente pagó todo (o dio de más), ponemos el saldo en 0 y el estado en PAGADO
+            # Si el cliente pagó todo, ponemos el saldo en 0 y el estado en PAGADO
             if self.credito.saldo_pendiente <= 0:
                 self.credito.saldo_pendiente = 0
                 self.credito.estado = 'PAGADO'
                 
+                # ACTUALIZACIÓN AUTOMÁTICA DE LA VENTA
+                if self.credito.venta:
+                    self.credito.venta.estado_pago = 'Pagado'
+                    self.credito.venta.save()
+            
             # Guardamos el crédito actualizado
             self.credito.save()

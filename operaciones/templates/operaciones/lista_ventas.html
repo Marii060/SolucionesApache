@@ -77,8 +77,9 @@
                             {% endif %}
                         </td>
 
+                        <!-- Lógica actualizada para el estado -->
                         <td class="align-middle">
-                            {% if venta.tipo_pago == 'Credito' %}
+                            {% if venta.tipo_pago == 'Credito' and venta.estado_pago != 'Pagado' %}
                                 <span class="badge bg-warning text-dark">Pendiente</span>
                             {% else %}
                                 <span class="badge bg-success text-white">Pagado</span>
@@ -129,30 +130,30 @@
                 </tbody>
             </table>
             <nav aria-label="Page navigation" class="mt-4">
-    <ul class="pagination justify-content-center">
-        {% if ventas.has_previous %}
-            <li class="page-item">
-                <a class="page-link" href="?page=1{% if request.GET.urlencode %}&{{ request.GET.urlencode|cut:'page=' }}{% endif %}">&laquo;</a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="?page={{ ventas.previous_page_number }}{% if request.GET.urlencode %}&{{ request.GET.urlencode|cut:'page=' }}{% endif %}">Anterior</a>
-            </li>
-        {% endif %}
+                <ul class="pagination justify-content-center">
+                    {% if ventas.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1{% if request.GET.urlencode %}&{{ request.GET.urlencode|cut:'page=' }}{% endif %}">&laquo;</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ ventas.previous_page_number }}{% if request.GET.urlencode %}&{{ request.GET.urlencode|cut:'page=' }}{% endif %}">Anterior</a>
+                        </li>
+                    {% endif %}
 
-        <li class="page-item active">
-            <span class="page-link fw-bold">{{ ventas.number }}</span>
-        </li>
+                    <li class="page-item active">
+                        <span class="page-link fw-bold">{{ ventas.number }}</span>
+                    </li>
 
-        {% if ventas.has_next %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ ventas.next_page_number }}{% if request.GET.urlencode %}&{{ request.GET.urlencode|cut:'page=' }}{% endif %}">Siguiente</a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="?page={{ ventas.paginator.num_pages }}{% if request.GET.urlencode %}&{{ request.GET.urlencode|cut:'page=' }}{% endif %}">&raquo;</a>
-            </li>
-        {% endif %}
-    </ul>
-</nav>
+                    {% if ventas.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ ventas.next_page_number }}{% if request.GET.urlencode %}&{{ request.GET.urlencode|cut:'page=' }}{% endif %}">Siguiente</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ ventas.paginator.num_pages }}{% if request.GET.urlencode %}&{{ request.GET.urlencode|cut:'page=' }}{% endif %}">&raquo;</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
         </div>
     </div>
 </div>
