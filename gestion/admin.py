@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Cliente, Moto
+from .models import Cliente, Moto, ConfiguracionSistema
 
 # Esto permite que al abrir un cliente, veas y agregues sus motos ahí mismo.
 class MotoInline(admin.TabularInline):
@@ -28,3 +28,5 @@ class MotoAdmin(admin.ModelAdmin):
     # Permite buscar la placa de la moto o el nombre de su dueño
     search_fields = ('placa', 'id_cliente__razon_social', 'id_cliente__nombre')
     
+# 4. SECCIÓN DE CONFIGURACIÓN DEL SISTEMA
+admin.site.register(ConfiguracionSistema)    
