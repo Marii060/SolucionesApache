@@ -81,8 +81,6 @@ class ConfiguracionSistema(models.Model):
     class Meta:
         verbose_name = "Configuración del Sistema"
         verbose_name_plural = "Configuraciones del Sistema"
-    
-    class Meta:
         permissions = [
             ("can_create_backup", "Puede crear copias de seguridad"),
         ]
@@ -92,31 +90,29 @@ class ConfiguracionSistema(models.Model):
 
     def clean(self):
         """Lógica Fail-Safe: Evita inconsistencias de configuración."""
-        # Si el taller es responsable de IVA, obligatoriamente debe ser factura electrónica
         if self.maneja_iva and self.tipo_documento == 'recibo':
             raise ValidationError(
                 "Error: Si el taller es responsable de IVA, el 'Tipo de Documento' debe ser 'Factura electrónica'."
             )
 
     def save(self, *args, **kwargs):
-        # Asegura que siempre se guarde con ID=1 (Singleton)
         self.id = 1
-        self.full_clean() # Ejecuta el método clean() antes de guardar
+        self.full_clean()
         super().save(*args, **kwargs)
-        # Limpia el cache al guardar
         cache.delete('configuracion_sistema')
 
     @classmethod
     def obtener_config(cls):
-        # Implementación con Cache para máximo rendimiento
         config = cache.get('configuracion_sistema')
         if not config:
-            # Si no está en cache, lo busca en la BD, creándolo si no existe
+            # CORRECCIÓN: Se agregan los campos obligatorios faltantes en los valores por defecto
             config, created = cls.objects.get_or_create(id=1, defaults={
                 'razon_social': 'Soluciones Apache', 
                 'nit': '000000000-0',
-                'tipo_documento': 'recibo', 
+                'tipo_documento': 'recibo',
+                'telefono': '3000000000',
+                'email': 'contacto@solucionesapache.com',
+                'direccion': 'Calle Principal Taller',
             })
-            # Cache por 24 horas
             cache.set('configuracion_sistema', config, 86400) 
         return config
