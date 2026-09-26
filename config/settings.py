@@ -1,4 +1,6 @@
 from pathlib import Path
+import dj_database_url
+import os
 
 
 
@@ -13,7 +15,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-(8udh@l59q2t6$oaaq#c2o+r#-tgbjph)(8+d7u%)kxq%v(zys'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
 
@@ -69,11 +71,13 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+# Configuración de base de datos compatible con local (SQLite) y producción (PostgreSQL en Render)
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=os.environ.get('DATABASE_URL', 'sqlite:///' + os.path.join(BASE_DIR, 'db.sqlite3')),
+        conn_max_age=600,
+        ssl_require=True
+    )
 }
 
 
